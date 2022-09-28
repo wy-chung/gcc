@@ -1649,7 +1649,7 @@ c_parser_translation_unit (c_parser *parser)
       do
 	{
 	  ggc_collect ();
-	  c_parser_external_declaration (parser);
+	  c_parser_external_declaration (parser); //wyc bt#6
 	  obstack_free (&parser_obstack, obstack_position);
 	}
       while (c_parser_next_token_is_not (parser, CPP_EOF));
@@ -1776,7 +1776,7 @@ c_parser_external_declaration (c_parser *parser)
 	 an @interface or @protocol with prefix attributes).  We can
 	 only tell which after parsing the declaration specifiers, if
 	 any, and the first declarator.  */
-      c_parser_declaration_or_fndef (parser, true, true, true, false, true);
+      c_parser_declaration_or_fndef (parser, true, true, true, false, true); //wyc bt#7
       break;
     }
 }
@@ -2150,7 +2150,7 @@ c_parser_declaration_or_fndef (c_parser *parser, bool fndef_ok,
 	 should diagnose if there were no declaration specifiers) or a
 	 function definition (in which case the diagnostic for
 	 implicit int suffices).  */
-      declarator = c_parser_declarator (parser, 
+      declarator = c_parser_declarator (parser,  //wyc bt#8
 					specs->typespec_kind != ctsk_none,
 					C_DTR_NORMAL, &dummy);
       if (declarator == NULL)
@@ -3067,7 +3067,7 @@ c_parser_declspecs (c_parser *parser, struct c_declspecs *specs,
 	case RID_VOLATILE:
 	case RID_RESTRICT:
 	  attrs_ok = true;
-	  declspecs_add_qual (loc, specs, c_parser_peek_token (parser)->value);
+	  declspecs_add_qual (loc, specs, c_parser_peek_token (parser)->value); //wyc bt#15
 	  c_parser_consume_token (parser);
 	  break;
 	case RID_ATTRIBUTE:
@@ -3890,7 +3890,7 @@ c_parser_declarator (c_parser *parser, bool type_seen_p, c_dtr_syn kind,
     }
   /* Now we have a direct declarator, direct abstract declarator or
      nothing (which counts as a direct abstract declarator here).  */
-  return c_parser_direct_declarator (parser, type_seen_p, kind, seen_id);
+  return c_parser_direct_declarator (parser, type_seen_p, kind, seen_id); //wyc bt#9
 }
 
 /* Parse a direct declarator or direct abstract declarator; arguments
@@ -3949,7 +3949,7 @@ c_parser_direct_declarator (c_parser *parser, bool type_seen_p, c_dtr_syn kind,
       c_parser_consume_token (parser);
       if (c_parser_nth_token_starts_std_attributes (parser, 1))
 	inner->u.id.attrs = c_parser_std_attribute_specifier_sequence (parser);
-      return c_parser_direct_declarator_inner (parser, *seen_id, inner);
+      return c_parser_direct_declarator_inner (parser, *seen_id, inner); //wyc bt#10
     }
 
   if (kind != C_DTR_NORMAL
@@ -4132,7 +4132,7 @@ c_parser_direct_declarator_inner (c_parser *parser, bool id_present,
       bool have_gnu_attrs = c_parser_next_token_is_keyword (parser,
 							    RID_ATTRIBUTE);
       attrs = c_parser_gnu_attributes (parser);
-      args = c_parser_parms_declarator (parser, id_present, attrs,
+      args = c_parser_parms_declarator (parser, id_present, attrs, //wyc bt#11
 					have_gnu_attrs);
       if (args == NULL)
 	return NULL;
@@ -4219,7 +4219,7 @@ c_parser_parms_declarator (c_parser *parser, bool id_list_ok, tree attrs,
   else
     {
       struct c_arg_info *ret
-	= c_parser_parms_list_declarator (parser, attrs, NULL, have_gnu_attrs);
+	= c_parser_parms_list_declarator (parser, attrs, NULL, have_gnu_attrs); //wyc bt#12
       pop_scope ();
       return ret;
     }
@@ -4286,7 +4286,7 @@ c_parser_parms_list_declarator (c_parser *parser, tree attrs, tree expr,
   while (true)
     {
       /* Parse a parameter.  */
-      struct c_parm *parm = c_parser_parameter_declaration (parser, attrs,
+      struct c_parm *parm = c_parser_parameter_declaration (parser, attrs, //wyc bt#13
 							    have_gnu_attrs);
       attrs = NULL_TREE;
       have_gnu_attrs = false;
@@ -4402,7 +4402,7 @@ c_parser_parameter_declaration (c_parser *parser, tree attrs,
       declspecs_add_attrs (input_location, specs, attrs);
       attrs = NULL_TREE;
     }
-  c_parser_declspecs (parser, specs, true, true, true, true, false,
+  c_parser_declspecs (parser, specs, true, true, true, true, false, //wyc bt#14
 		      !have_gnu_attrs, true, cla_nonabstract_decl);
   finish_declspecs (specs);
   pending_xref_error ();
@@ -23355,7 +23355,7 @@ c_parse_file (void)
   if (flag_exceptions)
     using_eh_for_cleanups ();
 
-  c_parser_translation_unit (the_parser);
+  c_parser_translation_unit (the_parser); //wyc bt#5
   the_parser = NULL;
 }
 

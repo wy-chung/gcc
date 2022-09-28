@@ -449,7 +449,7 @@ compile_file (void)
   timevar_push (TV_PARSE_GLOBAL);
 
   /* Parse entire file and generate initial debug information.  */
-  lang_hooks.parse_file ();
+  lang_hooks.parse_file (); //wyc bt#3
 
   timevar_pop (TV_PARSE_GLOBAL);
   timevar_stop (TV_PHASE_PARSING);
@@ -2072,7 +2072,7 @@ do_compile (bool no_backend)
 
       timevar_start (TV_PHASE_SETUP);
 
-      if (flag_save_optimization_record)
+      if (flag_save_optimization_record) //wyc false
 	{
 	  dump_context::get ().set_json_writer (new optrecord_json_writer ());
 	}
@@ -2080,7 +2080,7 @@ do_compile (bool no_backend)
       /* This must be run always, because it is needed to compute the FP
 	 predefined macros, such as __LDBL_MAX__, for targets using non
 	 default FP formats.  */
-      init_adjust_machine_modes ();
+      init_adjust_machine_modes (); //wyc gcc.build/gcc/insn-modes.cc
       init_derived_machine_modes ();
 
       /* This must happen after the backend has a chance to process
@@ -2141,7 +2141,7 @@ do_compile (bool no_backend)
 
           timevar_stop (TV_PHASE_SETUP);
 
-          compile_file ();
+          compile_file (); //wyc bt#2
         }
       else
         {
@@ -2293,7 +2293,7 @@ toplev::main (int argc, char **argv)
 
       if (m_use_TV_TOTAL)
 	start_timevars ();
-      do_compile (no_backend);
+      do_compile (no_backend); //wyc bt#1
 
       if (flag_self_test)
 	{

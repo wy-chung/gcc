@@ -1237,7 +1237,7 @@ c_common_parse_file (void)
       original_dump_file = dump_begin (TDI_original, &original_dump_flags);
       pch_init ();
       push_file_scope ();
-      c_parse_file ();
+      c_parse_file (); //wyc bt#4
       pop_file_scope ();
       /* And end the main input file, if the debug writer wants it  */
       if (debug_hooks->start_end_main_source_file)

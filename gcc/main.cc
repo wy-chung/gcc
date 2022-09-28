@@ -36,7 +36,7 @@ main (int argc, char **argv)
   toplev toplev (NULL, /* external_timer */
 		 true /* init_signals */);
 
-  int r = toplev.main (argc, argv);
+  int r = toplev.main (argc, argv); //wyc bt#0
 
   if (flag_checking && !seen_error ())
     toplev.finalize ();

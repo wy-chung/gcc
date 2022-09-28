@@ -8128,7 +8128,7 @@ driver::main (int argc, char **argv)
   bool early_exit;
 
   set_progname (argv[0]);
-  expand_at_files (&argc, &argv);
+  expand_at_files (&argc, &argv); //wyc at means @
   decode_argv (argc, const_cast <const char **> (argv));
   global_initializations ();
   build_multilib_strings ();
@@ -8567,7 +8567,7 @@ driver::putenv_COLLECT_GCC (const char *argv0) const
 }
 
 /* Set up to remember the pathname of the lto wrapper. */
-
+// lto: Link Time Optimization
 void
 driver::maybe_putenv_COLLECT_LTO_WRAPPER () const
 {
