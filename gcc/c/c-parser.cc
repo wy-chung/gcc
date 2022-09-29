@@ -2804,7 +2804,7 @@ c_parser_static_assert_declaration_no_semi (c_parser *parser)
      typedef-name objc-protocol-refs
      objc-protocol-refs
 */
-
+//wyc out: specs
 void
 c_parser_declspecs (c_parser *parser, struct c_declspecs *specs,
 		    bool scspec_ok, bool typespec_ok, bool start_attr_ok,
@@ -2813,13 +2813,13 @@ c_parser_declspecs (c_parser *parser, struct c_declspecs *specs,
 		    enum c_lookahead_kind la)
 {
   bool attrs_ok = start_attr_ok;
-  bool seen_type = specs->typespec_kind != ctsk_none;
+  bool seen_type = specs->typespec_kind != ctsk_none; //wyc enum c_typespec_kind
 
   if (!typespec_ok)
-    gcc_assert (la == cla_prefer_id);
+    gcc_assert (la == cla_prefer_id); //wyc enum c_lookahead_kind
 
   if (start_std_attr_ok
-      && c_parser_nth_token_starts_std_attributes (parser, 1))
+      && c_parser_nth_token_starts_std_attributes (parser, 1)) //wyc '[['
     {
       gcc_assert (!specs->non_std_attrs_seen_p);
       location_t loc = c_parser_peek_token (parser)->location;
@@ -2828,7 +2828,7 @@ c_parser_declspecs (c_parser *parser, struct c_declspecs *specs,
       specs->non_std_attrs_seen_p = false;
     }
 
-  while (c_parser_next_token_is (parser, CPP_NAME)
+  while (c_parser_next_token_is (parser, CPP_NAME) //wyc TK(NAME, IDENT)
 	 || c_parser_next_token_is (parser, CPP_KEYWORD)
 	 || (c_dialect_objc () && c_parser_next_token_is (parser, CPP_LESS)))
     {
@@ -2922,7 +2922,7 @@ c_parser_declspecs (c_parser *parser, struct c_declspecs *specs,
 	  declspecs_add_type (loc, specs, t);
 	  continue;
 	}
-      gcc_assert (c_parser_next_token_is (parser, CPP_KEYWORD));
+      gcc_assert (c_parser_next_token_is (parser, CPP_KEYWORD)); //wyc token type must be keyword
       switch (c_parser_peek_token (parser)->keyword)
 	{
 	case RID_STATIC:
@@ -3063,7 +3063,7 @@ c_parser_declspecs (c_parser *parser, struct c_declspecs *specs,
 	  else
 	    declspecs_add_qual (loc, specs, value);
 	  break;
-	case RID_CONST:
+	case RID_CONST: //wyc c_parser_peek_token (parser)->keyword
 	case RID_VOLATILE:
 	case RID_RESTRICT:
 	  attrs_ok = true;
@@ -3099,7 +3099,7 @@ c_parser_declspecs (c_parser *parser, struct c_declspecs *specs,
 	default:
 	  goto out;
 	}
-    }
+    } //wyc while
  out:
   if (end_std_attr_ok
       && c_parser_nth_token_starts_std_attributes (parser, 1))
@@ -3875,7 +3875,7 @@ c_parser_declarator (c_parser *parser, bool type_seen_p, c_dtr_syn kind,
 		     bool *seen_id)
 {
   /* Parse any initial pointer part.  */
-  if (c_parser_next_token_is (parser, CPP_MULT))
+  if (c_parser_next_token_is (parser, CPP_MULT)) //wyc "*"
     {
       struct c_declspecs *quals_attrs = build_null_declspecs ();
       struct c_declarator *inner;
@@ -13306,7 +13306,7 @@ c_parser_omp_variable_list (c_parser *parser,
 
       c_parser_consume_token (parser);
       first = false;
-    }
+    } //wyc while (1)
 
   return list;
 }

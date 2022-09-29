@@ -8567,7 +8567,7 @@ driver::putenv_COLLECT_GCC (const char *argv0) const
 }
 
 /* Set up to remember the pathname of the lto wrapper. */
-// lto: Link Time Optimization
+//wyc lto: Link Time Optimization
 void
 driver::maybe_putenv_COLLECT_LTO_WRAPPER () const
 {

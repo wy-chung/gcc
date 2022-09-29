@@ -10794,7 +10794,7 @@ declspecs_add_addrspace (location_t location,
 
 /* Add the type qualifier QUAL to the declaration specifiers SPECS,
    returning SPECS.  */
-
+//wyc out: specs
 struct c_declspecs *
 declspecs_add_qual (location_t loc,
 		    struct c_declspecs *specs, tree qual)
@@ -11716,11 +11716,11 @@ declspecs_add_type (location_t loc, struct c_declspecs *specs,
     }
 
   return specs;
-}
+} //wyc declspecs_add_type()
 
 /* Add the storage class specifier or function specifier SCSPEC to the
    declaration specifiers SPECS, returning SPECS.  */
-
+//wyc out: specs
 struct c_declspecs *
 declspecs_add_scspec (location_t loc,
 		      struct c_declspecs *specs,
