@@ -1649,7 +1649,7 @@ c_parser_translation_unit (c_parser *parser)
       do
 	{
 	  ggc_collect ();
-	  c_parser_external_declaration (parser); //wyc bt#6
+	  c_parser_external_declaration (parser);
 	  obstack_free (&parser_obstack, obstack_position);
 	}
       while (c_parser_next_token_is_not (parser, CPP_EOF));
@@ -1776,7 +1776,7 @@ c_parser_external_declaration (c_parser *parser)
 	 an @interface or @protocol with prefix attributes).  We can
 	 only tell which after parsing the declaration specifiers, if
 	 any, and the first declarator.  */
-      c_parser_declaration_or_fndef (parser, true, true, true, false, true); //wyc bt#7
+      c_parser_declaration_or_fndef (parser, true, true, true, false, true);
       break;
     }
 }
@@ -2150,7 +2150,7 @@ c_parser_declaration_or_fndef (c_parser *parser, bool fndef_ok,
 	 should diagnose if there were no declaration specifiers) or a
 	 function definition (in which case the diagnostic for
 	 implicit int suffices).  */
-      declarator = c_parser_declarator (parser,  //wyc bt#8
+      declarator = c_parser_declarator (parser,
 					specs->typespec_kind != ctsk_none,
 					C_DTR_NORMAL, &dummy);
       if (declarator == NULL)
@@ -2812,9 +2812,9 @@ c_parser_declspecs (c_parser *parser, struct c_declspecs *specs,
 		    bool start_std_attr_ok, bool end_std_attr_ok,
 		    enum c_lookahead_kind la)
 {
-  bool attrs_ok = start_attr_ok;
+  bool attrs_ok = start_attr_ok; //wyc gnu-attributes are accepted at the start?
   bool seen_type = specs->typespec_kind != ctsk_none; //wyc enum c_typespec_kind
-
+  //wyc typespec are int, long,...
   if (!typespec_ok)
     gcc_assert (la == cla_prefer_id); //wyc enum c_lookahead_kind
 
@@ -2829,7 +2829,7 @@ c_parser_declspecs (c_parser *parser, struct c_declspecs *specs,
     }
 
   while (c_parser_next_token_is (parser, CPP_NAME) //wyc TK(NAME, IDENT)
-	 || c_parser_next_token_is (parser, CPP_KEYWORD)
+	 || c_parser_next_token_is (parser, CPP_KEYWORD) //wyc reserved ID, i.e. RID
 	 || (c_dialect_objc () && c_parser_next_token_is (parser, CPP_LESS)))
     {
       struct c_typespec t;
@@ -2842,7 +2842,7 @@ c_parser_declspecs (c_parser *parser, struct c_declspecs *specs,
 	 a typename would be an error anyway and likely the user
 	 has simply forgotten a semicolon, so we exit.  */
       if ((!typespec_ok || specs->typespec_kind == ctsk_tagdef)
-	  && c_parser_next_tokens_start_typename (parser, la)
+	  && c_parser_next_tokens_start_typename (parser, la) //wyc such as int, long, ...
 	  && !c_parser_next_token_is_qualifier (parser)
 	  && !c_parser_next_token_is_keyword (parser, RID_ALIGNAS))
 	break;
@@ -3067,7 +3067,7 @@ c_parser_declspecs (c_parser *parser, struct c_declspecs *specs,
 	case RID_VOLATILE:
 	case RID_RESTRICT:
 	  attrs_ok = true;
-	  declspecs_add_qual (loc, specs, c_parser_peek_token (parser)->value); //wyc bt#15
+	  declspecs_add_qual (loc, specs, c_parser_peek_token (parser)->value);
 	  c_parser_consume_token (parser);
 	  break;
 	case RID_ATTRIBUTE:
@@ -3890,7 +3890,7 @@ c_parser_declarator (c_parser *parser, bool type_seen_p, c_dtr_syn kind,
     }
   /* Now we have a direct declarator, direct abstract declarator or
      nothing (which counts as a direct abstract declarator here).  */
-  return c_parser_direct_declarator (parser, type_seen_p, kind, seen_id); //wyc bt#9
+  return c_parser_direct_declarator (parser, type_seen_p, kind, seen_id);
 }
 
 /* Parse a direct declarator or direct abstract declarator; arguments
@@ -3949,7 +3949,7 @@ c_parser_direct_declarator (c_parser *parser, bool type_seen_p, c_dtr_syn kind,
       c_parser_consume_token (parser);
       if (c_parser_nth_token_starts_std_attributes (parser, 1))
 	inner->u.id.attrs = c_parser_std_attribute_specifier_sequence (parser);
-      return c_parser_direct_declarator_inner (parser, *seen_id, inner); //wyc bt#10
+      return c_parser_direct_declarator_inner (parser, *seen_id, inner);
     }
 
   if (kind != C_DTR_NORMAL
@@ -4132,7 +4132,7 @@ c_parser_direct_declarator_inner (c_parser *parser, bool id_present,
       bool have_gnu_attrs = c_parser_next_token_is_keyword (parser,
 							    RID_ATTRIBUTE);
       attrs = c_parser_gnu_attributes (parser);
-      args = c_parser_parms_declarator (parser, id_present, attrs, //wyc bt#11
+      args = c_parser_parms_declarator (parser, id_present, attrs,
 					have_gnu_attrs);
       if (args == NULL)
 	return NULL;
@@ -4219,7 +4219,7 @@ c_parser_parms_declarator (c_parser *parser, bool id_list_ok, tree attrs,
   else
     {
       struct c_arg_info *ret
-	= c_parser_parms_list_declarator (parser, attrs, NULL, have_gnu_attrs); //wyc bt#12
+	= c_parser_parms_list_declarator (parser, attrs, NULL, have_gnu_attrs);
       pop_scope ();
       return ret;
     }
@@ -4286,7 +4286,7 @@ c_parser_parms_list_declarator (c_parser *parser, tree attrs, tree expr,
   while (true)
     {
       /* Parse a parameter.  */
-      struct c_parm *parm = c_parser_parameter_declaration (parser, attrs, //wyc bt#13
+      struct c_parm *parm = c_parser_parameter_declaration (parser, attrs,
 							    have_gnu_attrs);
       attrs = NULL_TREE;
       have_gnu_attrs = false;
@@ -4402,7 +4402,7 @@ c_parser_parameter_declaration (c_parser *parser, tree attrs,
       declspecs_add_attrs (input_location, specs, attrs);
       attrs = NULL_TREE;
     }
-  c_parser_declspecs (parser, specs, true, true, true, true, false, //wyc bt#14
+  c_parser_declspecs (parser, specs, true, true, true, true, false,
 		      !have_gnu_attrs, true, cla_nonabstract_decl);
   finish_declspecs (specs);
   pending_xref_error ();
@@ -6115,7 +6115,7 @@ c_parser_statement_after_labels (c_parser *parser, bool *if_p,
       add_stmt (c_parser_compound_statement (parser));
       break;
     case CPP_KEYWORD:
-      switch (c_parser_peek_token (parser)->keyword)
+      switch (c_parser_peek_token (parser)->keyword) //wyc keyword == RID
 	{
 	case RID_IF:
 	  c_parser_if_statement (parser, if_p, chain);
@@ -8227,7 +8227,7 @@ c_parser_unary_expression (c_parser *parser)
 	}
       return ret;
     case CPP_KEYWORD:
-      switch (c_parser_peek_token (parser)->keyword)
+      switch (c_parser_peek_token (parser)->keyword) //wyc keyword == RID
 	{
 	case RID_SIZEOF:
 	  return c_parser_sizeof_expression (parser);
@@ -9141,7 +9141,7 @@ c_parser_postfix_expression (c_parser *parser)
 	}
       break;
     case CPP_KEYWORD:
-      switch (c_parser_peek_token (parser)->keyword)
+      switch (c_parser_peek_token (parser)->keyword) //wyc keyword == RID
 	{
 	case RID_FUNCTION_NAME:
 	case RID_PRETTY_FUNCTION_NAME:
@@ -11560,7 +11560,7 @@ c_parser_objc_type_name (c_parser *parser)
     {
       c_token *token = c_parser_peek_token (parser);
       if (token->type == CPP_KEYWORD
-	  && (token->keyword == RID_IN
+	  && (token->keyword == RID_IN //wyc keyword == RID
 	      || token->keyword == RID_OUT
 	      || token->keyword == RID_INOUT
 	      || token->keyword == RID_BYCOPY
@@ -11776,7 +11776,7 @@ c_parser_objc_selector (c_parser *parser)
     }
   if (token->type != CPP_KEYWORD)
     return NULL_TREE;
-  switch (token->keyword)
+  switch (token->keyword) //wyc keyword == RID
     {
     case RID_ENUM:
     case RID_STRUCT:
@@ -23355,7 +23355,7 @@ c_parse_file (void)
   if (flag_exceptions)
     using_eh_for_cleanups ();
 
-  c_parser_translation_unit (the_parser); //wyc bt#5
+  c_parser_translation_unit (the_parser);
   the_parser = NULL;
 }
 

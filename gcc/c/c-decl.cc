@@ -10800,7 +10800,7 @@ declspecs_add_qual (location_t loc,
 		    struct c_declspecs *specs, tree qual)
 {
   enum rid i;
-  bool dupe = false; //wyc bt#16
+  bool dupe = false;
   specs->non_sc_seen_p = true;
   specs->declspecs_seen_p = true;
   specs->non_std_attrs_seen_p = true;

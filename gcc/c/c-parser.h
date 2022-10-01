@@ -58,7 +58,7 @@ struct GTY (()) c_token {
   ENUM_BITFIELD (c_id_kind) id_kind : 8;
   /* If this token is a keyword, this value indicates which keyword.
      Otherwise, this value is RID_MAX.  */
-  ENUM_BITFIELD (rid) keyword : 8;
+  ENUM_BITFIELD (rid) keyword : 8; //wyc == reserved id, i.e. RID
   /* If this token is a CPP_PRAGMA, this indicates the pragma that
      was seen.  Otherwise it is PRAGMA_NONE.  */
   ENUM_BITFIELD (pragma_kind) pragma_kind : 8;

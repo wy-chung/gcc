@@ -449,7 +449,7 @@ compile_file (void)
   timevar_push (TV_PARSE_GLOBAL);
 
   /* Parse entire file and generate initial debug information.  */
-  lang_hooks.parse_file (); //wyc bt#3
+  lang_hooks.parse_file ();
 
   timevar_pop (TV_PARSE_GLOBAL);
   timevar_stop (TV_PHASE_PARSING);
@@ -2141,7 +2141,7 @@ do_compile (bool no_backend)
 
           timevar_stop (TV_PHASE_SETUP);
 
-          compile_file (); //wyc bt#2
+          compile_file ();
         }
       else
         {
@@ -2293,7 +2293,7 @@ toplev::main (int argc, char **argv)
 
       if (m_use_TV_TOTAL)
 	start_timevars ();
-      do_compile (no_backend); //wyc bt#1
+      do_compile (no_backend);
 
       if (flag_self_test)
 	{

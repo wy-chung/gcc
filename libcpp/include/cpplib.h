@@ -156,7 +156,7 @@ enum cpp_ttype
   N_TTYPES,
 
   /* A token type for keywords, as opposed to ordinary identifiers.  */
-  CPP_KEYWORD, //wyc reserved word such as int, check c_common_reswords
+  CPP_KEYWORD, //wyc RID(reserved ID) such as int, check c_common_reswords
 
   /* Positions in the table.  */
   CPP_LAST_EQ        = CPP_LSHIFT,
