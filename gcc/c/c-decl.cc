@@ -11825,7 +11825,7 @@ declspecs_add_scspec (location_t loc,
       else
 	{
 	  specs->storage_class = n;
-	  specs->locations[cdw_storage_class] = loc;
+	  specs->locations[cdw_storage_class] = loc; //wyc enum c_declspec_word
 	  if (n != csc_extern && n != csc_static && specs->thread_p)
 	    {
 	      error ("%qs used with %qE",

@@ -445,7 +445,7 @@ struct GTY((tag ("1"))) line_map_ordinary : public line_map {
   location_t included_from;
 
   /* Size is 20 or 24 bytes, no padding  */
-};
+}; //wyc line_map_ordinary
 
 /* This is the highest possible source location encoded within an
    ordinary or macro map.  */

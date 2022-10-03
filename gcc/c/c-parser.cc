@@ -1703,7 +1703,7 @@ c_parser_external_declaration (c_parser *parser)
     case CPP_KEYWORD:
       switch (c_parser_peek_token (parser)->keyword)
 	{
-	case RID_EXTENSION:
+	case RID_EXTENSION: //wyc __extension__
 	  ext = disable_extension_diagnostics ();
 	  c_parser_consume_token (parser);
 	  c_parser_external_declaration (parser);
@@ -2819,7 +2819,7 @@ c_parser_declspecs (c_parser *parser, struct c_declspecs *specs,
     gcc_assert (la == cla_prefer_id); //wyc enum c_lookahead_kind
 
   if (start_std_attr_ok
-      && c_parser_nth_token_starts_std_attributes (parser, 1)) //wyc '[['
+      && c_parser_nth_token_starts_std_attributes (parser, 1)) //wyc "[["
     {
       gcc_assert (!specs->non_std_attrs_seen_p);
       location_t loc = c_parser_peek_token (parser)->location;
@@ -3875,7 +3875,7 @@ c_parser_declarator (c_parser *parser, bool type_seen_p, c_dtr_syn kind,
 		     bool *seen_id)
 {
   /* Parse any initial pointer part.  */
-  if (c_parser_next_token_is (parser, CPP_MULT)) //wyc "*"
+  if (c_parser_next_token_is (parser, CPP_MULT)) //wyc '*'
     {
       struct c_declspecs *quals_attrs = build_null_declspecs ();
       struct c_declarator *inner;
@@ -4042,7 +4042,7 @@ c_parser_direct_declarator_inner (c_parser *parser, bool id_present,
 				  struct c_declarator *inner)
 {
   /* Parse a sequence of array declarators and parameter lists.  */
-  if (c_parser_next_token_is (parser, CPP_OPEN_SQUARE)
+  if (c_parser_next_token_is (parser, CPP_OPEN_SQUARE) //wyc '['
       && !c_parser_nth_token_starts_std_attributes (parser, 1))
     {
       location_t brace_loc = c_parser_peek_token (parser)->location;
