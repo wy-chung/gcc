@@ -10716,7 +10716,7 @@ struct c_declarator *
 build_id_declarator (tree ident)
 {
   struct c_declarator *ret = XOBNEW (&parser_obstack, struct c_declarator);
-  ret->kind = cdk_id;
+  ret->kind = cdk_id; //wyc enum c_declarator_kind
   ret->declarator = 0;
   ret->u.id.id = ident;
   ret->u.id.attrs = NULL_TREE;
@@ -11251,7 +11251,7 @@ declspecs_add_type (location_t loc, struct c_declspecs *specs,
 	    error_at (loc, "duplicate %qE", type);
 
 	  return specs;
-	}
+	} //wyc if ((int) i <= (int) RID_LAST_MODIFIER)
       else
 	{
 	  /* "void", "_Bool", "char", "int", "float", "double",
@@ -11727,7 +11727,7 @@ declspecs_add_scspec (location_t loc,
 		      tree scspec)
 {
   enum rid i;
-  enum c_storage_class n = csc_none;
+  enum c_storage_class csc = csc_none;
   bool dupe = false;
   specs->declspecs_seen_p = true;
   specs->non_std_attrs_seen_p = true;
@@ -11784,30 +11784,30 @@ declspecs_add_scspec (location_t loc,
 	}
       break;
     case RID_AUTO:
-      n = csc_auto;
+      csc = csc_auto;
       break;
     case RID_EXTERN:
-      n = csc_extern;
+      csc = csc_extern;
       /* Diagnose "__thread extern".  */
       if (specs->thread_p && specs->thread_gnu_p)
 	error ("%<__thread%> before %<extern%>");
       break;
     case RID_REGISTER:
-      n = csc_register;
+      csc = csc_register;
       break;
     case RID_STATIC:
-      n = csc_static;
+      csc = csc_static;
       /* Diagnose "__thread static".  */
       if (specs->thread_p && specs->thread_gnu_p)
 	error ("%<__thread%> before %<static%>");
       break;
     case RID_TYPEDEF:
-      n = csc_typedef;
+      csc = csc_typedef;
       break;
     default:
       gcc_unreachable ();
     }
-  if (n != csc_none && n == specs->storage_class)
+  if (csc != csc_none && csc == specs->storage_class)
     dupe = true;
   if (dupe)
     {
@@ -11816,17 +11816,17 @@ declspecs_add_scspec (location_t loc,
       else
 	error ("duplicate %qE", scspec);
     }
-  if (n != csc_none)
+  if (csc != csc_none)
     {
-      if (specs->storage_class != csc_none && n != specs->storage_class)
+      if (specs->storage_class != csc_none && csc != specs->storage_class)
 	{
 	  error ("multiple storage classes in declaration specifiers");
 	}
       else
 	{
-	  specs->storage_class = n;
+	  specs->storage_class = csc;
 	  specs->locations[cdw_storage_class] = loc; //wyc enum c_declspec_word
-	  if (n != csc_extern && n != csc_static && specs->thread_p)
+	  if (csc != csc_extern && csc != csc_static && specs->thread_p)
 	    {
 	      error ("%qs used with %qE",
 		     specs->thread_gnu_p ? "__thread" : "_Thread_local",

@@ -1991,7 +1991,7 @@ c_parser_declaration_or_fndef (c_parser *parser, bool fndef_ok,
   /* When there are standard attributes at the start of the
      declaration (to apply to the entity being declared), an
      init-declarator-list or function definition must be present.  */
-  if (c_parser_nth_token_starts_std_attributes (parser, 1))
+  if (c_parser_nth_token_starts_std_attributes (parser, 1)) //wyc "[["
     have_attrs = true;
 
   c_parser_declspecs (parser, specs, true, true, start_attr_ok,
@@ -2041,7 +2041,7 @@ c_parser_declaration_or_fndef (c_parser *parser, bool fndef_ok,
       if (oacc_routine_data)
 	c_finish_oacc_routine (oacc_routine_data, NULL_TREE, false);
       return;
-    }
+    } //wyc if next token is CPP_SEMICOLON
 
   /* Provide better error recovery.  Note that a type name here is usually
      better diagnosed as a redeclaration.  */
@@ -2905,7 +2905,7 @@ c_parser_declspecs (c_parser *parser, struct c_declspecs *specs,
 	  t.expr_const_operands = true;
 	  declspecs_add_type (name_token->location, specs, t);
 	  continue;
-	}
+	} //wyc if next_token_is CPP_NAME
       if (c_parser_next_token_is (parser, CPP_LESS))
 	{
 	  /* Make "<SomeProtocol>" equivalent to "id <SomeProtocol>" -
@@ -2975,7 +2975,7 @@ c_parser_declspecs (c_parser *parser, struct c_declspecs *specs,
 	  seen_type = true;
 	  if (c_dialect_objc ())
 	    parser->objc_need_raw_identifier = true;
-	  t.kind = ctsk_resword;
+	  t.kind = ctsk_resword; //wyc enum c_typespec_kind
 	  t.spec = c_parser_peek_token (parser)->value;
 	  t.expr = NULL_TREE;
 	  t.expr_const_operands = true;
