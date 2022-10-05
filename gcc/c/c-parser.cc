@@ -1646,7 +1646,7 @@ c_parser_translation_unit (c_parser *parser)
     {
       void *obstack_position = obstack_alloc (&parser_obstack, 0);
       mark_valid_location_for_stdc_pragma (false);
-      do
+      do //wyc there have two external declarations
 	{
 	  ggc_collect ();
 	  c_parser_external_declaration (parser);
@@ -1693,10 +1693,10 @@ c_parser_translation_unit (c_parser *parser)
      objc-method-definition
      @end
 */
-
+//wyc always goto decl_or_fndef: then call c_parser_declaration_or_fndef()
 static void
 c_parser_external_declaration (c_parser *parser)
-{
+{ //wyc ignore this function. Just follow the next function c_parser_declaration_or_fndef()
   int ext;
   switch (c_parser_peek_token (parser)->type)
     {
@@ -1778,7 +1778,7 @@ c_parser_external_declaration (c_parser *parser)
 	 any, and the first declarator.  */
       c_parser_declaration_or_fndef (parser, true, true, true, false, true);
       break;
-    }
+    } //wyc switch (token type)
 }
 
 static void c_finish_omp_declare_simd (c_parser *, tree, tree, vec<c_token> *);
@@ -1901,9 +1901,9 @@ c_parser_declaration_or_fndef (c_parser *parser, bool fndef_ok,
 			       /* = NULL */,
 			       bool *fallthru_attr_p /* = NULL */)
 {
-  struct c_declspecs *specs;
-  tree prefix_attrs;
-  tree all_prefix_attrs;
+  //wyc struct c_declspecs *specs;
+  //wyc tree prefix_attrs;
+  //wyc tree all_prefix_attrs;
   bool diagnosed_no_specs = false;
   location_t here = c_parser_peek_token (parser)->location;
 
@@ -1915,7 +1915,7 @@ c_parser_declaration_or_fndef (c_parser *parser, bool fndef_ok,
       c_parser_static_assert_declaration (parser);
       return;
     }
-  specs = build_null_declspecs ();
+  struct c_declspecs *specs = build_null_declspecs ();
 
   /* Handle any standard attributes parsed in the caller.  */
   if (have_attrs)
@@ -2137,8 +2137,8 @@ c_parser_declaration_or_fndef (c_parser *parser, bool fndef_ok,
 		"%<fallthrough%> attribute not followed by %<;%>");
 
   pending_xref_error ();
-  prefix_attrs = specs->attrs;
-  all_prefix_attrs = prefix_attrs;
+  tree  prefix_attrs = specs->attrs;
+  tree  all_prefix_attrs = prefix_attrs;
   specs->attrs = NULL_TREE;
   while (true)
     {
@@ -2975,7 +2975,7 @@ c_parser_declspecs (c_parser *parser, struct c_declspecs *specs,
 	  seen_type = true;
 	  if (c_dialect_objc ())
 	    parser->objc_need_raw_identifier = true;
-	  t.kind = ctsk_resword; //wyc enum c_typespec_kind
+	  t.kind = ctsk_resword; //wyc struct c_typespec, enum c_typespec_kind
 	  t.spec = c_parser_peek_token (parser)->value;
 	  t.expr = NULL_TREE;
 	  t.expr_const_operands = true;
@@ -4350,11 +4350,11 @@ static struct c_parm *
 c_parser_parameter_declaration (c_parser *parser, tree attrs,
 				bool have_gnu_attrs)
 {
-  struct c_declspecs *specs;
-  struct c_declarator *declarator;
-  tree prefix_attrs;
-  tree postfix_attrs = NULL_TREE;
-  bool dummy = false;
+  //wyc struct c_declspecs *specs;
+  //wyc struct c_declarator *declarator;
+  //wyc tree prefix_attrs;
+  //wyc tree postfix_attrs = NULL_TREE;
+  //wyc bool dummy = false;
 
   /* Accept #pragmas between parameter declarations.  */
   while (c_parser_next_token_is (parser, CPP_PRAGMA))
@@ -4396,7 +4396,7 @@ c_parser_parameter_declaration (c_parser *parser, tree attrs,
 
   location_t start_loc = c_parser_peek_token (parser)->location;
 
-  specs = build_null_declspecs ();
+  struct c_declspecs *specs = build_null_declspecs ();
   if (attrs)
     {
       declspecs_add_attrs (input_location, specs, attrs);
@@ -4406,9 +4406,10 @@ c_parser_parameter_declaration (c_parser *parser, tree attrs,
 		      !have_gnu_attrs, true, cla_nonabstract_decl);
   finish_declspecs (specs);
   pending_xref_error ();
-  prefix_attrs = specs->attrs;
+  tree prefix_attrs = specs->attrs;
+  bool dummy = false;
   specs->attrs = NULL_TREE;
-  declarator = c_parser_declarator (parser,
+  struct c_declarator *declarator = c_parser_declarator (parser,
 				    specs->typespec_kind != ctsk_none,
 				    C_DTR_PARM, &dummy);
   if (declarator == NULL)
@@ -4416,6 +4417,7 @@ c_parser_parameter_declaration (c_parser *parser, tree attrs,
       c_parser_skip_until_found (parser, CPP_COMMA, NULL);
       return NULL;
     }
+  tree postfix_attrs = NULL_TREE;
   if (c_parser_next_token_is_keyword (parser, RID_ATTRIBUTE))
     postfix_attrs = c_parser_gnu_attributes (parser);
 
