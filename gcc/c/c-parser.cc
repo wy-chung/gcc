@@ -1649,7 +1649,7 @@ c_parser_translation_unit (c_parser *parser)
       do //wyc there have two external declarations
 	{
 	  ggc_collect ();
-	  c_parser_external_declaration (parser);
+	  c_parser_external_declaration (parser); //wyc next function to trace, c_parser_declaration_or_fndef()
 	  obstack_free (&parser_obstack, obstack_position);
 	}
       while (c_parser_next_token_is_not (parser, CPP_EOF));
@@ -1778,7 +1778,7 @@ c_parser_external_declaration (c_parser *parser)
 	 any, and the first declarator.  */
       c_parser_declaration_or_fndef (parser, true, true, true, false, true);
       break;
-    } //wyc switch (token type)
+    } // switch (token type)
 }
 
 static void c_finish_omp_declare_simd (c_parser *, tree, tree, vec<c_token> *);
@@ -2041,7 +2041,7 @@ c_parser_declaration_or_fndef (c_parser *parser, bool fndef_ok,
       if (oacc_routine_data)
 	c_finish_oacc_routine (oacc_routine_data, NULL_TREE, false);
       return;
-    } //wyc if next token is CPP_SEMICOLON
+    } // if next_token is CPP_SEMICOLON
 
   /* Provide better error recovery.  Note that a type name here is usually
      better diagnosed as a redeclaration.  */
@@ -2905,7 +2905,7 @@ c_parser_declspecs (c_parser *parser, struct c_declspecs *specs,
 	  t.expr_const_operands = true;
 	  declspecs_add_type (name_token->location, specs, t);
 	  continue;
-	} //wyc if next_token_is CPP_NAME
+	} // if next_token_is CPP_NAME
       if (c_parser_next_token_is (parser, CPP_LESS))
 	{
 	  /* Make "<SomeProtocol>" equivalent to "id <SomeProtocol>" -
@@ -4164,8 +4164,9 @@ c_parser_direct_declarator_inner (c_parser *parser, bool id_present,
    occur).  */
 
 static struct c_arg_info *
-c_parser_parms_declarator (c_parser *parser, bool id_list_ok, tree attrs,
-			   bool have_gnu_attrs)
+c_parser_parms_declarator (c_parser *parser, bool id_list_ok,
+	tree attrs, //wyc gnu-attributes at the start of the list
+	bool have_gnu_attrs)
 {
   push_scope ();
   declare_parm_level ();
@@ -4279,7 +4280,7 @@ c_parser_parms_list_declarator (c_parser *parser, tree attrs, tree expr,
 				     "expected %<)%>");
 	  return NULL;
 	}
-    }
+    } // if next_token is CPP_ELLIPSIS
   /* Nonempty list of parameters, either terminated with semicolon
      (forward declarations; recurse) or with close parenthesis (normal
      function) or with ", ... )" (variadic function).  */
@@ -13308,7 +13309,7 @@ c_parser_omp_variable_list (c_parser *parser,
 
       c_parser_consume_token (parser);
       first = false;
-    } //wyc while (1)
+    } // while (1)
 
   return list;
 }

@@ -391,7 +391,7 @@ const struct c_common_resword c_common_reswords[] =
   { "__builtin_offsetof", RID_OFFSETOF, 0 },
   { "__builtin_types_compatible_p", RID_TYPES_COMPATIBLE_P, D_CONLY },
   { "__builtin_va_arg",	RID_VA_ARG,	0 },
-  { "__bound__",	RID_BOUND,	0 }, //wyc
+  { "__bound__",	RID_BOUND,	0 }, //wyc bound
   { "__complex",	RID_COMPLEX,	0 },
   { "__complex__",	RID_COMPLEX,	0 },
   { "__const",		RID_CONST,	0 },

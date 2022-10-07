@@ -11251,7 +11251,7 @@ declspecs_add_type (location_t loc, struct c_declspecs *specs,
 	    error_at (loc, "duplicate %qE", type);
 
 	  return specs;
-	} //wyc if ((int) i <= (int) RID_LAST_MODIFIER)
+	} // if (i <= RID_LAST_MODIFIER)
       else
 	{
 	  /* "void", "_Bool", "char", "int", "float", "double",
@@ -11716,7 +11716,7 @@ declspecs_add_type (location_t loc, struct c_declspecs *specs,
     }
 
   return specs;
-} //wyc declspecs_add_type()
+} // declspecs_add_type()
 
 /* Add the storage class specifier or function specifier SCSPEC to the
    declaration specifiers SPECS, returning SPECS.  */

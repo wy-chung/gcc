@@ -607,7 +607,8 @@ enum cv_qualifier {
   TYPE_QUAL_CONST    = 0x1,
   TYPE_QUAL_VOLATILE = 0x2,
   TYPE_QUAL_RESTRICT = 0x4,
-  TYPE_QUAL_ATOMIC   = 0x8
+  TYPE_QUAL_ATOMIC   = 0x8,
+  TYPE_QUAL_BOUND    = 0X10, //wyc bound
 };
 
 /* Standard named or nameless data types of the C compiler.  */
