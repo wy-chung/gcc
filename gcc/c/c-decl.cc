@@ -6260,18 +6260,22 @@ smallest_type_quals_location (const location_t *locations,
 static tree
 grokdeclarator (const struct c_declarator *declarator,
 		struct c_declspecs *declspecs,
-		enum decl_context decl_context, bool initialized, tree *width,
-		tree *decl_attrs, tree *expr, bool *expr_const_operands,
+		enum decl_context decl_context,
+		bool initialized,
+		tree *width,
+		tree *decl_attrs,
+		tree *expr,
+		bool *expr_const_operands,
 		enum deprecated_states deprecated_state)
 {
   tree type = declspecs->type;
   bool threadp = declspecs->thread_p;
   enum c_storage_class storage_class = declspecs->storage_class;
-  int constp;
-  int restrictp;
-  int volatilep;
-  int atomicp;
-  int type_quals = TYPE_UNQUALIFIED;
+  //wyc int constp;
+  //wyc int restrictp;
+  //wyc int volatilep;
+  //wyc int atomicp;
+  //wyc int type_quals = TYPE_UNQUALIFIED;
   tree name = NULL_TREE;
   bool funcdef_flag = false;
   bool funcdef_syntax = false;
@@ -6288,7 +6292,7 @@ grokdeclarator (const struct c_declarator *declarator,
   tree orig_qual_type = NULL;
   size_t orig_qual_indirect = 0;
   struct c_arg_info *arg_info = 0;
-  addr_space_t as1, as2, address_space;
+  //wyc addr_space_t as1, as2, address_space;
   location_t loc = UNKNOWN_LOCATION;
   tree expr_dummy;
   bool expr_const_operands_dummy;
@@ -6364,7 +6368,7 @@ grokdeclarator (const struct c_declarator *declarator,
 			&& declarator->kind == cdk_id));
 	gcc_assert (!initialized);
       }
-  }
+  } // compound statement
 
   /* A function definition's declarator must have the form of
      a function declarator.  */
@@ -6441,13 +6445,13 @@ grokdeclarator (const struct c_declarator *declarator,
      duplicate qualifiers should be diagnosed in this case, but it
      seems most appropriate to do so).  */
   element_type = strip_array_types (type);
-  constp = declspecs->const_p + TYPE_READONLY (element_type);
-  restrictp = declspecs->restrict_p + TYPE_RESTRICT (element_type);
-  volatilep = declspecs->volatile_p + TYPE_VOLATILE (element_type);
-  atomicp = declspecs->atomic_p + TYPE_ATOMIC (element_type);
-  as1 = declspecs->address_space;
-  as2 = TYPE_ADDR_SPACE (element_type);
-  address_space = ADDR_SPACE_GENERIC_P (as1)? as2 : as1;
+  int constp = declspecs->const_p + TYPE_READONLY (element_type);
+  int restrictp = declspecs->restrict_p + TYPE_RESTRICT (element_type);
+  int volatilep = declspecs->volatile_p + TYPE_VOLATILE (element_type);
+  int atomicp = declspecs->atomic_p + TYPE_ATOMIC (element_type);
+  addr_space_t as1 = declspecs->address_space;
+  addr_space_t as2 = TYPE_ADDR_SPACE (element_type);
+  addr_space_t address_space = ADDR_SPACE_GENERIC_P (as1)? as2 : as1;
 
   if (constp > 1)
     pedwarn_c90 (loc, OPT_Wpedantic, "duplicate %<const%>");
@@ -6469,7 +6473,7 @@ grokdeclarator (const struct c_declarator *declarator,
       orig_qual_type = type;
       type = TYPE_MAIN_VARIANT (type);
     }
-  type_quals = ((constp ? TYPE_QUAL_CONST : 0)
+  int type_quals = ((constp ? TYPE_QUAL_CONST : 0)
 		| (restrictp ? TYPE_QUAL_RESTRICT : 0)
 		| (volatilep ? TYPE_QUAL_VOLATILE : 0)
 		| (atomicp ? TYPE_QUAL_ATOMIC : 0)
@@ -7020,7 +7024,7 @@ grokdeclarator (const struct c_declarator *declarator,
 	      }
 	    orig_qual_indirect++;
 	    break;
-	  }
+	  } // case cdk_array
 	case cdk_function:
 	  {
 	    /* Say it's a definition only for the declarator closest
@@ -7135,7 +7139,7 @@ grokdeclarator (const struct c_declarator *declarator,
 		TYPE_CONTEXT (tag->type) = type;
 	    }
 	    break;
-	  }
+	  } // case cdk_function
 	case cdk_pointer:
 	  {
 	    /* Merge any constancy or volatility into the target type
@@ -7224,11 +7228,11 @@ grokdeclarator (const struct c_declarator *declarator,
 
 	    declarator = declarator->declarator;
 	    break;
-	  }
+	  } // case cdk_pointer
 	default:
 	  gcc_unreachable ();
-	}
-    }
+	} // switch (declarator->kind)
+    } // while (declarator->kind != cdk_id)
   *decl_attrs = chainon (returned_attrs, *decl_attrs);
   *decl_attrs = chainon (decl_id_attrs, *decl_attrs);
 
@@ -7267,7 +7271,7 @@ grokdeclarator (const struct c_declarator *declarator,
 	    default:
 	      gcc_unreachable ();
 	    }
-	}
+	} // if (decl_context == NORMAL)
       else if (decl_context == PARM && TREE_CODE (type) != ARRAY_TYPE)
 	{
 	  if (name)
@@ -7286,7 +7290,7 @@ grokdeclarator (const struct c_declarator *declarator,
 	    error ("%qs specified for structure field",
 		   c_addr_space_name (address_space));
 	}
-    }
+    } // if (!ADDR_SPACE_GENERIC_P (address_space))
 
   /* Check the type and width of a bit-field.  */
   if (bitfield)
@@ -7343,7 +7347,7 @@ grokdeclarator (const struct c_declarator *declarator,
 	      alignas_align = 0;
 	    }
 	}
-    }
+    } // if (declspecs->alignas_p)
 
   /* If this is declaring a typedef name, return a TYPE_DECL.  */
 
@@ -7393,7 +7397,7 @@ grokdeclarator (const struct c_declarator *declarator,
 	}
 
       return decl;
-    }
+    } // if (storage_class == csc_typedef)
 
   /* If this is a type name (such as, in a cast or sizeof),
      compute the type and return it now.  */
@@ -7527,7 +7531,7 @@ grokdeclarator (const struct c_declarator *declarator,
 	  pedwarn (loc, 0, "parameter %q+D declared %<inline%>", decl);
 	if (declspecs->noreturn_p)
 	  pedwarn (loc, 0, "parameter %q+D declared %<_Noreturn%>", decl);
-      }
+      } // if (decl_context == PARM)
     else if (decl_context == FIELD)
       {
 	/* Note that the grammar rejects storage classes in typenames
@@ -7580,7 +7584,7 @@ grokdeclarator (const struct c_declarator *declarator,
 
 	if (size_varies)
 	  C_DECL_VARIABLE_SIZE (decl) = 1;
-      }
+      } // else if (decl_context == FIELD)
     else if (TREE_CODE (type) == FUNCTION_TYPE)
       {
 	if (storage_class == csc_register || threadp)
@@ -7676,7 +7680,7 @@ grokdeclarator (const struct c_declarator *declarator,
 		TREE_THIS_VOLATILE (decl) = 1;
 	      }
 	  }
-      }
+      } // else if (TREE_CODE (type) == FUNCTION_TYPE)
     else
       {
 	/* It's a variable.  */
@@ -7738,7 +7742,7 @@ grokdeclarator (const struct c_declarator *declarator,
 
 	if (threadp)
 	  set_decl_tls_model (decl, decl_default_tls_model (decl));
-      }
+      } // else
 
     if ((storage_class == csc_extern
 	 || (storage_class == csc_none
@@ -7826,7 +7830,7 @@ grokdeclarator (const struct c_declarator *declarator,
 		  decl);
 
     return decl;
-  }
+  } // compound statement
 }
 
 /* Decode the parameter-list info for a function type or function definition.
@@ -9617,7 +9621,7 @@ start_function (struct c_declspecs *declspecs, struct c_declarator *declarator,
 		}
 	    }
 	}
-    }
+    } // if (!prototype_p (newtype))
 
   /* Optionally warn of old-fashioned def with no previous prototype.  */
   if (warn_strict_prototypes

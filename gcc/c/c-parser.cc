@@ -2290,7 +2290,7 @@ c_parser_declaration_or_fndef (c_parser *parser, bool fndef_ok,
 		  finish_decl (d, init_loc, init.value,
 			       init.original_type, asm_name);
 		}
-	    }
+	    } // if next_token is CPP_EQ
 	  else
 	    {
 	      if (auto_type_p)
@@ -2346,7 +2346,7 @@ c_parser_declaration_or_fndef (c_parser *parser, bool fndef_ok,
 
 		      warn_parm_array_mismatch (lastloc, d, parms);
 		    }
-		}
+		} // if (d && TREE_CODE (d) == FUNCTION_DECL)
 	      if (omp_declare_simd_clauses)
 		{
 		  tree parms = NULL_TREE;
@@ -2382,7 +2382,7 @@ c_parser_declaration_or_fndef (c_parser *parser, bool fndef_ok,
 		  else
 		    *objc_foreach_object_declaration = error_mark_node;		    
 		}
-	    }
+	    } // if next_token is NOT CPP_EQ
 	  if (c_parser_next_token_is (parser, CPP_COMMA))
 	    {
 	      if (auto_type_p)
@@ -2421,7 +2421,7 @@ c_parser_declaration_or_fndef (c_parser *parser, bool fndef_ok,
 	      c_parser_skip_to_end_of_block_or_statement (parser);
 	      return;
 	    }
-	}
+	} // if next_token is CPP_EQ||CPP_COMMA||CPP_SEMICOLON||RID_ASM||RID_ATTRIBUTE||RID_IN
       else if (auto_type_p)
 	{
 	  error_at (here,
@@ -3882,7 +3882,7 @@ c_parser_declarator (c_parser *parser, bool type_seen_p, c_dtr_syn kind,
       c_parser_consume_token (parser);
       c_parser_declspecs (parser, quals_attrs, false, false, true,
 			  false, false, true, false, cla_prefer_id);
-      inner = c_parser_declarator (parser, type_seen_p, kind, seen_id);
+      inner = c_parser_declarator (parser, type_seen_p, kind, seen_id); //wyc recursive call
       if (inner == NULL)
 	return NULL;
       else
@@ -4019,7 +4019,7 @@ c_parser_direct_declarator (c_parser *parser, bool type_seen_p, c_dtr_syn kind,
 				     "expected %<)%>");
 	  return NULL;
 	}
-    }
+    } // if next_token CPP_OPEN_PAREN
   else
     {
       if (kind == C_DTR_NORMAL)
