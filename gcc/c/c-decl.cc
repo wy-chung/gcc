@@ -5184,7 +5184,7 @@ start_decl (struct c_declarator *declarator, struct c_declspecs *declspecs,
 	    error ("variable-sized object may not be initialized");
 	    initialized = false;
 	  }
-      }
+      } // switch (TREE_CODE (decl))
 
   if (initialized)
     {
@@ -6259,13 +6259,13 @@ smallest_type_quals_location (const location_t *locations,
 
 static tree
 grokdeclarator (const struct c_declarator *declarator,
-		struct c_declspecs *declspecs,
+		struct c_declspecs *declspecs, // the declaration specifiers
 		enum decl_context decl_context,
-		bool initialized,
-		tree *width,
-		tree *decl_attrs,
-		tree *expr,
-		bool *expr_const_operands,
+		bool initialized, // has an initializer?
+		tree *width,      // for bit-fields
+		tree *decl_attrs, // points to the list of attributes
+		tree *expr,       // any expressions that need to be evaluated
+		bool *expr_const_operands, // can be used in constant expressions?
 		enum deprecated_states deprecated_state)
 {
   tree type = declspecs->type;
@@ -6279,12 +6279,12 @@ grokdeclarator (const struct c_declarator *declarator,
   tree name = NULL_TREE;
   bool funcdef_flag = false;
   bool funcdef_syntax = false;
-  bool size_varies = false;
+  //wyc bool size_varies = false;
   tree decl_attr = declspecs->decl_attr;
   int array_ptr_quals = TYPE_UNQUALIFIED;
   tree array_ptr_attrs = NULL_TREE;
   bool array_parm_static = false;
-  bool array_parm_vla_unspec_p = false;
+  //wyc bool array_parm_vla_unspec_p = false;
   tree returned_attrs = NULL_TREE;
   tree decl_id_attrs = NULL_TREE;
   bool bitfield = width != NULL;
@@ -6327,7 +6327,7 @@ grokdeclarator (const struct c_declarator *declarator,
   {
     const struct c_declarator *decl = declarator;
 
-    first_non_attr_kind = cdk_attrs;
+    first_non_attr_kind = cdk_attrs; // enum c_declarator_kind
     while (decl)
       switch (decl->kind)
 	{
@@ -6402,7 +6402,7 @@ grokdeclarator (const struct c_declarator *declarator,
       type = integer_type_node;
     }
 
-  size_varies = C_TYPE_VARIABLE_SIZE (type) != 0;
+  bool size_varies = C_TYPE_VARIABLE_SIZE (type) != 0;
 
   /* Diagnose defaulting to "int".  */
 
@@ -6674,7 +6674,7 @@ grokdeclarator (const struct c_declarator *declarator,
 	    array_ptr_quals = declarator->u.array.quals;
 	    array_ptr_attrs = declarator->u.array.attrs;
 	    array_parm_static = declarator->u.array.static_p;
-	    array_parm_vla_unspec_p = declarator->u.array.vla_unspec_p;
+	    bool array_parm_vla_unspec_p = declarator->u.array.vla_unspec_p;
 
 	    declarator = declarator->declarator;
 
@@ -11650,7 +11650,7 @@ declspecs_add_type (location_t loc, struct c_declspecs *specs,
 	      break;
 	    }
 	}
-    }
+    } /* Handle type specifier keywords.  */
 
   /* Now we have a typedef (a TYPE_DECL node), an identifier (some
      form of ObjC type, cases such as "int" and "long" being handled
@@ -11937,7 +11937,7 @@ finish_declspecs (struct c_declspecs *specs)
 	     give more specific diagnostics according to whether it is
 	     a function definition.  */
 	}
-    }
+    } // if (specs->typespec_word == cts_none)
 
   /* If "signed" was specified, record this to distinguish "int" and
      "signed int" in the case of a bit-field with

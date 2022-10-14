@@ -1986,7 +1986,7 @@ c_parser_declaration_or_fndef (c_parser *parser, bool fndef_ok,
       c_parser_peek_token (parser)->keyword = RID_VOID;
       c_parser_peek_token (parser)->value = error_mark_node;
       fndef_ok = !nested;
-    }
+    } /* Try to detect an unknown type name when we have "A B" or "A *B".  */
 
   /* When there are standard attributes at the start of the
      declaration (to apply to the entity being declared), an
@@ -2131,7 +2131,7 @@ c_parser_declaration_or_fndef (c_parser *parser, bool fndef_ok,
 	default:
 	  break;
 	}
-    }
+    } // else if (c_dialect_objc () && !auto_type_p)
   else if (attribute_fallthrough_p (specs->attrs))
     warning_at (here, OPT_Wattributes,
 		"%<fallthrough%> attribute not followed by %<;%>");
@@ -2567,8 +2567,8 @@ c_parser_declaration_or_fndef (c_parser *parser, bool fndef_ok,
 	DECL_SAVED_TREE (fndecl) = NULL_TREE;
 
       break;
-    }
-}
+    } // while (true)
+} // c_parser_declaration_or_fndef
 
 /* Parse an asm-definition (asm() outside a function body).  This is a
    GNU extension.
@@ -2906,7 +2906,7 @@ c_parser_declspecs (c_parser *parser, struct c_declspecs *specs,
 	  declspecs_add_type (name_token->location, specs, t);
 	  continue;
 	} // if next_token_is CPP_NAME
-      if (c_parser_next_token_is (parser, CPP_LESS))
+      if (c_parser_next_token_is (parser, CPP_LESS)) // objc
 	{
 	  /* Make "<SomeProtocol>" equivalent to "id <SomeProtocol>" -
 	     nisse@lysator.liu.se.  */
@@ -3098,7 +3098,7 @@ c_parser_declspecs (c_parser *parser, struct c_declspecs *specs,
 	  break;
 	default:
 	  goto out;
-	}
+	} // switch (c_parser_peek_token (parser)->keyword)
     } //wyc while
  out:
   if (end_std_attr_ok
