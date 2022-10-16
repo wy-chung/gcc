@@ -2214,6 +2214,9 @@ extern tree vector_element_bits_tree (const_tree);
 /* Nonzero in a type considered atomic as a whole.  */
 #define TYPE_ATOMIC(NODE) (TYPE_CHECK (NODE)->base.u.bits.atomic_flag)
 
+/* Means this type is bound-qualified.  */
+#define TYPE_BOUND(NODE) (TYPE_CHECK (NODE)->base.bound_flag) //wyc bound
+
 /* Means this type is const-qualified.  */
 #define TYPE_READONLY(NODE) (TYPE_CHECK (NODE)->base.readonly_flag)
 

@@ -1027,6 +1027,7 @@ struct GTY(()) tree_base {
 
   unsigned side_effects_flag : 1;
   unsigned constant_flag : 1;
+  unsigned bound_flag : 1; //wyc bound
   unsigned addressable_flag : 1;
   unsigned volatile_flag : 1;
   unsigned readonly_flag : 1;

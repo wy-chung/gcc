@@ -4027,7 +4027,7 @@ c_parser_direct_declarator (c_parser *parser, bool type_seen_p, c_dtr_syn kind,
   else
     {
       if (kind == C_DTR_NORMAL)
-	{
+	{ //wyc error: expected identifier or ‘(’ before ‘__bound__’
 	  c_parser_error (parser, "expected identifier or %<(%>");
 	  return NULL;
 	}

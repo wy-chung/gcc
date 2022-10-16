@@ -4891,6 +4891,7 @@ quals_from_declspecs (const struct c_declspecs *specs)
 	       | (specs->volatile_p ? TYPE_QUAL_VOLATILE : 0)
 	       | (specs->restrict_p ? TYPE_QUAL_RESTRICT : 0)
 	       | (specs->atomic_p ? TYPE_QUAL_ATOMIC : 0)
+	       | (specs->bound_p ? TYPE_QUAL_BOUND : 0) //wyc bound
 	       | (ENCODE_QUAL_ADDR_SPACE (specs->address_space)));
   gcc_assert (!specs->type
 	      && !specs->decl_attr
@@ -6449,6 +6450,7 @@ grokdeclarator (const struct c_declarator *declarator,
   int restrictp = declspecs->restrict_p + TYPE_RESTRICT (element_type);
   int volatilep = declspecs->volatile_p + TYPE_VOLATILE (element_type);
   int atomicp = declspecs->atomic_p + TYPE_ATOMIC (element_type);
+  int boundp = declspecs->bound_p + TYPE_BOUND (element_type); //wyc bound
   addr_space_t as1 = declspecs->address_space;
   addr_space_t as2 = TYPE_ADDR_SPACE (element_type);
   addr_space_t address_space = ADDR_SPACE_GENERIC_P (as1)? as2 : as1;
@@ -6461,6 +6463,8 @@ grokdeclarator (const struct c_declarator *declarator,
     pedwarn_c90 (loc, OPT_Wpedantic, "duplicate %<volatile%>");
   if (atomicp > 1)
     pedwarn_c90 (loc, OPT_Wpedantic, "duplicate %<_Atomic%>");
+  if (boundp > 1) //wyc bound
+    pedwarn_c90 (loc, OPT_Wpedantic, "duplicate %<__bound__%>");
 
   if (!ADDR_SPACE_GENERIC_P (as1) && !ADDR_SPACE_GENERIC_P (as2) && as1 != as2)
     error_at (loc, "conflicting named address spaces (%s vs %s)",
@@ -6477,6 +6481,7 @@ grokdeclarator (const struct c_declarator *declarator,
 		| (restrictp ? TYPE_QUAL_RESTRICT : 0)
 		| (volatilep ? TYPE_QUAL_VOLATILE : 0)
 		| (atomicp ? TYPE_QUAL_ATOMIC : 0)
+		| (boundp ? TYPE_QUAL_BOUND : 0) //wyc bound
 		| ENCODE_QUAL_ADDR_SPACE (address_space));
   if (type_quals != TYPE_QUALS (element_type))
     orig_qual_type = NULL_TREE;
