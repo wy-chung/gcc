@@ -2042,7 +2042,7 @@ c_parser_gimple_declaration (gimple_parser &parser)
   struct c_declarator *declarator;
   struct c_declspecs *specs = build_null_declspecs ();
   c_parser_declspecs (parser, specs, true, true, true,
-		      true, true, true, true, cla_nonabstract_decl);
+		      true, true, true, true, false, cla_nonabstract_decl);
   finish_declspecs (specs);
 
   /* Provide better error recovery.  Note that a type name here is usually

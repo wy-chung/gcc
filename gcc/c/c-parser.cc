@@ -1995,7 +1995,7 @@ c_parser_declaration_or_fndef (c_parser *parser, bool fndef_ok,
     have_attrs = true;
 
   c_parser_declspecs (parser, specs, true, true, start_attr_ok,
-		      true, true, start_attr_ok, true, cla_nonabstract_decl);
+		      true, true, start_attr_ok, true, false, cla_nonabstract_decl);
   if (parser->error)
     {
       c_parser_skip_to_end_of_block_or_statement (parser);
@@ -2810,7 +2810,7 @@ c_parser_declspecs (c_parser *parser, struct c_declspecs *specs,
 		    bool scspec_ok, bool typespec_ok, bool start_attr_ok,
 		    bool alignspec_ok, bool auto_type_ok,
 		    bool start_std_attr_ok, bool end_std_attr_ok,
-		    enum c_lookahead_kind la)
+		    bool bound_ok, enum c_lookahead_kind la)
 {
   bool attrs_ok = start_attr_ok; //wyc gnu-attributes are accepted at the start?
   bool seen_type = specs->typespec_kind != ctsk_none; //wyc enum c_typespec_kind
@@ -3063,6 +3063,10 @@ c_parser_declspecs (c_parser *parser, struct c_declspecs *specs,
 	  else
 	    declspecs_add_qual (loc, specs, value);
 	  break;
+	case RID_BOUND: //wyc bound
+	  if (!bound_ok)
+	    goto out;
+	  __attribute__((fallthrough));
 	case RID_CONST: //wyc c_parser_peek_token (parser)->keyword
 	case RID_VOLATILE:
 	case RID_RESTRICT:
@@ -3099,7 +3103,7 @@ c_parser_declspecs (c_parser *parser, struct c_declspecs *specs,
 	default:
 	  goto out;
 	} // switch (c_parser_peek_token (parser)->keyword)
-    } //wyc while
+    } // while (next_token CPP_NAME || CPP_KEYWORD)
  out:
   if (end_std_attr_ok
       && c_parser_nth_token_starts_std_attributes (parser, 1))
@@ -3568,7 +3572,7 @@ c_parser_struct_declaration (c_parser *parser)
      of N1731.
      <http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1731.pdf>  */
   c_parser_declspecs (parser, specs, false, true, true,
-		      true, false, true, true, cla_nonabstract_decl);
+		      true, false, true, true, false, cla_nonabstract_decl);
   if (parser->error)
     return NULL_TREE;
   if (!specs->declspecs_seen_p)
@@ -3881,7 +3885,7 @@ c_parser_declarator (c_parser *parser, bool type_seen_p, c_dtr_syn kind,
       struct c_declarator *inner;
       c_parser_consume_token (parser);
       c_parser_declspecs (parser, quals_attrs, false, false, true,
-			  false, false, true, false, cla_prefer_id);
+			  false, false, true, false, true, cla_prefer_id);
       inner = c_parser_declarator (parser, type_seen_p, kind, seen_id); //wyc recursive call
       if (inner == NULL)
 	return NULL;
@@ -4056,13 +4060,13 @@ c_parser_direct_declarator_inner (c_parser *parser, bool id_present,
       dimen.original_type = NULL_TREE;
       c_parser_consume_token (parser);
       c_parser_declspecs (parser, quals_attrs, false, false, true,
-			  false, false, false, false, cla_prefer_id);
+			  false, false, false, false, false, cla_prefer_id);
       static_seen = c_parser_next_token_is_keyword (parser, RID_STATIC);
       if (static_seen)
 	c_parser_consume_token (parser);
       if (static_seen && !quals_attrs->declspecs_seen_p)
 	c_parser_declspecs (parser, quals_attrs, false, false, true,
-			    false, false, false, false, cla_prefer_id);
+			    false, false, false, false, false, cla_prefer_id);
       if (!quals_attrs->declspecs_seen_p)
 	quals_attrs = NULL;
       /* If "static" is present, there must be an array dimension.
@@ -4123,7 +4127,7 @@ c_parser_direct_declarator_inner (c_parser *parser, bool id_present,
 	}
       inner = set_array_declarator_inner (declarator, inner);
       return c_parser_direct_declarator_inner (parser, id_present, inner);
-    }
+    } /* Parse a sequence of array declarators and parameter lists.  */
   else if (c_parser_next_token_is (parser, CPP_OPEN_PAREN))
     {
       tree attrs;
@@ -4216,8 +4220,8 @@ c_parser_parms_declarator (c_parser *parser, bool id_list_ok,
 	  pop_scope ();
 	  return NULL;
 	}
-    }
-  else
+    } // an identifier list
+  else // either a prototype list or an empty list
     {
       struct c_arg_info *ret
 	= c_parser_parms_list_declarator (parser, attrs, NULL, have_gnu_attrs);
@@ -4339,7 +4343,7 @@ c_parser_parms_list_declarator (c_parser *parser, tree attrs, tree expr,
 	      return NULL;
 	    }
 	}
-    }
+    } // while (true)
 }
 
 /* Parse a parameter declaration.  ATTRS are the gnu-attributes at the
@@ -4404,7 +4408,7 @@ c_parser_parameter_declaration (c_parser *parser, tree attrs,
       attrs = NULL_TREE;
     }
   c_parser_declspecs (parser, specs, true, true, true, true, false,
-		      !have_gnu_attrs, true, cla_nonabstract_decl);
+		      !have_gnu_attrs, true, false, cla_nonabstract_decl);
   finish_declspecs (specs);
   pending_xref_error ();
   tree prefix_attrs = specs->attrs;
@@ -5144,7 +5148,7 @@ c_parser_type_name (c_parser *parser, bool alignas_ok)
   struct c_type_name *ret;
   bool dummy = false;
   c_parser_declspecs (parser, specs, false, true, true, alignas_ok, false,
-		      false, true, cla_prefer_type);
+		      false, true, false, cla_prefer_type);
   if (!specs->declspecs_seen_p)
     {
       c_parser_error (parser, "expected specifier-qualifier-list");

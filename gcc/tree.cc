@@ -5615,7 +5615,7 @@ build_qualified_type (tree type, int type_quals MEM_STAT_DECL)
 	/* T is its own canonical type. */
 	TYPE_CANONICAL (t) = t;
 
-    }
+    } // if (!t)
 
   return t;
 }

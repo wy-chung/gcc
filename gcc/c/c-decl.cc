@@ -6359,7 +6359,7 @@ grokdeclarator (const struct c_declarator *declarator,
 
 	default:
 	  gcc_unreachable ();
-	}
+	} // switch (decl->kind)
     if (name == NULL_TREE)
       {
 	gcc_assert (decl_context == PARM
@@ -10837,6 +10837,12 @@ declspecs_add_qual (location_t loc,
       specs->atomic_p = true;
       prev_loc = specs->locations[cdw_atomic];
       specs->locations[cdw_atomic] = loc;
+      break;
+    case RID_BOUND: //wyc bound
+      dupe = specs->bound_p;
+      specs->bound_p = true;
+      prev_loc = specs->locations[cdw_bound];
+      specs->locations[cdw_bound] = loc;
       break;
     default:
       gcc_unreachable ();
