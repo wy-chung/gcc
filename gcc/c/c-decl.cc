@@ -723,11 +723,12 @@ c_print_identifier (FILE *file, tree node, int indent)
 /* Establish a binding between NAME, an IDENTIFIER_NODE, and DECL,
    which may be any of several kinds of DECL or TYPE or error_mark_node,
    in the scope SCOPE.  */
+//wyc out: scope->bindings and new_binding->shadowed
 static void
 bind (tree name, tree decl, struct c_scope *scope, bool invisible,
       bool nested, location_t locus)
 {
-  struct c_binding *b, **here;
+  struct c_binding *b;
 
   if (binding_freelist)
     {
@@ -737,14 +738,14 @@ bind (tree name, tree decl, struct c_scope *scope, bool invisible,
   else
     b = ggc_alloc<c_binding> ();
 
-  b->shadowed = 0;
+  b->shadowed = nullptr;
   b->decl = decl;
   b->id = name;
   b->depth = scope->depth;
   b->invisible = invisible;
   b->nested = nested;
-  b->inner_comp = 0;
-  b->in_struct = 0;
+  b->inner_comp = false;
+  b->in_struct = false;
   b->locus = locus;
 
   b->u.type = NULL;
@@ -753,24 +754,27 @@ bind (tree name, tree decl, struct c_scope *scope, bool invisible,
   scope->bindings = b;
 
   if (decl_jump_unsafe (decl))
-    scope->has_jump_unsafe_decl = 1;
+    scope->has_jump_unsafe_decl = true;
 
   if (!name)
     return;
 
+  struct c_binding **here;
   switch (TREE_CODE (decl))
     {
-    case LABEL_DECL:     here = &I_LABEL_BINDING (name);   break;
+    case LABEL_DECL:
+      here = &I_LABEL_BINDING (name);   break;
     case ENUMERAL_TYPE:
     case UNION_TYPE:
-    case RECORD_TYPE:    here = &I_TAG_BINDING (name);     break;
+    case RECORD_TYPE:
+      here = &I_TAG_BINDING (name);     break;
     case VAR_DECL:
     case FUNCTION_DECL:
     case TYPE_DECL:
     case CONST_DECL:
     case PARM_DECL:
-    case ERROR_MARK:     here = &I_SYMBOL_BINDING (name);  break;
-
+    case ERROR_MARK:
+      here = &I_SYMBOL_BINDING (name);  break;
     default:
       gcc_unreachable ();
     }
@@ -3188,7 +3192,7 @@ pushdecl (tree x)
 	}
       else
 	goto skip_external_and_shadow_checks;
-    }
+    } // if (b && B_IN_SCOPE (b, scope))
 
   /* All declarations with external linkage, and all external
      references, go in the external scope, no matter what scope is
@@ -3312,7 +3316,7 @@ pushdecl (tree x)
 	      nested = true;
 	    }
 	}
-    }
+    } // if ((DECL_EXTERNAL (x) || scope == file_scope) &&...
 
   if (TREE_CODE (x) != PARM_DECL)
     warn_if_shadowing (x);
@@ -5503,7 +5507,7 @@ finish_decl (tree decl, location_t init_loc, tree init,
 	  TREE_USED (decl) = 1;
 	  DECL_READ_P (decl) = 1;
 	}
-    }
+    } // if (VAR_P (decl))
 
   /* If this is a function and an assembler name is specified, reset DECL_RTL
      so we can give it its new name.  Also, update builtin_decl if it
@@ -5620,7 +5624,7 @@ finish_decl (tree decl, location_t init_loc, tree init,
 		DECL_INITIAL (decl) = NULL_TREE;
 	    }
 	}
-    }
+    } // if (VAR_OR_FUNCTION_DECL_P (decl))
 
   if (TREE_CODE (decl) == TYPE_DECL)
     {
@@ -5673,7 +5677,7 @@ finish_decl (tree decl, location_t init_loc, tree init,
 	diagnose_uninitialized_cst_member (decl, type);
     }
 
-  if (flag_openmp
+  if (flag_openmp //false
       && VAR_P (decl)
       && lookup_attribute ("omp declare target implicit",
 			   DECL_ATTRIBUTES (decl)))
@@ -5923,7 +5927,7 @@ push_parm_decl (const struct c_parm *parm, tree *expr)
   tree attrs = parm->attrs;
   tree decl = grokdeclarator (parm->declarator, parm->specs, PARM, false, NULL,
 			      &attrs, expr, NULL, DEPRECATED_NORMAL);
-  if (decl && DECL_P (decl))
+  if (decl && DECL_P (decl)) //wyc if decl represents a declaration
     DECL_SOURCE_LOCATION (decl) = parm->loc;
 
   attrs = get_parm_array_spec (parm, attrs);
@@ -6450,7 +6454,6 @@ grokdeclarator (const struct c_declarator *declarator,
   int restrictp = declspecs->restrict_p + TYPE_RESTRICT (element_type);
   int volatilep = declspecs->volatile_p + TYPE_VOLATILE (element_type);
   int atomicp = declspecs->atomic_p + TYPE_ATOMIC (element_type);
-  int boundp = declspecs->bound_p + TYPE_BOUND (element_type); //wyc bound
   addr_space_t as1 = declspecs->address_space;
   addr_space_t as2 = TYPE_ADDR_SPACE (element_type);
   addr_space_t address_space = ADDR_SPACE_GENERIC_P (as1)? as2 : as1;
@@ -6463,8 +6466,6 @@ grokdeclarator (const struct c_declarator *declarator,
     pedwarn_c90 (loc, OPT_Wpedantic, "duplicate %<volatile%>");
   if (atomicp > 1)
     pedwarn_c90 (loc, OPT_Wpedantic, "duplicate %<_Atomic%>");
-  if (boundp > 1) //wyc bound
-    pedwarn_c90 (loc, OPT_Wpedantic, "duplicate %<__bound__%>");
 
   if (!ADDR_SPACE_GENERIC_P (as1) && !ADDR_SPACE_GENERIC_P (as2) && as1 != as2)
     error_at (loc, "conflicting named address spaces (%s vs %s)",
@@ -6481,7 +6482,6 @@ grokdeclarator (const struct c_declarator *declarator,
 		| (restrictp ? TYPE_QUAL_RESTRICT : 0)
 		| (volatilep ? TYPE_QUAL_VOLATILE : 0)
 		| (atomicp ? TYPE_QUAL_ATOMIC : 0)
-		| (boundp ? TYPE_QUAL_BOUND : 0) //wyc bound
 		| ENCODE_QUAL_ADDR_SPACE (address_space));
   if (type_quals != TYPE_QUALS (element_type))
     orig_qual_type = NULL_TREE;

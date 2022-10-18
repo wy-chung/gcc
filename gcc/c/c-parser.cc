@@ -4242,7 +4242,7 @@ static struct c_arg_info *
 c_parser_parms_list_declarator (c_parser *parser, tree attrs, tree expr,
 				bool have_gnu_attrs)
 {
-  bool bad_parm = false;
+  //bool bad_parm = false;
 
   /* ??? Following the old parser, forward parameter declarations may
      use abstract declarators, and if no real parameter declarations
@@ -4288,6 +4288,7 @@ c_parser_parms_list_declarator (c_parser *parser, tree attrs, tree expr,
   /* Nonempty list of parameters, either terminated with semicolon
      (forward declarations; recurse) or with close parenthesis (normal
      function) or with ", ... )" (variadic function).  */
+  bool bad_parm = false;
   while (true)
     {
       /* Parse a parameter.  */

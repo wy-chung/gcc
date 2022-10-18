@@ -77,7 +77,7 @@ along with GCC; see the file COPYING3.  If not see
 #define DEFTREECODE(SYM, NAME, TYPE, LENGTH) TYPE,
 #define END_OF_BASE_TREE_CODES tcc_exceptional,
 
-const enum tree_code_class tree_code_type[] = {
+const enum tree_code_class tree_code_type[] = { //wyc tree code to code class
 #include "all-tree.def"
 };
 

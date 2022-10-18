@@ -127,7 +127,7 @@ as_internal_fn (combined_fn code)
 
 #define TREE_CODE_CLASS_STRING(CLASS)\
         tree_code_class_strings[(int) (CLASS)]
-
+//wyc tree code to code class
 #define TREE_CODE_CLASS(CODE)	tree_code_type[(int) (CODE)]
 
 /* Nonzero if NODE represents an exceptional code.  */
@@ -2213,9 +2213,6 @@ extern tree vector_element_bits_tree (const_tree);
 
 /* Nonzero in a type considered atomic as a whole.  */
 #define TYPE_ATOMIC(NODE) (TYPE_CHECK (NODE)->base.u.bits.atomic_flag)
-
-/* Means this type is bound-qualified.  */
-#define TYPE_BOUND(NODE) (TYPE_CHECK (NODE)->base.bound_flag) //wyc bound
 
 /* Means this type is const-qualified.  */
 #define TYPE_READONLY(NODE) (TYPE_CHECK (NODE)->base.readonly_flag)

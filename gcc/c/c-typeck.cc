@@ -15851,7 +15851,7 @@ c_build_qualified_type (tree type, int type_quals, tree orig_qual_type,
             TYPE_CANONICAL (t) = t;
 	}
       return t;
-    }
+    } // if (TREE_CODE (type) == ARRAY_TYPE)
 
   /* A restrict-qualified pointer type must be a pointer to object or
      incomplete type.  Note that the use of POINTER_TYPE_P also allows
