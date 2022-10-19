@@ -526,8 +526,8 @@ extern FILE *aux_info_file;
    function definition (even the implicit ones).  */
 
 void
-gen_aux_info_record (tree fndecl, int is_definition, int is_implicit,
-		     int is_prototyped)
+gen_aux_info_record (tree fndecl, bool is_definition, bool is_implicit,
+		     bool is_prototyped) //wyc
 {
   if (flag_gen_aux_info)
     {

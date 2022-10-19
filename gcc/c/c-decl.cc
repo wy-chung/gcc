@@ -4573,7 +4573,7 @@ c_make_fname_decl (location_t loc, tree id, int type_dep)
 
   return decl;
 }
-
+//wyc from lang_dependent_init and all the way down here
 tree
 c_builtin_function (tree decl)
 {
@@ -4599,7 +4599,7 @@ c_builtin_function (tree decl)
 
   return decl;
 }
-
+//wyc never been called
 tree
 c_builtin_function_ext_scope (tree decl)
 {
@@ -5102,8 +5102,8 @@ tree
 start_decl (struct c_declarator *declarator, struct c_declspecs *declspecs,
 	    bool initialized, tree attributes, location_t *lastloc /* = NULL */)
 {
-  tree decl;
-  tree tem;
+  //wyc tree decl;
+  //wyc tree tem;
   tree expr = NULL_TREE;
   enum deprecated_states deprecated_state = DEPRECATED_NORMAL;
 
@@ -5117,7 +5117,7 @@ start_decl (struct c_declarator *declarator, struct c_declspecs *declspecs,
   else if (lookup_attribute ("deprecated", attributes))
     deprecated_state = DEPRECATED_SUPPRESS;
 
-  decl = grokdeclarator (declarator, declspecs,
+  tree decl = grokdeclarator (declarator, declspecs,
 			 NORMAL, initialized, NULL, &attributes, &expr, NULL,
 			 deprecated_state);
   if (!decl || decl == error_mark_node)
@@ -5287,7 +5287,7 @@ start_decl (struct c_declarator *declarator, struct c_declspecs *declspecs,
 
   /* Add this decl to the current scope.
      TEM may equal DECL or it may be a previous decl of the same name.  */
-  tem = pushdecl (decl);
+  tree tem = pushdecl (decl);
 
   if (initialized && DECL_EXTERNAL (tem))
     {
@@ -5437,7 +5437,7 @@ finish_decl (tree decl, location_t init_loc, tree init,
 	TREE_TYPE (DECL_INITIAL (decl)) = type;
 
       relayout_decl (decl);
-    }
+    } // if (TREE_CODE (type) == ARRAY_TYPE
 
   /* Look for braced array initializers for character arrays and
      recursively convert them into STRING_CSTs.  */
@@ -5717,7 +5717,7 @@ finish_decl (tree decl, location_t init_loc, tree init,
       && !DECL_HARD_REGISTER (decl))
     targetm.lower_local_decl_alignment (decl);
 
-  invoke_plugin_callbacks (PLUGIN_FINISH_DECL, decl);
+  invoke_plugin_callbacks (PLUGIN_FINISH_DECL, decl); // plugin not enabled
 }
 
 /* Given a parsed parameter declaration, decode it into a PARM_DECL.

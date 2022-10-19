@@ -2142,7 +2142,7 @@ c_parser_declaration_or_fndef (c_parser *parser, bool fndef_ok,
   specs->attrs = NULL_TREE;
   while (true)
     {
-      struct c_declarator *declarator;
+      //wyc struct c_declarator *declarator;
       bool dummy = false;
       timevar_id_t tv;
       tree fnbody = NULL_TREE;
@@ -2150,7 +2150,7 @@ c_parser_declaration_or_fndef (c_parser *parser, bool fndef_ok,
 	 should diagnose if there were no declaration specifiers) or a
 	 function definition (in which case the diagnostic for
 	 implicit int suffices).  */
-      declarator = c_parser_declarator (parser,
+      struct c_declarator *declarator = c_parser_declarator (parser,
 					specs->typespec_kind != ctsk_none,
 					C_DTR_NORMAL, &dummy);
       if (declarator == NULL)
@@ -3900,10 +3900,6 @@ c_parser_declarator (c_parser *parser, bool type_seen_p, c_dtr_syn kind,
 /* Parse a direct declarator or direct abstract declarator; arguments
    as c_parser_declarator.  */
 
-static struct c_declarator *
-c_parser_direct_declarator (c_parser *parser, bool type_seen_p, c_dtr_syn kind,
-			    bool *seen_id)
-{
   /* The direct declarator must start with an identifier (possibly
      omitted) or a parenthesized declarator (possibly abstract).  In
      an ordinary declarator, initial parentheses must start a
@@ -3939,6 +3935,10 @@ c_parser_direct_declarator (c_parser *parser, bool type_seen_p, c_dtr_syn kind,
      ??? Also following the old parser, typedef names may be
      redeclared in declarators, but not Objective-C class names.  */
 
+static struct c_declarator *
+c_parser_direct_declarator (c_parser *parser, bool type_seen_p,
+			    c_dtr_syn kind, bool *seen_id)
+{
   if (kind != C_DTR_ABSTRACT
       && c_parser_next_token_is (parser, CPP_NAME)
       && ((type_seen_p

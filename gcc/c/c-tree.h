@@ -546,7 +546,7 @@ extern void c_parse_init (void);
 extern bool c_keyword_starts_typename (enum rid keyword);
 
 /* in c-aux-info.cc */
-extern void gen_aux_info_record (tree, int, int, int);
+extern void gen_aux_info_record (tree, bool, bool, bool); //wyc
 
 /* in c-decl.cc */
 struct c_spot_bindings;
