@@ -306,6 +306,7 @@ enum c_declspec_il {
    specifier is added, please update the enum c_declspec_word above
    accordingly.  */
 struct c_declspecs {
+  static c_declspecs *new_null (); //wyc
   location_t locations[cdw_number_of_elements];
   /* The type specified, if a single type specifier such as a struct,
      union or enum specifier, typedef name or typeof specifies the
@@ -460,6 +461,7 @@ struct c_arg_info {
 
 /* A declarator.  */
 struct c_declarator {
+  static c_declarator *new_id (tree ident); //wyc
   /* The kind of declarator.  */
   enum c_declarator_kind kind;
   location_t id_loc; /* Currently only set for cdk_id, cdk_array. */

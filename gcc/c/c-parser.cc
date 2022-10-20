@@ -1915,7 +1915,7 @@ c_parser_declaration_or_fndef (c_parser *parser, bool fndef_ok,
       c_parser_static_assert_declaration (parser);
       return;
     }
-  struct c_declspecs *specs = build_null_declspecs ();
+  struct c_declspecs *specs = c_declspecs::new_null (); //build_null_declspecs ();
 
   /* Handle any standard attributes parsed in the caller.  */
   if (have_attrs)
@@ -2145,7 +2145,7 @@ c_parser_declaration_or_fndef (c_parser *parser, bool fndef_ok,
       //wyc struct c_declarator *declarator;
       bool dummy = false;
       timevar_id_t tv;
-      tree fnbody = NULL_TREE;
+      //tree fnbody = NULL_TREE;
       /* Declaring either one or more declarators (in which case we
 	 should diagnose if there were no declaration specifiers) or a
 	 function definition (in which case the diagnostic for
@@ -2401,7 +2401,7 @@ c_parser_declaration_or_fndef (c_parser *parser, bool fndef_ok,
 		all_prefix_attrs = prefix_attrs;
 	      continue;
 	    }
-	  else if (c_parser_next_token_is (parser, CPP_SEMICOLON))
+	  else if (c_parser_next_token_is (parser, CPP_SEMICOLON)) // ';'
 	    {
 	      c_parser_consume_token (parser);
 	      return;
@@ -2513,6 +2513,7 @@ c_parser_declaration_or_fndef (c_parser *parser, bool fndef_ok,
 	= startloc;
       location_t endloc = startloc;
 
+      tree fnbody = NULL_TREE;
       /* If the definition was marked with __RTL, use the RTL parser now,
 	 consuming the function body.  */
       if (specs->declspec_il == cdil_rtl)
@@ -3564,7 +3565,7 @@ c_parser_struct_declaration (c_parser *parser)
       c_parser_static_assert_declaration_no_semi (parser);
       return NULL_TREE;
     }
-  specs = build_null_declspecs ();
+  specs = c_declspecs::new_null (); //build_null_declspecs ();
   decl_loc = c_parser_peek_token (parser)->location;
   /* Strictly by the standard, we shouldn't allow _Alignas here,
      but it appears to have been intended to allow it there, so
@@ -3600,7 +3601,7 @@ c_parser_struct_declaration (c_parser *parser)
 	  tree attrs = NULL;
 
 	  ret = grokfield (c_parser_peek_token (parser)->location,
-			   build_id_declarator (NULL_TREE), specs,
+			   c_declarator::new_id (NULL_TREE), specs,
 			   NULL_TREE, &attrs);
 	  if (ret)
 	    decl_attributes (&ret, attrs, 0);
@@ -3631,7 +3632,7 @@ c_parser_struct_declaration (c_parser *parser)
       struct c_declarator *declarator;
       bool dummy = false;
       if (c_parser_next_token_is (parser, CPP_COLON))
-	declarator = build_id_declarator (NULL_TREE);
+	declarator = c_declarator::new_id (NULL_TREE);
       else
 	declarator = c_parser_declarator (parser,
 					  specs->typespec_kind != ctsk_none,
@@ -3881,7 +3882,7 @@ c_parser_declarator (c_parser *parser, bool type_seen_p, c_dtr_syn kind,
   /* Parse any initial pointer part.  */
   if (c_parser_next_token_is (parser, CPP_MULT)) //wyc '*'
     {
-      struct c_declspecs *quals_attrs = build_null_declspecs ();
+      struct c_declspecs *quals_attrs = c_declspecs::new_null (); //build_null_declspecs ();
       struct c_declarator *inner;
       c_parser_consume_token (parser);
       c_parser_declspecs (parser, quals_attrs, false, false, true,
@@ -3947,7 +3948,7 @@ c_parser_direct_declarator (c_parser *parser, bool type_seen_p,
 	  || c_parser_peek_token (parser)->id_kind == C_ID_ID))
     {
       struct c_declarator *inner
-	= build_id_declarator (c_parser_peek_token (parser)->value);
+	= c_declarator::new_id (c_parser_peek_token (parser)->value);
       *seen_id = true;
       inner->id_loc = c_parser_peek_token (parser)->location;
       c_parser_consume_token (parser);
@@ -3960,7 +3961,7 @@ c_parser_direct_declarator (c_parser *parser, bool type_seen_p,
       && c_parser_next_token_is (parser, CPP_OPEN_SQUARE)
       && !c_parser_nth_token_starts_std_attributes (parser, 1))
     {
-      struct c_declarator *inner = build_id_declarator (NULL_TREE);
+      struct c_declarator *inner = c_declarator::new_id (NULL_TREE);
       inner->id_loc = c_parser_peek_token (parser)->location;
       return c_parser_direct_declarator_inner (parser, *seen_id, inner);
     }
@@ -3989,7 +3990,7 @@ c_parser_direct_declarator (c_parser *parser, bool type_seen_p,
 	    return NULL;
 	  else
 	    {
-	      inner = build_id_declarator (NULL_TREE);
+	      inner = c_declarator::new_id (NULL_TREE);
 	      if (!(args->types
 		    && args->types != error_mark_node
 		    && TREE_CODE (TREE_VALUE (args->types)) == IDENTIFIER_NODE)
@@ -4032,7 +4033,7 @@ c_parser_direct_declarator (c_parser *parser, bool type_seen_p,
 	  return NULL;
 	}
       else
-	return build_id_declarator (NULL_TREE);
+	return c_declarator::new_id (NULL_TREE);
     }
 }
 
@@ -4051,7 +4052,7 @@ c_parser_direct_declarator_inner (c_parser *parser, bool id_present,
     {
       location_t brace_loc = c_parser_peek_token (parser)->location;
       struct c_declarator *declarator;
-      struct c_declspecs *quals_attrs = build_null_declspecs ();
+      struct c_declspecs *quals_attrs = c_declspecs::new_null (); //build_null_declspecs ();
       bool static_seen;
       bool star_seen;
       struct c_expr dimen;
@@ -4402,7 +4403,7 @@ c_parser_parameter_declaration (c_parser *parser, tree attrs,
 
   location_t start_loc = c_parser_peek_token (parser)->location;
 
-  struct c_declspecs *specs = build_null_declspecs ();
+  struct c_declspecs *specs = c_declspecs::new_null (); //build_null_declspecs ();
   if (attrs)
     {
       declspecs_add_attrs (input_location, specs, attrs);
@@ -5144,7 +5145,7 @@ c_parser_std_attribute_specifier_sequence (c_parser *parser)
 struct c_type_name *
 c_parser_type_name (c_parser *parser, bool alignas_ok)
 {
-  struct c_declspecs *specs = build_null_declspecs ();
+  struct c_declspecs *specs = c_declspecs::new_null (); //build_null_declspecs ();
   struct c_declarator *declarator;
   struct c_type_name *ret;
   bool dummy = false;

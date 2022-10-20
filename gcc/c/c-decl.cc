@@ -10734,6 +10734,19 @@ build_id_declarator (tree ident)
   return ret;
 }
 
+c_declarator *
+c_declarator::new_id (tree ident)
+{
+  c_declarator *ret = XOBNEW (&parser_obstack, c_declarator);
+  ret->kind = cdk_id; //wyc enum c_declarator_kind
+  ret->declarator = 0;
+  ret->u.id.id = ident;
+  ret->u.id.attrs = NULL_TREE;
+  /* Default value - may get reset to a more precise location. */
+  ret->id_loc = input_location;
+  return ret;
+}
+
 /* Return something to represent absolute declarators containing a *.
    TARGET is the absolute declarator that the * contains.
    TYPE_QUALS_ATTRS is a structure for type qualifiers and attributes
@@ -10767,6 +10780,20 @@ struct c_declspecs *
 build_null_declspecs (void)
 {
   struct c_declspecs *ret = XOBNEW (&parser_obstack, struct c_declspecs);
+  memset (ret, 0, sizeof *ret);
+  ret->align_log = -1;
+  ret->typespec_word = cts_none;
+  ret->storage_class = csc_none;
+  ret->expr_const_operands = true;
+  ret->typespec_kind = ctsk_none;
+  ret->address_space = ADDR_SPACE_GENERIC;
+  return ret;
+}
+
+c_declspecs *
+c_declspecs::new_null ()
+{
+  c_declspecs *ret = XOBNEW (&parser_obstack, c_declspecs);
   memset (ret, 0, sizeof *ret);
   ret->align_log = -1;
   ret->typespec_word = cts_none;
