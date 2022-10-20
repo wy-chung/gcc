@@ -461,7 +461,13 @@ struct c_arg_info {
 
 /* A declarator.  */
 struct c_declarator {
-  static c_declarator *new_id (tree ident); //wyc
+  //wyc
+  static c_declarator *new_attrs (tree attrs, c_declarator *target);
+  static c_declarator *new_function (c_arg_info *args, c_declarator *target);
+  static c_declarator *new_id (tree ident);
+  static c_declarator *new_pointer (c_declspecs *type_quals_attrs,
+				    c_declarator *target);
+
   /* The kind of declarator.  */
   enum c_declarator_kind kind;
   location_t id_loc; /* Currently only set for cdk_id, cdk_array. */

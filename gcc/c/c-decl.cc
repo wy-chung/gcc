@@ -10704,6 +10704,16 @@ build_attrs_declarator (tree attrs, struct c_declarator *target)
   return ret;
 }
 
+c_declarator * //wyc build_attrs_declarator
+c_declarator::new_attrs (tree attrs, c_declarator *target)
+{
+  c_declarator *ret = XOBNEW (&parser_obstack, c_declarator);
+  ret->kind = cdk_attrs;
+  ret->declarator = target;
+  ret->u.attrs = attrs;
+  return ret;
+}
+
 /* Return a declarator for a function with arguments specified by ARGS
    and return type specified by TARGET.  */
 
@@ -10712,6 +10722,17 @@ build_function_declarator (struct c_arg_info *args,
 			   struct c_declarator *target)
 {
   struct c_declarator *ret = XOBNEW (&parser_obstack, struct c_declarator);
+  ret->kind = cdk_function;
+  ret->declarator = target;
+  ret->u.arg_info = args;
+  return ret;
+}
+
+c_declarator * //wyc build_function_declarator
+c_declarator::new_function (c_arg_info *args,
+			    c_declarator *target)
+{
+  c_declarator *ret = XOBNEW (&parser_obstack, c_declarator);
   ret->kind = cdk_function;
   ret->declarator = target;
   ret->u.arg_info = args;
@@ -10734,7 +10755,7 @@ build_id_declarator (tree ident)
   return ret;
 }
 
-c_declarator *
+c_declarator * //wyc build_id_declarator
 c_declarator::new_id (tree ident)
 {
   c_declarator *ret = XOBNEW (&parser_obstack, c_declarator);
@@ -10765,7 +10786,28 @@ make_pointer_declarator (struct c_declspecs *type_quals_attrs,
       attrs = type_quals_attrs->attrs;
       quals = quals_from_declspecs (type_quals_attrs);
       if (attrs != NULL_TREE)
-	itarget = build_attrs_declarator (attrs, target);
+	itarget = c_declarator::new_attrs (attrs, target);
+    }
+  ret->kind = cdk_pointer;
+  ret->declarator = itarget;
+  ret->u.pointer_quals = quals;
+  return ret;
+}
+
+c_declarator * // wyc make_pointer_declarator
+c_declarator::new_pointer (c_declspecs *type_quals_attrs,
+			   c_declarator *target)
+{
+  tree attrs;
+  int quals = 0;
+  c_declarator *itarget = target;
+  c_declarator *ret = XOBNEW (&parser_obstack, c_declarator);
+  if (type_quals_attrs)
+    {
+      attrs = type_quals_attrs->attrs;
+      quals = quals_from_declspecs (type_quals_attrs);
+      if (attrs != NULL_TREE)
+	itarget = c_declarator::new_attrs (attrs, target);
     }
   ret->kind = cdk_pointer;
   ret->declarator = itarget;
@@ -10790,7 +10832,7 @@ build_null_declspecs (void)
   return ret;
 }
 
-c_declspecs *
+c_declspecs * //wyc build_null_declspecs
 c_declspecs::new_null ()
 {
   c_declspecs *ret = XOBNEW (&parser_obstack, c_declspecs);

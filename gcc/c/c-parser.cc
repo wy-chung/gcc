@@ -3891,7 +3891,7 @@ c_parser_declarator (c_parser *parser, bool type_seen_p, c_dtr_syn kind,
       if (inner == NULL)
 	return NULL;
       else
-	return make_pointer_declarator (quals_attrs, inner);
+	return c_declarator::new_pointer (quals_attrs, inner); // make_pointer_declarator
     }
   /* Now we have a direct declarator, direct abstract declarator or
      nothing (which counts as a direct abstract declarator here).  */
@@ -3999,9 +3999,9 @@ c_parser_direct_declarator (c_parser *parser, bool type_seen_p,
 		  tree std_attrs
 		    = c_parser_std_attribute_specifier_sequence (parser);
 		  if (std_attrs)
-		    inner = build_attrs_declarator (std_attrs, inner);
+		    inner = c_declarator::new_attrs (std_attrs, inner);
 		}
-	      inner = build_function_declarator (args, inner);
+	      inner = c_declarator::new_function (args, inner);
 	      return c_parser_direct_declarator_inner (parser, *seen_id,
 						       inner);
 	    }
@@ -4009,7 +4009,7 @@ c_parser_direct_declarator (c_parser *parser, bool type_seen_p,
       /* A parenthesized declarator.  */
       inner = c_parser_declarator (parser, type_seen_p, kind, seen_id);
       if (inner != NULL && attrs != NULL)
-	inner = build_attrs_declarator (attrs, inner);
+	inner = c_declarator::new_attrs (attrs, inner);
       if (c_parser_next_token_is (parser, CPP_CLOSE_PAREN))
 	{
 	  c_parser_consume_token (parser);
@@ -4124,7 +4124,7 @@ c_parser_direct_declarator_inner (c_parser *parser, bool id_present,
 	  tree std_attrs
 	    = c_parser_std_attribute_specifier_sequence (parser);
 	  if (std_attrs)
-	    inner = build_attrs_declarator (std_attrs, inner);
+	    inner = c_declarator::new_attrs (std_attrs, inner);
 	}
       inner = set_array_declarator_inner (declarator, inner);
       return c_parser_direct_declarator_inner (parser, id_present, inner);
@@ -4151,9 +4151,9 @@ c_parser_direct_declarator_inner (c_parser *parser, bool id_present,
 	      tree std_attrs
 		= c_parser_std_attribute_specifier_sequence (parser);
 	      if (std_attrs)
-		inner = build_attrs_declarator (std_attrs, inner);
+		inner = c_declarator::new_attrs (std_attrs, inner);
 	    }
-	  inner = build_function_declarator (args, inner);
+	  inner = c_declarator::new_function (args, inner);
 	  return c_parser_direct_declarator_inner (parser, id_present, inner);
 	}
     }
