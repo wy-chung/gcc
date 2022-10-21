@@ -10694,16 +10694,6 @@ build_c_parm (struct c_declspecs *specs, tree attrs,
    declarator to which these attributes apply.  ATTRS are the
    attributes.  */
 
-struct c_declarator *
-build_attrs_declarator (tree attrs, struct c_declarator *target)
-{
-  struct c_declarator *ret = XOBNEW (&parser_obstack, struct c_declarator);
-  ret->kind = cdk_attrs;
-  ret->declarator = target;
-  ret->u.attrs = attrs;
-  return ret;
-}
-
 c_declarator * //wyc build_attrs_declarator
 c_declarator::new_attrs (tree attrs, c_declarator *target)
 {
@@ -10713,20 +10703,19 @@ c_declarator::new_attrs (tree attrs, c_declarator *target)
   ret->u.attrs = attrs;
   return ret;
 }
-
-/* Return a declarator for a function with arguments specified by ARGS
-   and return type specified by TARGET.  */
-
+#if 0
 struct c_declarator *
-build_function_declarator (struct c_arg_info *args,
-			   struct c_declarator *target)
+build_attrs_declarator (tree attrs, struct c_declarator *target)
 {
   struct c_declarator *ret = XOBNEW (&parser_obstack, struct c_declarator);
-  ret->kind = cdk_function;
+  ret->kind = cdk_attrs;
   ret->declarator = target;
-  ret->u.arg_info = args;
+  ret->u.attrs = attrs;
   return ret;
 }
+#endif
+/* Return a declarator for a function with arguments specified by ARGS
+   and return type specified by TARGET.  */
 
 c_declarator * //wyc build_function_declarator
 c_declarator::new_function (c_arg_info *args,
@@ -10738,22 +10727,20 @@ c_declarator::new_function (c_arg_info *args,
   ret->u.arg_info = args;
   return ret;
 }
-
-/* Return a declarator for the identifier IDENT (which may be
-   NULL_TREE for an abstract declarator).  */
-
+#if 0
 struct c_declarator *
-build_id_declarator (tree ident)
+build_function_declarator (struct c_arg_info *args,
+			   struct c_declarator *target)
 {
   struct c_declarator *ret = XOBNEW (&parser_obstack, struct c_declarator);
-  ret->kind = cdk_id; //wyc enum c_declarator_kind
-  ret->declarator = 0;
-  ret->u.id.id = ident;
-  ret->u.id.attrs = NULL_TREE;
-  /* Default value - may get reset to a more precise location. */
-  ret->id_loc = input_location;
+  ret->kind = cdk_function;
+  ret->declarator = target;
+  ret->u.arg_info = args;
   return ret;
 }
+#endif
+/* Return a declarator for the identifier IDENT (which may be
+   NULL_TREE for an abstract declarator).  */
 
 c_declarator * //wyc build_id_declarator
 c_declarator::new_id (tree ident)
@@ -10767,32 +10754,24 @@ c_declarator::new_id (tree ident)
   ret->id_loc = input_location;
   return ret;
 }
-
+#if 0
+struct c_declarator *
+build_id_declarator (tree ident)
+{
+  struct c_declarator *ret = XOBNEW (&parser_obstack, struct c_declarator);
+  ret->kind = cdk_id; //wyc enum c_declarator_kind
+  ret->declarator = 0;
+  ret->u.id.id = ident;
+  ret->u.id.attrs = NULL_TREE;
+  /* Default value - may get reset to a more precise location. */
+  ret->id_loc = input_location;
+  return ret;
+}
+#endif
 /* Return something to represent absolute declarators containing a *.
    TARGET is the absolute declarator that the * contains.
    TYPE_QUALS_ATTRS is a structure for type qualifiers and attributes
    to apply to the pointer type.  */
-
-struct c_declarator *
-make_pointer_declarator (struct c_declspecs *type_quals_attrs,
-			 struct c_declarator *target)
-{
-  tree attrs;
-  int quals = 0;
-  struct c_declarator *itarget = target;
-  struct c_declarator *ret = XOBNEW (&parser_obstack, struct c_declarator);
-  if (type_quals_attrs)
-    {
-      attrs = type_quals_attrs->attrs;
-      quals = quals_from_declspecs (type_quals_attrs);
-      if (attrs != NULL_TREE)
-	itarget = c_declarator::new_attrs (attrs, target);
-    }
-  ret->kind = cdk_pointer;
-  ret->declarator = itarget;
-  ret->u.pointer_quals = quals;
-  return ret;
-}
 
 c_declarator * // wyc make_pointer_declarator
 c_declarator::new_pointer (c_declspecs *type_quals_attrs,
@@ -10814,23 +10793,30 @@ c_declarator::new_pointer (c_declspecs *type_quals_attrs,
   ret->u.pointer_quals = quals;
   return ret;
 }
-
-/* Return a pointer to a structure for an empty list of declaration
-   specifiers.  */
-
-struct c_declspecs *
-build_null_declspecs (void)
+#if 0
+struct c_declarator *
+make_pointer_declarator (struct c_declspecs *type_quals_attrs,
+			 struct c_declarator *target)
 {
-  struct c_declspecs *ret = XOBNEW (&parser_obstack, struct c_declspecs);
-  memset (ret, 0, sizeof *ret);
-  ret->align_log = -1;
-  ret->typespec_word = cts_none;
-  ret->storage_class = csc_none;
-  ret->expr_const_operands = true;
-  ret->typespec_kind = ctsk_none;
-  ret->address_space = ADDR_SPACE_GENERIC;
+  tree attrs;
+  int quals = 0;
+  struct c_declarator *itarget = target;
+  struct c_declarator *ret = XOBNEW (&parser_obstack, struct c_declarator);
+  if (type_quals_attrs)
+    {
+      attrs = type_quals_attrs->attrs;
+      quals = quals_from_declspecs (type_quals_attrs);
+      if (attrs != NULL_TREE)
+	itarget = c_declarator::new_attrs (attrs, target);
+    }
+  ret->kind = cdk_pointer;
+  ret->declarator = itarget;
+  ret->u.pointer_quals = quals;
   return ret;
 }
+#endif
+/* Return a pointer to a structure for an empty list of declaration
+   specifiers.  */
 
 c_declspecs * //wyc build_null_declspecs
 c_declspecs::new_null ()
@@ -10845,7 +10831,21 @@ c_declspecs::new_null ()
   ret->address_space = ADDR_SPACE_GENERIC;
   return ret;
 }
-
+#if 0
+struct c_declspecs *
+build_null_declspecs (void)
+{
+  struct c_declspecs *ret = XOBNEW (&parser_obstack, struct c_declspecs);
+  memset (ret, 0, sizeof *ret);
+  ret->align_log = -1;
+  ret->typespec_word = cts_none;
+  ret->storage_class = csc_none;
+  ret->expr_const_operands = true;
+  ret->typespec_kind = ctsk_none;
+  ret->address_space = ADDR_SPACE_GENERIC;
+  return ret;
+}
+#endif
 /* Add the address space ADDRSPACE to the declaration specifiers
    SPECS, returning SPECS.  */
 
