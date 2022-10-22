@@ -647,6 +647,7 @@ extern struct c_typespec parser_xref_tag (location_t, enum tree_code, tree,
 					  bool, tree);
 extern struct c_parm *build_c_parm (struct c_declspecs *, tree,
 				    struct c_declarator *, location_t);
+#if 0
 extern struct c_declarator *build_attrs_declarator (tree,
 						    struct c_declarator *);
 extern struct c_declarator *build_function_declarator (struct c_arg_info *,
@@ -655,6 +656,7 @@ extern struct c_declarator *build_id_declarator (tree);
 extern struct c_declarator *make_pointer_declarator (struct c_declspecs *,
 						     struct c_declarator *);
 extern struct c_declspecs *build_null_declspecs (void);
+#endif
 extern struct c_declspecs *declspecs_add_qual (location_t,
 					       struct c_declspecs *, tree);
 extern struct c_declspecs *declspecs_add_type (location_t,

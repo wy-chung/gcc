@@ -723,7 +723,7 @@ c_print_identifier (FILE *file, tree node, int indent)
 /* Establish a binding between NAME, an IDENTIFIER_NODE, and DECL,
    which may be any of several kinds of DECL or TYPE or error_mark_node,
    in the scope SCOPE.  */
-//wyc out: scope->bindings and new_binding->shadowed
+//wyc out: scope->bindings
 static void
 bind (tree name, tree decl, struct c_scope *scope, bool invisible,
       bool nested, location_t locus)
@@ -3108,13 +3108,13 @@ warn_if_shadowing (tree new_decl)
    Returns either X or an old decl for the same name.
    If an old decl is returned, it may have been smashed
    to agree with what X says.  */
-
+//wyc output current_scope
 tree
 pushdecl (tree x)
 {
   tree name = DECL_NAME (x);
   struct c_scope *scope = current_scope;
-  struct c_binding *b;
+  //wyc struct c_binding *b;
   bool nested = false;
   location_t locus = DECL_SOURCE_LOCATION (x);
 
@@ -3141,7 +3141,7 @@ pushdecl (tree x)
      replace the old one (duplicate_decls has issued all appropriate
      diagnostics).  In particular, we should not consider possible
      duplicates in the external scope, or shadowing.  */
-  b = I_SYMBOL_BINDING (name);
+  struct c_binding *b = I_SYMBOL_BINDING (name);
   if (b && B_IN_SCOPE (b, scope))
     {
       struct c_binding *b_ext, *b_use;
@@ -11963,7 +11963,7 @@ declspecs_add_alignas (location_t loc,
    type.  This is where ISO C checks on complex types are made, since
    "_Complex long" is a prefix of the valid ISO C type "_Complex long
    double".  Also apply postfix standard attributes to modify the type.  */
-
+// output: specs->[typespec_word, default_int_p, explicit_signed_p, type]
 struct c_declspecs *
 finish_declspecs (struct c_declspecs *specs)
 {

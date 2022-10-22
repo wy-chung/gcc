@@ -2144,7 +2144,7 @@ c_parser_declaration_or_fndef (c_parser *parser, bool fndef_ok,
     {
       //wyc struct c_declarator *declarator;
       bool dummy = false;
-      timevar_id_t tv;
+      //wyc timevar_id_t tv;
       //tree fnbody = NULL_TREE;
       /* Declaring either one or more declarators (in which case we
 	 should diagnose if there were no declaration specifiers) or a
@@ -2479,7 +2479,7 @@ c_parser_declaration_or_fndef (c_parser *parser, bool fndef_ok,
 	    c_pop_function_context ();
 	  break;
 	}
-
+      timevar_id_t tv;
       if (DECL_DECLARED_INLINE_P (current_function_decl))
         tv = TV_PARSE_INLINE;
       else
