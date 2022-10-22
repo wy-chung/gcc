@@ -5717,7 +5717,7 @@ finish_decl (tree decl, location_t init_loc, tree init,
       && !DECL_HARD_REGISTER (decl))
     targetm.lower_local_decl_alignment (decl);
 
-  invoke_plugin_callbacks (PLUGIN_FINISH_DECL, decl); // plugin not enabled
+  invoke_plugin_callbacks (PLUGIN_FINISH_DECL, decl); //wyc plugin not enabled
 }
 
 /* Given a parsed parameter declaration, decode it into a PARM_DECL.
@@ -7956,6 +7956,19 @@ grokparms (struct c_arg_info *arg_info, bool funcdef_flag)
 /* Allocate and initialize a c_arg_info structure from the parser's
    obstack.  */
 
+c_arg_info *
+c_arg_info::new_null ()
+{
+  c_arg_info *ret = XOBNEW (&parser_obstack, c_arg_info);
+  ret->parms = NULL_TREE;
+  ret->tags = NULL;
+  ret->types = NULL_TREE;
+  ret->others = NULL_TREE;
+  ret->pending_sizes = NULL;
+  ret->had_vla_unspec = 0;
+  return ret;
+}
+#if 0
 struct c_arg_info *
 build_arg_info (void)
 {
@@ -7968,7 +7981,7 @@ build_arg_info (void)
   ret->had_vla_unspec = 0;
   return ret;
 }
-
+#endif
 /* Take apart the current scope and return a c_arg_info structure with
    info on a parameter list just parsed.
 
@@ -7984,11 +7997,11 @@ struct c_arg_info *
 get_parm_info (bool ellipsis, tree expr)
 {
   struct c_binding *b = current_scope->bindings;
-  struct c_arg_info *arg_info = build_arg_info ();
+  struct c_arg_info *arg_info = c_arg_info::new_null (); // build_arg_info
 
   tree parms = NULL_TREE;
   vec<c_arg_tag, va_gc> *tags = NULL;
-  tree types = NULL_TREE;
+  //wyc tree types = NULL_TREE;
   tree others = NULL_TREE;
 
   bool gave_void_only_once_err = false;
@@ -8024,7 +8037,7 @@ get_parm_info (bool ellipsis, tree expr)
       arg_info->types = void_list_node;
       return arg_info;
     }
-
+  tree types = NULL_TREE;
   if (!ellipsis)
     types = void_list_node;
 
@@ -8147,10 +8160,10 @@ get_parm_info (bool ellipsis, tree expr)
 	case VAR_DECL:
 	default:
 	  gcc_unreachable ();
-	}
+	} // switch (TREE_CODE (decl))
 
       b = free_binding_and_advance (b);
-    }
+    } // while (b)
 
   arg_info->parms = parms;
   arg_info->tags = tags;

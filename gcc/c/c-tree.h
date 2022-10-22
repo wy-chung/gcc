@@ -307,6 +307,7 @@ enum c_declspec_il {
    accordingly.  */
 struct c_declspecs {
   static c_declspecs *new_null (); //wyc
+
   location_t locations[cdw_number_of_elements];
   /* The type specified, if a single type specifier such as a struct,
      union or enum specifier, typedef name or typeof specifies the
@@ -440,6 +441,8 @@ struct c_arg_tag {
 
 /* Information about the parameters in a function declarator.  */
 struct c_arg_info {
+  static c_arg_info *new_null(); //wyc
+
   /* A list of parameter decls.  */
   tree parms;
   /* A list of structure, union and enum tags defined.  */
@@ -517,6 +520,7 @@ struct c_type_name {
 struct c_parm {
   static c_parm *new_init(c_declspecs *specs, tree attrs,
 		  c_declarator *declarator, location_t loc);
+
   /* The declaration specifiers, minus any prefix attributes.  */
   struct c_declspecs *specs;
   /* The attributes.  */
@@ -613,7 +617,7 @@ extern tree c_simulate_enum_decl (location_t, const char *,
 				  vec<string_int_pair> *);
 extern tree c_simulate_record_decl (location_t, const char *,
 				    array_slice<const tree>);
-extern struct c_arg_info *build_arg_info (void);
+//extern struct c_arg_info *build_arg_info (void);
 extern struct c_arg_info *get_parm_info (bool, tree);
 extern tree grokfield (location_t, struct c_declarator *,
 		       struct c_declspecs *, tree, tree *);

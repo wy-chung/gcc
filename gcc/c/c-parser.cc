@@ -4208,7 +4208,7 @@ c_parser_parms_declarator (c_parser *parser, bool id_list_ok,
 	}
       if (c_parser_next_token_is (parser, CPP_CLOSE_PAREN))
 	{
-	  struct c_arg_info *ret = build_arg_info ();
+	  struct c_arg_info *ret = c_arg_info::new_null (); // build_arg_info
 	  ret->types = list;
 	  c_parser_consume_token (parser);
 	  pop_scope ();
@@ -4253,13 +4253,13 @@ c_parser_parms_list_declarator (c_parser *parser, tree attrs, tree expr,
      declarations.  */
   if (c_parser_next_token_is (parser, CPP_CLOSE_PAREN))
     {
-      struct c_arg_info *ret = build_arg_info ();
+      struct c_arg_info *ret = c_arg_info::new_null (); // build_arg_info
       c_parser_consume_token (parser);
       return ret;
     }
   if (c_parser_next_token_is (parser, CPP_ELLIPSIS))
     {
-      struct c_arg_info *ret = build_arg_info ();
+      struct c_arg_info *ret = c_arg_info::new_null (); // build_arg_info
 
       if (flag_allow_parameterless_variadic_functions)
         {
