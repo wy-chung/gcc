@@ -10677,6 +10677,18 @@ build_void_list_node (void)
 
 /* Return a c_parm structure with the given SPECS, ATTRS and DECLARATOR.  */
 
+c_parm *
+c_parm::new_init (c_declspecs *specs, tree attrs,
+		  c_declarator *declarator, location_t loc)
+{
+  c_parm *ret = XOBNEW (&parser_obstack, c_parm);
+  ret->specs = specs;
+  ret->attrs = attrs;
+  ret->declarator = declarator;
+  ret->loc = loc;
+  return ret;
+}
+#if 0
 struct c_parm *
 build_c_parm (struct c_declspecs *specs, tree attrs,
 	      struct c_declarator *declarator,
@@ -10689,7 +10701,7 @@ build_c_parm (struct c_declspecs *specs, tree attrs,
   ret->loc = loc;
   return ret;
 }
-
+#endif
 /* Return a declarator with nested attributes.  TARGET is the inner
    declarator to which these attributes apply.  ATTRS are the
    attributes.  */

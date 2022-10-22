@@ -515,6 +515,8 @@ struct c_type_name {
 
 /* A parameter.  */
 struct c_parm {
+  static c_parm *new_init(c_declspecs *specs, tree attrs,
+		  c_declarator *declarator, location_t loc);
   /* The declaration specifiers, minus any prefix attributes.  */
   struct c_declspecs *specs;
   /* The attributes.  */
@@ -645,9 +647,9 @@ extern void temp_pop_parm_decls (void);
 extern tree xref_tag (enum tree_code, tree);
 extern struct c_typespec parser_xref_tag (location_t, enum tree_code, tree,
 					  bool, tree);
+#if 0
 extern struct c_parm *build_c_parm (struct c_declspecs *, tree,
 				    struct c_declarator *, location_t);
-#if 0
 extern struct c_declarator *build_attrs_declarator (tree,
 						    struct c_declarator *);
 extern struct c_declarator *build_function_declarator (struct c_arg_info *,

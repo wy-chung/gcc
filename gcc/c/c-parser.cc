@@ -4452,7 +4452,7 @@ c_parser_parameter_declaration (c_parser *parser, tree attrs,
 			  : start_loc);
   location_t param_loc = make_location (caret_loc, start_loc, end_loc);
 
-  return build_c_parm (specs, chainon (postfix_attrs, prefix_attrs),
+  return c_parm::new_init (specs, chainon (postfix_attrs, prefix_attrs),
 		       declarator, param_loc);
 }
 
