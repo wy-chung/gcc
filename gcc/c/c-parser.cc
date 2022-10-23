@@ -2382,7 +2382,7 @@ c_parser_declaration_or_fndef (c_parser *parser, bool fndef_ok,
 		  else
 		    *objc_foreach_object_declaration = error_mark_node;		    
 		}
-	    } // if next_token is NOT CPP_EQ
+	    } // else next_token is NOT CPP_EQ
 	  if (c_parser_next_token_is (parser, CPP_COMMA))
 	    {
 	      if (auto_type_p)

@@ -146,7 +146,7 @@ int current_function_returns_abnormally;
 /* Set to nonzero by `grokdeclarator' for a function
    whose return type is defaulted, if warnings for this are desired.  */
 
-static int warn_about_return_type;
+static bool warn_about_return_type;
 
 /* Nonzero when the current toplevel function contains a declaration
    of a nested function which is never defined.  */
@@ -6418,7 +6418,7 @@ grokdeclarator (const struct c_declarator *declarator,
 	 prefer the former warning since it is more explicit.  */
       if ((warn_implicit_int || warn_return_type > 0 || flag_isoc99)
 	  && funcdef_flag)
-	warn_about_return_type = 1;
+	warn_about_return_type = true;
       else
 	{
 	  if (name)
@@ -8037,9 +8037,9 @@ get_parm_info (bool ellipsis, tree expr)
       arg_info->types = void_list_node;
       return arg_info;
     }
-  tree types = NULL_TREE;
-  if (!ellipsis)
-    types = void_list_node;
+  tree types = void_list_node;	//wyc NULL_TREE
+  if (ellipsis) 		//wyc !ellipsis
+    types = NULL_TREE;		//wyc void_list_node
 
   /* Break up the bindings list into parms, tags, types, and others;
      apply sanity checks; purge the name-to-decl bindings.  */
@@ -9513,7 +9513,7 @@ start_function (struct c_declspecs *declspecs, struct c_declarator *declarator,
   current_function_returns_value = 0;  /* Assume, until we see it does.  */
   current_function_returns_null = 0;
   current_function_returns_abnormally = 0;
-  warn_about_return_type = 0;
+  warn_about_return_type = false;
   c_switch_stack = NULL;
 
   /* Indicate no valid break/continue context.  */

@@ -233,7 +233,7 @@ class auto_timevar
       m_timer->push (m_tv);
   }
 
-  explicit auto_timevar (timevar_id_t tv)
+  explicit auto_timevar (timevar_id_t tv) //wyc don't allow implicit conversion
     : m_timer (g_timer)
     , m_tv (tv)
   {
