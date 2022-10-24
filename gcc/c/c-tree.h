@@ -576,7 +576,7 @@ extern struct obstack parser_obstack;
 #define IN_OMP_BLOCK		4
 #define IN_OMP_FOR		8
 #define IN_OBJC_FOREACH		16
-extern unsigned char in_statement;
+extern unsigned char In_statement;
 
 extern bool switch_statement_break_seen_p;
 
@@ -696,7 +696,7 @@ extern bool c_in_omp_for;
 extern tree c_last_sizeof_arg;
 extern location_t c_last_sizeof_loc;
 
-extern struct c_switch *c_switch_stack;
+extern struct c_switch *C_switch_stack;
 
 extern bool char_type_p (tree);
 extern tree c_objc_common_truthvalue_conversion (location_t, tree);
@@ -790,17 +790,17 @@ extern tree c_omp_clause_copy_ctor (tree, tree, tree);
 /* Set to 0 at beginning of a function definition, set to 1 if
    a return statement that specifies a return value is seen.  */
 
-extern int current_function_returns_value;
+extern int Current_function_returns_value;
 
 /* Set to 0 at beginning of a function definition, set to 1 if
    a return statement with no argument is seen.  */
 
-extern int current_function_returns_null;
+extern int Current_function_returns_null;
 
 /* Set to 0 at beginning of a function definition, set to 1 if
    a call to a noreturn function is seen.  */
 
-extern int current_function_returns_abnormally;
+extern int Current_function_returns_abnormally;
 
 /* In c-decl.cc */
 

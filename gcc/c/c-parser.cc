@@ -6592,8 +6592,8 @@ c_parser_switch_statement (c_parser *parser, bool *if_p)
       ce.original_type = error_mark_node;
     }
   c_start_switch (switch_loc, switch_cond_loc, expr, explicit_cast_p);
-  save_in_statement = in_statement;
-  in_statement |= IN_SWITCH_STMT;
+  save_in_statement = In_statement;
+  In_statement |= IN_SWITCH_STMT;
   location_t loc_after_labels;
   bool open_brace_p = c_parser_peek_token (parser)->type == CPP_OPEN_BRACE;
   body = c_parser_c99_block_statement (parser, if_p, &loc_after_labels);
@@ -6602,7 +6602,7 @@ c_parser_switch_statement (c_parser *parser, bool *if_p)
     warn_for_multistatement_macros (loc_after_labels, next_loc, switch_loc,
 				    RID_SWITCH);
   c_finish_switch (body, ce.original_type);
-  in_statement = save_in_statement;
+  In_statement = save_in_statement;
   add_stmt (c_end_compound_stmt (switch_loc, block, flag_isoc99));
   c_parser_maybe_reclassify_token (parser);
 }
@@ -6640,8 +6640,8 @@ c_parser_while_statement (c_parser *parser, bool ivdep, unsigned short unroll,
 		   build_int_cst (integer_type_node,
 				  annot_expr_unroll_kind),
 		   build_int_cst (integer_type_node, unroll));
-  save_in_statement = in_statement;
-  in_statement = IN_ITERATION_STMT;
+  save_in_statement = In_statement;
+  In_statement = IN_ITERATION_STMT;
 
   token_indent_info body_tinfo
     = get_token_indent_info (c_parser_peek_token (parser));
@@ -6661,7 +6661,7 @@ c_parser_while_statement (c_parser *parser, bool ivdep, unsigned short unroll,
     warn_for_multistatement_macros (loc_after_labels, next_tinfo.location,
 				    while_tinfo.location, RID_WHILE);
 
-  in_statement = save_in_statement;
+  In_statement = save_in_statement;
 }
 
 /* Parse a do statement (C90 6.6.5, C99 6.8.5, C11 6.8.5).
@@ -6684,11 +6684,11 @@ c_parser_do_statement (c_parser *parser, bool ivdep, unsigned short unroll)
 		"suggest braces around empty body in %<do%> statement");
   block = c_begin_compound_stmt (flag_isoc99);
   loc = c_parser_peek_token (parser)->location;
-  save_in_statement = in_statement;
-  in_statement = IN_ITERATION_STMT;
+  save_in_statement = In_statement;
+  In_statement = IN_ITERATION_STMT;
   body = c_parser_c99_block_statement (parser, NULL);
   c_parser_require_keyword (parser, RID_WHILE, "expected %<while%>");
-  in_statement = save_in_statement;
+  In_statement = save_in_statement;
   cond = c_parser_paren_condition (parser);
   if (ivdep && cond != error_mark_node)
     cond = build3 (ANNOTATE_EXPR, TREE_TYPE (cond), cond,
@@ -6954,17 +6954,17 @@ c_parser_for_statement (c_parser *parser, bool ivdep, unsigned short unroll,
 	}
       parens.skip_until_found_close (parser);
     }
-  save_in_statement = in_statement;
+  save_in_statement = In_statement;
   if (is_foreach_statement)
     {
-      in_statement = IN_OBJC_FOREACH;
+      In_statement = IN_OBJC_FOREACH;
       save_objc_foreach_break_label = objc_foreach_break_label;
       save_objc_foreach_continue_label = objc_foreach_continue_label;
       objc_foreach_break_label = create_artificial_label (loc);
       objc_foreach_continue_label = create_artificial_label (loc);
     }
   else
-    in_statement = IN_ITERATION_STMT;
+    In_statement = IN_ITERATION_STMT;
 
   token_indent_info body_tinfo
     = get_token_indent_info (c_parser_peek_token (parser));
@@ -6993,7 +6993,7 @@ c_parser_for_statement (c_parser *parser, bool ivdep, unsigned short unroll,
     warn_for_multistatement_macros (loc_after_labels, next_tinfo.location,
 				    for_tinfo.location, RID_FOR);
 
-  in_statement = save_in_statement;
+  In_statement = save_in_statement;
   if (is_foreach_statement)
     {
       objc_foreach_break_label = save_objc_foreach_break_label;
@@ -19290,8 +19290,8 @@ c_parser_omp_for_loop (location_t loc, c_parser *parser, enum tree_code code,
 
   /* Forbid break/continue in the loop initializer, condition, and
      increment expressions.  */
-  save_in_statement = in_statement;
-  in_statement = IN_OMP_BLOCK;
+  save_in_statement = In_statement;
+  In_statement = IN_OMP_BLOCK;
 
   for (i = 0; i < count; i++)
     {
@@ -19465,7 +19465,7 @@ c_parser_omp_for_loop (location_t loc, c_parser *parser, enum tree_code code,
   if (nbraces)
     if_p = NULL;
 
-  in_statement = IN_OMP_FOR;
+  In_statement = IN_OMP_FOR;
   body = push_stmt_list ();
 
   if (inscan)
@@ -19481,7 +19481,7 @@ c_parser_omp_for_loop (location_t loc, c_parser *parser, enum tree_code code,
     add_stmt (c_parser_c99_block_statement (parser, if_p));
 
   body = pop_stmt_list (body);
-  in_statement = save_in_statement;
+  In_statement = save_in_statement;
 
   while (nbraces)
     {

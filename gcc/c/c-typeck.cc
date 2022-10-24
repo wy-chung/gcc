@@ -3160,7 +3160,7 @@ build_function_call_vec (location_t loc, vec<location_t> arg_loc,
     }
 
   if (fundecl && TREE_THIS_VOLATILE (fundecl))
-    current_function_returns_abnormally = 1;
+    Current_function_returns_abnormally = 1;
 
   /* fntype now gets the type of function pointed to.  */
   fntype = TREE_TYPE (fntype);
@@ -10876,7 +10876,7 @@ c_finish_return (location_t loc, tree retval, tree origtype)
 
   if (!retval)
     {
-      current_function_returns_null = 1;
+      Current_function_returns_null = 1;
       if ((warn_return_type >= 0 || flag_isoc99)
 	  && valtype != NULL_TREE && TREE_CODE (valtype) != VOID_TYPE)
 	{
@@ -10897,7 +10897,7 @@ c_finish_return (location_t loc, tree retval, tree origtype)
     }
   else if (valtype == NULL_TREE || TREE_CODE (valtype) == VOID_TYPE)
     {
-      current_function_returns_null = 1;
+      Current_function_returns_null = 1;
       bool warned_here;
       if (TREE_CODE (TREE_TYPE (retval)) != VOID_TYPE)
 	warned_here = pedwarn
@@ -10920,7 +10920,7 @@ c_finish_return (location_t loc, tree retval, tree origtype)
       tree inner;
       bool save;
 
-      current_function_returns_value = 1;
+      Current_function_returns_value = 1;
       if (t == error_mark_node)
 	return NULL_TREE;
 
@@ -11049,7 +11049,7 @@ struct c_switch {
    during the processing of the body of a function, and we never
    collect at that point.  */
 
-struct c_switch *c_switch_stack;
+struct c_switch *C_switch_stack;
 
 /* Start a C switch statement, testing expression EXP.  Return the new
    SWITCH_STMT.  SWITCH_LOC is the location of the `switch'.
@@ -11118,8 +11118,8 @@ c_start_switch (location_t switch_loc,
   cs->bindings = c_get_switch_bindings ();
   cs->break_stmt_seen_p = false;
   cs->bool_cond_p = bool_cond_p;
-  cs->next = c_switch_stack;
-  c_switch_stack = cs;
+  cs->next = C_switch_stack;
+  C_switch_stack = cs;
 
   return add_stmt (cs->switch_stmt);
 }
@@ -11147,7 +11147,7 @@ do_case (location_t loc, tree low_value, tree high_value)
 		 "case label is not an integer constant expression");
     }
 
-  if (c_switch_stack == NULL)
+  if (C_switch_stack == NULL)
     {
       if (low_value)
 	error_at (loc, "case label not within a switch statement");
@@ -11156,13 +11156,13 @@ do_case (location_t loc, tree low_value, tree high_value)
       return NULL_TREE;
     }
 
-  if (c_check_switch_jump_warnings (c_switch_stack->bindings,
-				    EXPR_LOCATION (c_switch_stack->switch_stmt),
+  if (c_check_switch_jump_warnings (C_switch_stack->bindings,
+				    EXPR_LOCATION (C_switch_stack->switch_stmt),
 				    loc))
     return NULL_TREE;
 
-  label = c_add_case_label (loc, c_switch_stack->cases,
-			    SWITCH_STMT_COND (c_switch_stack->switch_stmt),
+  label = c_add_case_label (loc, C_switch_stack->cases,
+			    SWITCH_STMT_COND (C_switch_stack->switch_stmt),
 			    low_value, high_value);
   if (label == error_mark_node)
     label = NULL_TREE;
@@ -11175,7 +11175,7 @@ do_case (location_t loc, tree low_value, tree high_value)
 void
 c_finish_switch (tree body, tree type)
 {
-  struct c_switch *cs = c_switch_stack;
+  struct c_switch *cs = C_switch_stack;
   location_t switch_location;
 
   SWITCH_STMT_BODY (cs->switch_stmt) = body;
@@ -11191,7 +11191,7 @@ c_finish_switch (tree body, tree type)
   SWITCH_STMT_NO_BREAK_P (cs->switch_stmt) = !cs->break_stmt_seen_p;
 
   /* Pop the stack.  */
-  c_switch_stack = cs->next;
+  C_switch_stack = cs->next;
   splay_tree_delete (cs->cases);
   c_release_switch_bindings (cs->bindings);
   XDELETE (cs);
@@ -11225,7 +11225,7 @@ c_finish_bc_stmt (location_t loc, tree label, bool is_break)
   bool skip = !block_may_fallthru (cur_stmt_list);
 
   if (is_break)
-    switch (in_statement)
+    switch (In_statement)
       {
       case 0:
 	error_at (loc, "break statement not within loop or switch");
@@ -11240,12 +11240,12 @@ c_finish_bc_stmt (location_t loc, tree label, bool is_break)
       case IN_OBJC_FOREACH:
 	break;
       default:
-	gcc_assert (in_statement & IN_SWITCH_STMT);
-	c_switch_stack->break_stmt_seen_p = true;
+	gcc_assert (In_statement & IN_SWITCH_STMT);
+	C_switch_stack->break_stmt_seen_p = true;
 	break;
       }
   else
-    switch (in_statement & ~IN_SWITCH_STMT)
+    switch (In_statement & ~IN_SWITCH_STMT)
       {
       case 0:
 	error_at (loc, "continue statement not within a loop");
@@ -11263,8 +11263,8 @@ c_finish_bc_stmt (location_t loc, tree label, bool is_break)
 
   if (skip)
     return NULL_TREE;
-  else if ((in_statement & IN_OBJC_FOREACH)
-	   && !(is_break && (in_statement & IN_SWITCH_STMT)))
+  else if ((In_statement & IN_OBJC_FOREACH)
+	   && !(is_break && (In_statement & IN_SWITCH_STMT)))
     {
       /* The foreach expander produces low-level code using gotos instead
 	 of a structured loop construct.  */
@@ -11388,9 +11388,9 @@ c_begin_stmt_expr (void)
   keep_next_level ();
   ret = c_begin_compound_stmt (true);
 
-  c_bindings_start_stmt_expr (c_switch_stack == NULL
+  c_bindings_start_stmt_expr (C_switch_stack == NULL
 			      ? NULL
-			      : c_switch_stack->bindings);
+			      : C_switch_stack->bindings);
 
   /* Mark the current statement list as belonging to a statement list.  */
   STATEMENT_LIST_STMT_EXPR (ret) = 1;
@@ -11409,9 +11409,9 @@ c_finish_stmt_expr (location_t loc, tree body)
 
   body = c_end_compound_stmt (loc, body, true);
 
-  c_bindings_end_stmt_expr (c_switch_stack == NULL
+  c_bindings_end_stmt_expr (C_switch_stack == NULL
 			    ? NULL
-			    : c_switch_stack->bindings);
+			    : C_switch_stack->bindings);
 
   /* Locate the last statement in BODY.  See c_end_compound_stmt
      about always returning a BIND_EXPR.  */

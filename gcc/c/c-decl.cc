@@ -97,15 +97,15 @@ location_t pending_invalid_xref_location;
    old-style definition; used for diagnostics in
    store_parm_decls_oldstyle.  */
 
-static location_t current_function_prototype_locus;
+static location_t Current_function_prototype_locus;
 
 /* Whether this prototype was built-in.  */
 
-static bool current_function_prototype_built_in;
+static bool Current_function_prototype_built_in;
 
 /* The argument type information of this prototype.  */
 
-static tree current_function_prototype_arg_types;
+static tree Current_function_prototype_arg_types;
 
 /* The argument information structure for the function currently being
    defined.  */
@@ -123,7 +123,7 @@ static GTY(()) struct stmt_tree_s c_stmt_tree;
 
 /* Zero if we are not in an iteration or switch statement, otherwise
    a bitmask.  See bitmask definitions in c-tree.h.  */
-unsigned char in_statement;
+unsigned char In_statement;
 
 /* A list of decls to be made automatically visible in each file scope.  */
 static GTY(()) tree visible_builtins;
@@ -131,22 +131,22 @@ static GTY(()) tree visible_builtins;
 /* Set to 0 at beginning of a function definition, set to 1 if
    a return statement that specifies a return value is seen.  */
 
-int current_function_returns_value;
+int Current_function_returns_value;
 
 /* Set to 0 at beginning of a function definition, set to 1 if
    a return statement with no argument is seen.  */
 
-int current_function_returns_null;
+int Current_function_returns_null;
 
 /* Set to 0 at beginning of a function definition, set to 1 if
    a call to a noreturn function is seen.  */
 
-int current_function_returns_abnormally;
+int Current_function_returns_abnormally;
 
 /* Set to nonzero by `grokdeclarator' for a function
    whose return type is defaulted, if warnings for this are desired.  */
 
-static bool warn_about_return_type;
+static bool Warn_about_return_type;
 
 /* Nonzero when the current toplevel function contains a declaration
    of a nested function which is never defined.  */
@@ -5437,7 +5437,7 @@ finish_decl (tree decl, location_t init_loc, tree init,
 	TREE_TYPE (DECL_INITIAL (decl)) = type;
 
       relayout_decl (decl);
-    } // if (TREE_CODE (type) == ARRAY_TYPE
+    } // if (TREE_CODE (type) == ARRAY_TYPE && ...
 
   /* Look for braced array initializers for character arrays and
      recursively convert them into STRING_CSTs.  */
@@ -6418,7 +6418,7 @@ grokdeclarator (const struct c_declarator *declarator,
 	 prefer the former warning since it is more explicit.  */
       if ((warn_implicit_int || warn_return_type > 0 || flag_isoc99)
 	  && funcdef_flag)
-	warn_about_return_type = true;
+	Warn_about_return_type = true;
       else
 	{
 	  if (name)
@@ -9510,14 +9510,14 @@ start_function (struct c_declspecs *declspecs, struct c_declarator *declarator,
   tree restype, resdecl;
   location_t loc;
 
-  current_function_returns_value = 0;  /* Assume, until we see it does.  */
-  current_function_returns_null = 0;
-  current_function_returns_abnormally = 0;
-  warn_about_return_type = false;
-  c_switch_stack = NULL;
+  Current_function_returns_value = false;  /* Assume, until we see it does.  */
+  Current_function_returns_null = false;
+  Current_function_returns_abnormally = false;
+  Warn_about_return_type = false;
+  C_switch_stack = NULL;
 
   /* Indicate no valid break/continue context.  */
-  in_statement = 0;
+  In_statement = 0;
 
   decl1 = grokdeclarator (declarator, declspecs, FUNCDEF, true, NULL,
 			  &attributes, NULL, NULL, DEPRECATED_NORMAL);
@@ -9555,7 +9555,7 @@ start_function (struct c_declspecs *declspecs, struct c_declarator *declarator,
 	DECL_EXTERNAL (decl1) = !DECL_EXTERNAL (decl1);
     }
 
-  announce_function (decl1);
+  announce_function (decl1); //wyc do nothing if option quiet is specified
 
   if (!COMPLETE_OR_VOID_TYPE_P (TREE_TYPE (TREE_TYPE (decl1))))
     {
@@ -9566,7 +9566,7 @@ start_function (struct c_declspecs *declspecs, struct c_declarator *declarator,
 			       TYPE_ARG_TYPES (TREE_TYPE (decl1)));
     }
 
-  if (warn_about_return_type)
+  if (Warn_about_return_type)
     warn_defaults_to (loc, flag_isoc99 ? OPT_Wimplicit_int
 			   : (warn_return_type > 0 ? OPT_Wreturn_type
 			      : OPT_Wimplicit_int),
@@ -9582,12 +9582,12 @@ start_function (struct c_declspecs *declspecs, struct c_declarator *declarator,
   if (old_decl && TREE_CODE (old_decl) != FUNCTION_DECL)
     old_decl = NULL_TREE;
 
-  current_function_prototype_locus = UNKNOWN_LOCATION;
-  current_function_prototype_built_in = false;
-  current_function_prototype_arg_types = NULL_TREE;
+  Current_function_prototype_locus = UNKNOWN_LOCATION;
+  Current_function_prototype_built_in = false;
+  Current_function_prototype_arg_types = NULL_TREE;
   tree newtype = TREE_TYPE (decl1);
   tree oldtype = old_decl ? TREE_TYPE (old_decl) : newtype;
-  if (!prototype_p (newtype))
+  if (!prototype_p (newtype)) //wyc if don't have a prototype
     {
       tree oldrt = TREE_TYPE (oldtype);
       tree newrt = TREE_TYPE (newtype);
@@ -9603,10 +9603,10 @@ start_function (struct c_declspecs *declspecs, struct c_declarator *declarator,
 	      locate_old_decl (old_decl);
 	    }
 	  TREE_TYPE (decl1) = composite_type (oldtype, newtype);
-	  current_function_prototype_locus = DECL_SOURCE_LOCATION (old_decl);
-	  current_function_prototype_built_in
+	  Current_function_prototype_locus = DECL_SOURCE_LOCATION (old_decl);
+	  Current_function_prototype_built_in
 	    = C_DECL_BUILTIN_PROTOTYPE (old_decl);
-	  current_function_prototype_arg_types
+	  Current_function_prototype_arg_types
 	    = TYPE_ARG_TYPES (newtype);
 	}
       if (TREE_PUBLIC (decl1))
@@ -9630,26 +9630,26 @@ start_function (struct c_declspecs *declspecs, struct c_declarator *declarator,
 		  && comptypes (TREE_TYPE (TREE_TYPE (decl1)),
 				TREE_TYPE (ext_type)))
 		{
-		  current_function_prototype_locus
+		  Current_function_prototype_locus
 		    = DECL_SOURCE_LOCATION (ext_decl);
-		  current_function_prototype_built_in
+		  Current_function_prototype_built_in
 		    = C_DECL_BUILTIN_PROTOTYPE (ext_decl);
-		  current_function_prototype_arg_types
+		  Current_function_prototype_arg_types
 		    = TYPE_ARG_TYPES (ext_type);
 		}
 	    }
 	}
-    } // if (!prototype_p (newtype))
+    } // if don't have a prototype
 
   /* Optionally warn of old-fashioned def with no previous prototype.  */
-  if (warn_strict_prototypes
+  if (warn_strict_prototypes //wyc global_option, default 0
       && old_decl != error_mark_node
       && !prototype_p (TREE_TYPE (decl1))
       && C_DECL_ISNT_PROTOTYPE (old_decl))
     warning_at (loc, OPT_Wstrict_prototypes,
 		"function declaration isn%'t a prototype");
   /* Optionally warn of any global def with no previous prototype.  */
-  else if (warn_missing_prototypes
+  else if (warn_missing_prototypes //wyc global_option, default 0
 	   && old_decl != error_mark_node
 	   && TREE_PUBLIC (decl1)
 	   && !MAIN_NAME_P (DECL_NAME (decl1))
@@ -9667,7 +9667,7 @@ start_function (struct c_declspecs *declspecs, struct c_declarator *declarator,
     warning_at (loc, OPT_Wmissing_prototypes,
 		"%qD was used with no prototype before its definition", decl1);
   /* Optionally warn of any global def with no previous declaration.  */
-  else if (warn_missing_declarations
+  else if (warn_missing_declarations //wyc global_option, default 0
 	   && TREE_PUBLIC (decl1)
 	   && old_decl == NULL_TREE
 	   && !MAIN_NAME_P (DECL_NAME (decl1))
@@ -9698,7 +9698,8 @@ start_function (struct c_declspecs *declspecs, struct c_declarator *declarator,
     maybe_apply_pragma_weak (decl1);
 
   /* Warn for unlikely, improbable, or stupid declarations of `main'.  */
-  if (warn_main && MAIN_NAME_P (DECL_NAME (decl1)))
+  if (warn_main //wyc global_option, default 0
+      && MAIN_NAME_P (DECL_NAME (decl1)))
     {
       if (TYPE_MAIN_VARIANT (TREE_TYPE (TREE_TYPE (decl1)))
 	  != integer_type_node)
@@ -9978,11 +9979,11 @@ store_parm_decls_oldstyle (tree fndecl, const struct c_arg_info *arg_info)
      set the DECL_ARG_TYPE of each argument according to
      the type previously specified, and report any mismatches.  */
 
-  if (current_function_prototype_arg_types)
+  if (Current_function_prototype_arg_types)
     {
       tree type;
       for (parm = DECL_ARGUMENTS (fndecl),
-	     type = current_function_prototype_arg_types;
+	     type = Current_function_prototype_arg_types;
 	   parm || (type != NULL_TREE
 		    && TREE_VALUE (type) != error_mark_node
 		    && TYPE_MAIN_VARIANT (TREE_VALUE (type)) != void_type_node);
@@ -9993,7 +9994,7 @@ store_parm_decls_oldstyle (tree fndecl, const struct c_arg_info *arg_info)
 	      || (TREE_VALUE (type) != error_mark_node
 		  && TYPE_MAIN_VARIANT (TREE_VALUE (type)) == void_type_node))
 	    {
-	      if (current_function_prototype_built_in)
+	      if (Current_function_prototype_built_in)
 		warning_at (DECL_SOURCE_LOCATION (fndecl),
 			    0, "number of arguments doesn%'t match "
 			    "built-in prototype");
@@ -10008,7 +10009,7 @@ store_parm_decls_oldstyle (tree fndecl, const struct c_arg_info *arg_info)
 		  error_at (input_location,
 			    "number of arguments doesn%'t match prototype");
 
-		  error_at (current_function_prototype_locus,
+		  error_at (Current_function_prototype_locus,
 			    "prototype declaration");
 		}
 	      break;
@@ -10046,7 +10047,7 @@ store_parm_decls_oldstyle (tree fndecl, const struct c_arg_info *arg_info)
 		     built-in prototype or will it always have
 		     been diagnosed as conflicting with an
 		     old-style definition and discarded?  */
-		  if (current_function_prototype_built_in)
+		  if (Current_function_prototype_built_in)
 		    warning_at (DECL_SOURCE_LOCATION (parm),
 				OPT_Wpedantic, "promoted argument %qD "
 				"doesn%'t match built-in prototype", parm);
@@ -10055,13 +10056,13 @@ store_parm_decls_oldstyle (tree fndecl, const struct c_arg_info *arg_info)
 		      pedwarn (DECL_SOURCE_LOCATION (parm),
 			       OPT_Wpedantic, "promoted argument %qD "
 			       "doesn%'t match prototype", parm);
-		      pedwarn (current_function_prototype_locus, OPT_Wpedantic,
+		      pedwarn (Current_function_prototype_locus, OPT_Wpedantic,
 			       "prototype declaration");
 		    }
 		}
 	      else
 		{
-		  if (current_function_prototype_built_in)
+		  if (Current_function_prototype_built_in)
 		    warning_at (DECL_SOURCE_LOCATION (parm),
 				0, "argument %qD doesn%'t match "
 				"built-in prototype", parm);
@@ -10069,7 +10070,7 @@ store_parm_decls_oldstyle (tree fndecl, const struct c_arg_info *arg_info)
 		    {
 		      error_at (DECL_SOURCE_LOCATION (parm),
 				"argument %qD doesn%'t match prototype", parm);
-		      error_at (current_function_prototype_locus,
+		      error_at (Current_function_prototype_locus,
 				"prototype declaration");
 		    }
 		}
@@ -10312,9 +10313,9 @@ finish_function (location_t end_loc)
      command line.  */
   if (warn_return_type > 0
       && TREE_CODE (TREE_TYPE (TREE_TYPE (fndecl))) != VOID_TYPE
-      && !current_function_returns_value && !current_function_returns_null
+      && !Current_function_returns_value && !Current_function_returns_null
       /* Don't complain if we are no-return.  */
-      && !current_function_returns_abnormally
+      && !Current_function_returns_abnormally
       /* Don't complain if we are declared noreturn.  */
       && !TREE_THIS_VOLATILE (fndecl)
       /* Don't warn for main().  */
@@ -10534,13 +10535,13 @@ c_push_function_context (void)
 
   p->base.x_stmt_tree = c_stmt_tree;
   c_stmt_tree.x_cur_stmt_list = vec_safe_copy (c_stmt_tree.x_cur_stmt_list);
-  p->x_in_statement = in_statement;
-  p->x_switch_stack = c_switch_stack;
+  p->x_in_statement = In_statement;
+  p->x_switch_stack = C_switch_stack;
   p->arg_info = current_function_arg_info;
-  p->returns_value = current_function_returns_value;
-  p->returns_null = current_function_returns_null;
-  p->returns_abnormally = current_function_returns_abnormally;
-  p->warn_about_return_type = warn_about_return_type;
+  p->returns_value = Current_function_returns_value;
+  p->returns_null = Current_function_returns_null;
+  p->returns_abnormally = Current_function_returns_abnormally;
+  p->warn_about_return_type = Warn_about_return_type;
 
   push_function_context ();
 }
@@ -10573,13 +10574,13 @@ c_pop_function_context (void)
 
   c_stmt_tree = p->base.x_stmt_tree;
   p->base.x_stmt_tree.x_cur_stmt_list = NULL;
-  in_statement = p->x_in_statement;
-  c_switch_stack = p->x_switch_stack;
+  In_statement = p->x_in_statement;
+  C_switch_stack = p->x_switch_stack;
   current_function_arg_info = p->arg_info;
-  current_function_returns_value = p->returns_value;
-  current_function_returns_null = p->returns_null;
-  current_function_returns_abnormally = p->returns_abnormally;
-  warn_about_return_type = p->warn_about_return_type;
+  Current_function_returns_value = p->returns_value;
+  Current_function_returns_null = p->returns_null;
+  Current_function_returns_abnormally = p->returns_abnormally;
+  Warn_about_return_type = p->warn_about_return_type;
 }
 
 /* The functions below are required for functionality of doing

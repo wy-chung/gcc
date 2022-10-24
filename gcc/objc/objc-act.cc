@@ -2189,7 +2189,7 @@ objc_start_method_definition (bool is_class_method, tree decl, tree attributes,
 
 #ifndef OBJCPLUS
   /* Indicate no valid break/continue context.  */
-  in_statement = 0;
+  In_statement = 0;
 #endif
 
   if (attributes)
@@ -8825,8 +8825,8 @@ objc_start_function (tree name, tree type, tree attrs,
   cplus_decl_attributes (&fndecl, attrs, 0);
   start_preparsed_function (fndecl, attrs, /*flags=*/SF_DEFAULT);
 #else
-  current_function_returns_value = 0;  /* Assume, until we see it does.  */
-  current_function_returns_null = 0;
+  Current_function_returns_value = 0;  /* Assume, until we see it does.  */
+  Current_function_returns_null = 0;
   decl_attributes (&fndecl, attrs, 0);
   announce_function (fndecl);
   DECL_INITIAL (fndecl) = error_mark_node;
