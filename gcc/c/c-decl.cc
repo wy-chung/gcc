@@ -110,7 +110,7 @@ static tree Current_function_prototype_arg_types;
 /* The argument information structure for the function currently being
    defined.  */
 
-static struct c_arg_info *current_function_arg_info;
+static struct c_arg_info *Current_function_arg_info;
 
 /* The obstack on which parser and related data structures, which are
    not live beyond their top-level declaration or definition, are
@@ -7655,7 +7655,7 @@ grokdeclarator (const struct c_declarator *declarator,
 	/* For a function definition, record the argument information
 	   block where store_parm_decls will look for it.  */
 	if (funcdef_flag)
-	  current_function_arg_info = arg_info;
+	  Current_function_arg_info = arg_info;
 
 	if (declspecs->default_int_p)
 	  C_FUNCTION_IMPLICIT_INT (decl) = 1;
@@ -9506,9 +9506,9 @@ bool
 start_function (struct c_declspecs *declspecs, struct c_declarator *declarator,
 		tree attributes)
 {
-  tree decl1, old_decl;
-  tree restype, resdecl;
-  location_t loc;
+  //tree decl1, old_decl;
+  //tree restype, resdecl;
+  //location_t loc;
 
   Current_function_returns_value = false;  /* Assume, until we see it does.  */
   Current_function_returns_null = false;
@@ -9519,7 +9519,7 @@ start_function (struct c_declspecs *declspecs, struct c_declarator *declarator,
   /* Indicate no valid break/continue context.  */
   In_statement = 0;
 
-  decl1 = grokdeclarator (declarator, declspecs, FUNCDEF, true, NULL,
+  tree decl1 = grokdeclarator (declarator, declspecs, FUNCDEF, true, NULL,
 			  &attributes, NULL, NULL, DEPRECATED_NORMAL);
   invoke_plugin_callbacks (PLUGIN_START_PARSE_FUNCTION, decl1);
 
@@ -9529,7 +9529,7 @@ start_function (struct c_declspecs *declspecs, struct c_declarator *declarator,
       || TREE_CODE (decl1) != FUNCTION_DECL)
     return false;
 
-  loc = DECL_SOURCE_LOCATION (decl1);
+  location_t loc = DECL_SOURCE_LOCATION (decl1);
 
   /* A nested function is not global.  */
   if (current_function_decl != NULL_TREE)
@@ -9578,7 +9578,7 @@ start_function (struct c_declspecs *declspecs, struct c_declarator *declarator,
 
   /* If this definition isn't a prototype and we had a prototype declaration
      before, copy the arg type info from that prototype.  */
-  old_decl = lookup_name_in_scope (DECL_NAME (decl1), current_scope);
+  tree old_decl = lookup_name_in_scope (DECL_NAME (decl1), current_scope);
   if (old_decl && TREE_CODE (old_decl) != FUNCTION_DECL)
     old_decl = NULL_TREE;
 
@@ -9659,7 +9659,7 @@ start_function (struct c_declspecs *declspecs, struct c_declarator *declarator,
 		"no previous prototype for %qD", decl1);
   /* Optionally warn of any def with no previous prototype
      if the function has already been used.  */
-  else if (warn_missing_prototypes
+  else if (warn_missing_prototypes //wyc global_option, default 0
 	   && old_decl != NULL_TREE
 	   && old_decl != error_mark_node
 	   && TREE_USED (old_decl)
@@ -9677,7 +9677,7 @@ start_function (struct c_declspecs *declspecs, struct c_declarator *declarator,
 		decl1);
   /* Optionally warn of any def with no previous declaration
      if the function has already been used.  */
-  else if (warn_missing_declarations
+  else if (warn_missing_declarations //wyc global_option, default 0
 	   && old_decl != NULL_TREE
 	   && old_decl != error_mark_node
 	   && TREE_USED (old_decl)
@@ -9715,7 +9715,7 @@ start_function (struct c_declspecs *declspecs, struct c_declarator *declarator,
 		 "%qD is normally a non-static function", decl1);
     }
 
-  tree parms = current_function_arg_info->parms;
+  tree parms = Current_function_arg_info->parms;
   if (old_decl)
     {
       location_t origloc = DECL_SOURCE_LOCATION (old_decl);
@@ -9735,8 +9735,8 @@ start_function (struct c_declspecs *declspecs, struct c_declarator *declarator,
   push_scope ();
   declare_parm_level ();
 
-  restype = TREE_TYPE (TREE_TYPE (current_function_decl));
-  resdecl = build_decl (loc, RESULT_DECL, NULL_TREE, restype);
+  tree restype = TREE_TYPE (TREE_TYPE (current_function_decl));
+  tree resdecl = build_decl (loc, RESULT_DECL, NULL_TREE, restype);
   DECL_ARTIFICIAL (resdecl) = 1;
   DECL_IGNORED_P (resdecl) = 1;
   DECL_RESULT (current_function_decl) = resdecl;
@@ -10120,7 +10120,7 @@ store_parm_decls_oldstyle (tree fndecl, const struct c_arg_info *arg_info)
 void
 store_parm_decls_from (struct c_arg_info *arg_info)
 {
-  current_function_arg_info = arg_info;
+  Current_function_arg_info = arg_info;
   store_parm_decls ();
 }
 
@@ -10156,8 +10156,8 @@ store_parm_decls (void)
   bool proto;
 
   /* The argument information block for FNDECL.  */
-  struct c_arg_info *arg_info = current_function_arg_info;
-  current_function_arg_info = 0;
+  struct c_arg_info *arg_info = Current_function_arg_info;
+  Current_function_arg_info = 0;
 
   /* True if this definition is written with a prototype.  In C2X, an
      empty argument list was converted to (void) in grokparms; in
@@ -10537,7 +10537,7 @@ c_push_function_context (void)
   c_stmt_tree.x_cur_stmt_list = vec_safe_copy (c_stmt_tree.x_cur_stmt_list);
   p->x_in_statement = In_statement;
   p->x_switch_stack = C_switch_stack;
-  p->arg_info = current_function_arg_info;
+  p->arg_info = Current_function_arg_info;
   p->returns_value = Current_function_returns_value;
   p->returns_null = Current_function_returns_null;
   p->returns_abnormally = Current_function_returns_abnormally;
@@ -10576,7 +10576,7 @@ c_pop_function_context (void)
   p->base.x_stmt_tree.x_cur_stmt_list = NULL;
   In_statement = p->x_in_statement;
   C_switch_stack = p->x_switch_stack;
-  current_function_arg_info = p->arg_info;
+  Current_function_arg_info = p->arg_info;
   Current_function_returns_value = p->returns_value;
   Current_function_returns_null = p->returns_null;
   Current_function_returns_abnormally = p->returns_abnormally;
