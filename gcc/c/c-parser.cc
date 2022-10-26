@@ -2258,7 +2258,7 @@ c_parser_declaration_or_fndef (c_parser *parser, bool fndef_ok,
 		  if (omp_declare_simd_clauses)
 		    c_finish_omp_declare_simd (parser, d, NULL_TREE,
 					       omp_declare_simd_clauses);
-		}
+		} // if (auto_type_p)
 	      else
 		{
 		  /* The declaration of the variable is in effect while
@@ -2281,7 +2281,7 @@ c_parser_declaration_or_fndef (c_parser *parser, bool fndef_ok,
 		  init = c_parser_initializer (parser);
 		  flag_sanitize = flag_sanitize_save;
 		  finish_init ();
-		}
+		} // not auto_type_p
 	      if (oacc_routine_data)
 		c_finish_oacc_routine (oacc_routine_data, d, false);
 	      if (d != error_mark_node)
@@ -5673,7 +5673,7 @@ c_parser_compound_statement_nostart (c_parser *parser)
 	  c_parser_skip_until_found (parser, CPP_SEMICOLON, "expected %<;%>");
 	}
       pedwarn (label_loc, OPT_Wpedantic, "ISO C forbids label declarations");
-    }
+    } // if next_token is RID_LABEL
   /* We must now have at least one statement, label or declaration.  */
   if (c_parser_next_token_is (parser, CPP_CLOSE_BRACE))
     {
@@ -5810,7 +5810,7 @@ c_parser_compound_statement_nostart (c_parser *parser)
 	}
 
       parser->error = false;
-    }
+    } //while (next_token is notCPP_CLOSE_BRACE
   if (last_label)
     pedwarn_c11 (label_loc, OPT_Wpedantic, "label at end of compound statement");
   location_t endloc = c_parser_peek_token (parser)->location;

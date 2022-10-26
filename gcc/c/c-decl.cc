@@ -9501,7 +9501,7 @@ c_simulate_record_decl (location_t loc, const char *name,
 
    Returns true on success.  If the DECLARATOR is not suitable for a function
    (it defines a datum instead), we return false to report a parse error.  */
-
+//wyc output: current_function_decl
 bool
 start_function (struct c_declspecs *declspecs, struct c_declarator *declarator,
 		tree attributes)

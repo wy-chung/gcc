@@ -621,10 +621,10 @@ c_addr_space_name (addr_space_t as)
 void
 start_fname_decls (void)
 {
-  unsigned ix;
+  //unsigned ix;
   tree saved = NULL_TREE;
 
-  for (ix = 0; fname_vars[ix].decl; ix++)
+  for (unsigned ix = 0; fname_vars[ix].decl; ix++)
     {
       tree decl = *fname_vars[ix].decl;
 
