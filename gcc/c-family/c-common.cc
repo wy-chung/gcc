@@ -341,9 +341,9 @@ static bool nonnull_check_p (tree, unsigned HOST_WIDE_INT);
    reserved word too, but only if it follows an '@' sign.
 */
 const struct c_common_resword c_common_reswords[] =
-{
-  { "_Alignas",		RID_ALIGNAS,   D_CONLY },
-  { "_Alignof",		RID_ALIGNOF,   D_CONLY },
+{ //wyc word,		rid,		disable
+  { "_Alignas",		RID_ALIGNAS,   D_CONLY }, //wyc D means disable
+  { "_Alignof",		RID_ALIGNOF,   D_CONLY }, //wyc D_CONLY means not used in C
   { "_Atomic",		RID_ATOMIC,    D_CONLY },
   { "_Bool",		RID_BOOL,      D_CONLY },
   { "_Complex",		RID_COMPLEX,	0 },

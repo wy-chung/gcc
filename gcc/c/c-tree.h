@@ -47,12 +47,12 @@ along with GCC; see the file COPYING3.  If not see
 
 /* In an IDENTIFIER_NODE, nonzero if this identifier is actually a
    keyword.  C_RID_CODE (node) is then the RID_* value of the keyword.  */
-#define C_IS_RESERVED_WORD(ID) TREE_LANG_FLAG_0 (ID)
+#define C_IS_RESERVED_WORD(ID) TREE_LANG_FLAG_0 (ID) //wyc (ID)->base.u.bits.lang_flag_0
 
 /* Record whether a type or decl was written with nonconstant size.
    Note that TYPE_SIZE may have simplified to a constant.  */
-#define C_TYPE_VARIABLE_SIZE(TYPE) TYPE_LANG_FLAG_1 (TYPE)
-#define C_DECL_VARIABLE_SIZE(TYPE) DECL_LANG_FLAG_0 (TYPE)
+#define C_TYPE_VARIABLE_SIZE(TYPE) TYPE_LANG_FLAG_1 (TYPE) //wyc (TYPE)->type_common.lang_flag_1
+#define C_DECL_VARIABLE_SIZE(TYPE) DECL_LANG_FLAG_0 (TYPE) //WYC (NODE)->decl_common.lang_flag_0
 
 /* Record whether a type is defined inside a struct or union type.
    This is used for -Wc++-compat. */
