@@ -9521,7 +9521,7 @@ start_function (struct c_declspecs *declspecs, struct c_declarator *declarator,
 
   tree decl1 = grokdeclarator (declarator, declspecs, FUNCDEF, true, NULL,
 			  &attributes, NULL, NULL, DEPRECATED_NORMAL);
-  invoke_plugin_callbacks (PLUGIN_START_PARSE_FUNCTION, decl1);
+  invoke_plugin_callbacks (PLUGIN_START_PARSE_FUNCTION, decl1); //wyc ignore
 
   /* If the declarator is not suitable for a function definition,
      cause a syntax error.  */

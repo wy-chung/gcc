@@ -150,7 +150,7 @@ struct _cpp_file;
 
 #define OP(e, s) CPP_ ## e,
 #define TK(e, s) CPP_ ## e,
-enum cpp_ttype
+enum cpp_ttype //wyc token type
 {
   TTYPE_TABLE
   N_TTYPES,

@@ -1160,8 +1160,8 @@ bool
 c_parser_require (c_parser *parser,
 		  enum cpp_ttype type,
 		  const char *msgid,
-		  location_t matching_location,
-		  bool type_is_unique)
+		  location_t matching_location /* = UNKNOWN_LOCATION */,
+		  bool type_is_unique /* = true */)
 {
   if (c_parser_next_token_is (parser, type))
     {
@@ -2203,7 +2203,7 @@ c_parser_declaration_or_fndef (c_parser *parser, bool fndef_ok,
 		  c_parser_skip_to_end_of_block_or_statement (parser);
 		  return;
 		}
-	    }
+	    } // if next_token is RID_ATTRIBUTE
 	  if (c_parser_next_token_is (parser, CPP_EQ))
 	    {
 	      tree d;
@@ -2368,7 +2368,7 @@ c_parser_declaration_or_fndef (c_parser *parser, bool fndef_ok,
 					     omp_declare_simd_clauses);
 		  if (parms)
 		    temp_pop_parm_decls ();
-		}
+		} // if (omp_declare_simd_clauses)
 	      if (oacc_routine_data)
 		c_finish_oacc_routine (oacc_routine_data, d, false);
 	      if (d)
@@ -2478,7 +2478,7 @@ c_parser_declaration_or_fndef (c_parser *parser, bool fndef_ok,
 	  if (nested)
 	    c_pop_function_context ();
 	  break;
-	}
+	} // if (!start_function())
       timevar_id_t tv;
       if (DECL_DECLARED_INLINE_P (current_function_decl))
         tv = TV_PARSE_INLINE;
@@ -5614,6 +5614,7 @@ c_parser_compound_statement (c_parser *parser, location_t *endlocp)
       c_end_compound_stmt (brace_loc, stmt, true);
       return error_mark_node;
     }
+  //wyc CPP_OPEN_BRACE consumed
   stmt = c_begin_compound_stmt (true);
   location_t end_loc = c_parser_compound_statement_nostart (parser);
   if (endlocp)
