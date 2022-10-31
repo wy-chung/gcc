@@ -529,7 +529,7 @@ void
 gen_aux_info_record (tree fndecl, bool is_definition, bool is_implicit,
 		     bool is_prototyped) //wyc
 {
-  if (flag_gen_aux_info)
+  if (flag_gen_aux_info) //wyc default false, global option.
     {
       static int compiled_from_record = 0;
       expanded_location xloc = expand_location (DECL_SOURCE_LOCATION (fndecl));
@@ -565,5 +565,5 @@ gen_aux_info_record (tree fndecl, bool is_definition, bool is_implicit,
 	}
 
       fprintf (aux_info_file, "\n");
-    }
+    } // if (flag_gen_aux_info)
 }

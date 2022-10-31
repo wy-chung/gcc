@@ -5055,7 +5055,7 @@ static tree
 c_decl_attributes (tree *node, tree attributes, int flags)
 {
   /* Add implicit "omp declare target" attribute if requested.  */
-  if (current_omp_declare_target_attribute
+  if (current_omp_declare_target_attribute	//wyc false
       && ((VAR_P (*node) && is_global_var (*node))
 	  || TREE_CODE (*node) == FUNCTION_DECL))
     {
@@ -5206,7 +5206,7 @@ start_decl (struct c_declarator *declarator, struct c_declspecs *declspecs,
      prototypes file (if requested).  */
 
   if (TREE_CODE (decl) == FUNCTION_DECL)
-    gen_aux_info_record (decl, 0, 0, prototype_p (TREE_TYPE (decl)));
+    gen_aux_info_record (decl, 0, 0, prototype_p (TREE_TYPE (decl))); //wyc do nothing
 
   /* ANSI specifies that a tentative definition which is not merged with
      a non-tentative definition behaves exactly like a definition with an
@@ -5223,7 +5223,7 @@ start_decl (struct c_declarator *declarator, struct c_declspecs *declspecs,
       && !initialized
       && TREE_PUBLIC (decl)
       && !DECL_THREAD_LOCAL_P (decl)
-      && !flag_no_common)
+      && !flag_no_common) //wyc flag_no_common: default true, global option
     DECL_COMMON (decl) = 1;
 
   /* Set attributes here so if duplicate decl, will have proper attributes.  */
