@@ -7843,7 +7843,7 @@ struct spelling
 
 #define SPELLING_STRING 1
 #define SPELLING_MEMBER 2
-#define SPELLING_BOUNDS 3
+#define SPELLING_BOUNDS 3 //wyc array bounds
 
 static struct spelling *spelling;	/* Next stack element (unused).  */
 static struct spelling *spelling_base;	/* Spelling stack base.  */
@@ -11513,7 +11513,7 @@ c_finish_stmt_expr (location_t loc, tree body)
 tree
 c_begin_compound_stmt (bool do_scope)
 {
-  tree stmt = push_stmt_list ();
+  tree stmt = push_stmt_list (); // Create an empty statement tree
   if (do_scope)
     push_scope ();
   return stmt;

@@ -5715,7 +5715,7 @@ finish_decl (tree decl, location_t init_loc, tree init,
   if (VAR_P (decl)
       && !is_global_var (decl)
       && !DECL_HARD_REGISTER (decl))
-    targetm.lower_local_decl_alignment (decl);
+    targetm.lower_local_decl_alignment (decl); // ix86_lower_local_decl_alignment
 
   invoke_plugin_callbacks (PLUGIN_FINISH_DECL, decl); //wyc plugin not enabled
 }
@@ -10903,16 +10903,16 @@ struct c_declspecs *
 declspecs_add_qual (location_t loc,
 		    struct c_declspecs *specs, tree qual)
 {
-  enum rid i;
+  //wyc enum rid i;
   bool dupe = false;
   specs->non_sc_seen_p = true;
   specs->declspecs_seen_p = true;
   specs->non_std_attrs_seen_p = true;
   gcc_assert (TREE_CODE (qual) == IDENTIFIER_NODE
 	      && C_IS_RESERVED_WORD (qual));
-  i = C_RID_CODE (qual);
+  //wyc i = C_RID_CODE (qual);
   location_t prev_loc = UNKNOWN_LOCATION;
-  switch (i)
+  switch (C_RID_CODE (qual)/*i*/)
     {
     case RID_CONST:
       dupe = specs->const_p;

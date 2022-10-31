@@ -2172,11 +2172,11 @@ c_parser_declaration_or_fndef (c_parser *parser, bool fndef_ok,
 	  return;
 	}
       if (c_parser_next_token_is (parser, CPP_EQ)
-	  || c_parser_next_token_is (parser, CPP_COMMA)
+	  || c_parser_next_token_is (parser, CPP_COMMA) // ','
 	  || c_parser_next_token_is (parser, CPP_SEMICOLON)
-	  || c_parser_next_token_is_keyword (parser, RID_ASM)
+	  || c_parser_next_token_is_keyword (parser, RID_ASM) // D_ASM
 	  || c_parser_next_token_is_keyword (parser, RID_ATTRIBUTE)
-	  || c_parser_next_token_is_keyword (parser, RID_IN))
+	  || c_parser_next_token_is_keyword (parser, RID_IN)) // D_OBJC
 	{
 	  tree asm_name = NULL_TREE;
 	  tree postfix_attrs = NULL_TREE;
@@ -2259,7 +2259,7 @@ c_parser_declaration_or_fndef (c_parser *parser, bool fndef_ok,
 		    c_finish_omp_declare_simd (parser, d, NULL_TREE,
 					       omp_declare_simd_clauses);
 		} // if (auto_type_p)
-	      else
+	      else // next_token is CPP_EQ && not auto_type
 		{
 		  /* The declaration of the variable is in effect while
 		     its initializer is parsed.  */
@@ -2267,7 +2267,7 @@ c_parser_declaration_or_fndef (c_parser *parser, bool fndef_ok,
 				  chainon (postfix_attrs, all_prefix_attrs));
 		  if (!d)
 		    d = error_mark_node;
-		  if (omp_declare_simd_clauses)
+		  if (omp_declare_simd_clauses) // NULL
 		    c_finish_omp_declare_simd (parser, d, NULL_TREE,
 					       omp_declare_simd_clauses);
 		  init_loc = c_parser_peek_token (parser)->location;
@@ -2291,7 +2291,7 @@ c_parser_declaration_or_fndef (c_parser *parser, bool fndef_ok,
 			       init.original_type, asm_name);
 		}
 	    } // if next_token is CPP_EQ
-	  else
+	  else // ',' || ';'
 	    {
 	      if (auto_type_p)
 		{
@@ -3109,7 +3109,7 @@ c_parser_declspecs (c_parser *parser, struct c_declspecs *specs,
   if (end_std_attr_ok
       && c_parser_nth_token_starts_std_attributes (parser, 1))
     specs->postfix_attrs = c_parser_std_attribute_specifier_sequence (parser);
-}
+} // void c_parser_declspecs()
 
 /* Parse an enum specifier (C90 6.5.2.2, C99 6.7.2.2, C11 6.7.2.2).
 
@@ -4035,7 +4035,7 @@ c_parser_direct_declarator (c_parser *parser, bool type_seen_p,
       else
 	return c_declarator::new_id (NULL_TREE);
     }
-}
+} // c_declarator * c_parser_direct_declarator()
 
 /* Parse part of a direct declarator or direct abstract declarator,
    given that some (in INNER) has already been parsed; ID_PRESENT is
@@ -5684,7 +5684,7 @@ c_parser_compound_statement_nostart (c_parser *parser)
       c_parser_consume_token (parser);
       return endloc;
     }
-  while (c_parser_next_token_is_not (parser, CPP_CLOSE_BRACE))
+  do //while (c_parser_next_token_is_not (parser, CPP_CLOSE_BRACE))
     {
       location_t loc = c_parser_peek_token (parser)->location;
       loc = expansion_point_location_if_in_system_header (loc);
@@ -5811,7 +5811,7 @@ c_parser_compound_statement_nostart (c_parser *parser)
 	}
 
       parser->error = false;
-    } //while (next_token is notCPP_CLOSE_BRACE
+    } while (c_parser_next_token_is_not (parser, CPP_CLOSE_BRACE));
   if (last_label)
     pedwarn_c11 (label_loc, OPT_Wpedantic, "label at end of compound statement");
   location_t endloc = c_parser_peek_token (parser)->location;
@@ -7648,7 +7648,7 @@ c_parser_conditional_expression (c_parser *parser, struct c_expr *after,
       exp1.src_range = cond.src_range;
       cond.value = c_objc_common_truthvalue_conversion (cond_loc, exp1.value);
       c_inhibit_evaluation_warnings += cond.value == truthvalue_true_node;
-    }
+    } // if next_token is CPP_COLON
   else
     {
       cond.value
@@ -9087,7 +9087,7 @@ c_parser_postfix_expression (c_parser *parser)
 							 component);
 	    set_c_expr_source_range (&expr, loc, end_loc);
 	    break;
-	  }
+	  } // case C_ID_CLASSNAME:
 	default:
 	  c_parser_error (parser, "expected expression");
 	  expr.set_error ();
@@ -9128,7 +9128,7 @@ c_parser_postfix_expression (c_parser *parser)
 	  expr.value = c_finish_stmt_expr (brace_loc, stmt);
 	  set_c_expr_source_range (&expr, loc, close_loc);
 	  mark_exp_read (expr.value);
-	}
+	} // if 2nd token  == CPP_OPEN_BRACE
       else
 	{
 	  /* A parenthesized expression.  */
@@ -10216,7 +10216,7 @@ c_parser_postfix_expression (c_parser *parser)
 	  c_parser_error (parser, "expected expression");
 	  expr.set_error ();
 	  break;
-	}
+	} // switch (keyword)
       break;
     case CPP_OPEN_SQUARE:
       if (c_dialect_objc ())
@@ -10238,7 +10238,7 @@ c_parser_postfix_expression (c_parser *parser)
       c_parser_error (parser, "expected expression");
       expr.set_error ();
       break;
-    }
+    } // switch (token type)
  out:
   return c_parser_postfix_expression_after_primary
     (parser, EXPR_LOC_OR_LOC (expr.value, loc), expr);
