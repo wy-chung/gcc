@@ -2259,7 +2259,7 @@ c_parser_declaration_or_fndef (c_parser *parser, bool fndef_ok,
 		    c_finish_omp_declare_simd (parser, d, NULL_TREE,
 					       omp_declare_simd_clauses);
 		} // if (auto_type_p)
-	      else // next_token is CPP_EQ && not auto_type
+	      else // is CPP_EQ && not auto_type
 		{
 		  /* The declaration of the variable is in effect while
 		     its initializer is parsed.  */
@@ -5690,7 +5690,7 @@ c_parser_compound_statement_nostart (c_parser *parser)
       loc = expansion_point_location_if_in_system_header (loc);
       /* Standard attributes may start a label, statement or declaration.  */
       bool have_std_attrs
-	= c_parser_nth_token_starts_std_attributes (parser, 1);
+	= c_parser_nth_token_starts_std_attributes (parser, 1); //wyc n is 1-based
       tree std_attrs = NULL_TREE;
       if (have_std_attrs)
 	std_attrs = c_parser_std_attribute_specifier_sequence (parser);
