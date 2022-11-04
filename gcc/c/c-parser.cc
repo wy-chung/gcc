@@ -3067,7 +3067,7 @@ c_parser_declspecs (c_parser *parser, struct c_declspecs *specs,
 	case RID_BOUND: //wyc bound
 	  if (!bound_ok)
 	    goto out;
-	  __attribute__((fallthrough));
+	  [[fallthrough]]; //wyc
 	case RID_CONST: //wyc c_parser_peek_token (parser)->keyword
 	case RID_VOLATILE:
 	case RID_RESTRICT:

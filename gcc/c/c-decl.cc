@@ -5194,7 +5194,7 @@ start_decl (struct c_declarator *declarator, struct c_declspecs *declspecs,
   if (initialized)
     {
       if (current_scope == file_scope)
-	TREE_STATIC (decl) = 1;
+	TREE_STATIC (decl) = 1; //wyc allocate static storage
 
       /* Tell 'pushdecl' this is an initialized decl
 	 even though we don't yet have the initializer expression.
@@ -6276,16 +6276,16 @@ grokdeclarator (const struct c_declarator *declarator,
   tree type = declspecs->type;
   bool threadp = declspecs->thread_p;
   enum c_storage_class storage_class = declspecs->storage_class;
+  tree decl_attr = declspecs->decl_attr;
   //wyc int constp;
   //wyc int restrictp;
   //wyc int volatilep;
   //wyc int atomicp;
   //wyc int type_quals = TYPE_UNQUALIFIED;
-  tree name = NULL_TREE;
-  bool funcdef_flag = false;
-  bool funcdef_syntax = false;
+  //wyc tree name = NULL_TREE;
+  //wyc bool funcdef_flag = false;
+  //wyc bool funcdef_syntax = false;
   //wyc bool size_varies = false;
-  tree decl_attr = declspecs->decl_attr;
   int array_ptr_quals = TYPE_UNQUALIFIED;
   tree array_ptr_attrs = NULL_TREE;
   bool array_parm_static = false;
@@ -6324,11 +6324,14 @@ grokdeclarator (const struct c_declarator *declarator,
     }
   *expr_const_operands = declspecs->expr_const_operands;
 
+  bool funcdef_flag = false;
   if (decl_context == FUNCDEF)
     funcdef_flag = true, decl_context = NORMAL;
 
   /* Look inside a declarator for the name being declared
      and get it as an IDENTIFIER_NODE, for an error message.  */
+  tree name = NULL_TREE;
+  bool funcdef_syntax = false;
   {
     const struct c_declarator *decl = declarator;
 
@@ -6341,8 +6344,10 @@ grokdeclarator (const struct c_declarator *declarator,
 	  /* FALL THRU.  */
 
 	case cdk_function:
+	  funcdef_syntax = true;
+	  [[fallthrough]]; //wyc
 	case cdk_pointer:
-	  funcdef_syntax = (decl->kind == cdk_function);
+	  //funcdef_syntax = (decl->kind == cdk_function);
 	  if (first_non_attr_kind == cdk_attrs)
 	    first_non_attr_kind = decl->kind;
 	  decl = decl->declarator;
@@ -7690,7 +7695,7 @@ grokdeclarator (const struct c_declarator *declarator,
       {
 	/* It's a variable.  */
 	/* An uninitialized decl with `extern' is a reference.  */
-	int extern_ref = !initialized && storage_class == csc_extern;
+	bool extern_ref = !initialized && storage_class == csc_extern;
 
 	type = c_build_qualified_type (type, type_quals, orig_qual_type,
 				       orig_qual_indirect);
