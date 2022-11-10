@@ -5104,7 +5104,7 @@ start_decl (struct c_declarator *declarator, struct c_declspecs *declspecs,
 {
   //wyc tree decl;
   //wyc tree tem;
-  tree expr = NULL_TREE;
+  //wyc tree expr = NULL_TREE;
   enum deprecated_states deprecated_state = DEPRECATED_NORMAL;
 
   /* An object declared as __attribute__((unavailable)) suppresses
@@ -5117,6 +5117,7 @@ start_decl (struct c_declarator *declarator, struct c_declspecs *declspecs,
   else if (lookup_attribute ("deprecated", attributes))
     deprecated_state = DEPRECATED_SUPPRESS;
 
+  tree expr = NULL_TREE;
   tree decl = grokdeclarator (declarator, declspecs,
 			 NORMAL, initialized, NULL, &attributes, &expr, NULL,
 			 deprecated_state);
@@ -6359,7 +6360,7 @@ grokdeclarator (const struct c_declarator *declarator,
 
 	case cdk_id:
 	  loc = decl->id_loc;
-	  if (decl->u.id.id)
+	  //wyc if (decl->u.id.id)
 	    name = decl->u.id.id;
 	  decl_id_attrs = decl->u.id.attrs;
 	  if (first_non_attr_kind == cdk_attrs)
@@ -6369,7 +6370,7 @@ grokdeclarator (const struct c_declarator *declarator,
 
 	default:
 	  gcc_unreachable ();
-	} // switch (decl->kind)
+	} // switch (decl->kind), while(decl->kind)
     if (name == NULL_TREE)
       {
 	gcc_assert (decl_context == PARM
@@ -6403,7 +6404,7 @@ grokdeclarator (const struct c_declarator *declarator,
 
   if ((decl_context == NORMAL || decl_context == FIELD)
       && current_scope == file_scope
-      && variably_modified_type_p (type, NULL_TREE))
+      && variably_modified_type_p (type, NULL_TREE)) //wyc false
     {
       if (name)
 	error_at (loc, "variably modified %qE at file scope", name);
@@ -6459,6 +6460,7 @@ grokdeclarator (const struct c_declarator *declarator,
   int restrictp = declspecs->restrict_p + TYPE_RESTRICT (element_type);
   int volatilep = declspecs->volatile_p + TYPE_VOLATILE (element_type);
   int atomicp = declspecs->atomic_p + TYPE_ATOMIC (element_type);
+  int boundp = declspecs->bound_p; //wyc???
   addr_space_t as1 = declspecs->address_space;
   addr_space_t as2 = TYPE_ADDR_SPACE (element_type);
   addr_space_t address_space = ADDR_SPACE_GENERIC_P (as1)? as2 : as1;
@@ -6487,6 +6489,7 @@ grokdeclarator (const struct c_declarator *declarator,
 		| (restrictp ? TYPE_QUAL_RESTRICT : 0)
 		| (volatilep ? TYPE_QUAL_VOLATILE : 0)
 		| (atomicp ? TYPE_QUAL_ATOMIC : 0)
+		| (boundp ? TYPE_QUAL_BOUND : 0) //wyc
 		| ENCODE_QUAL_ADDR_SPACE (address_space));
   if (type_quals != TYPE_QUALS (element_type))
     orig_qual_type = NULL_TREE;
