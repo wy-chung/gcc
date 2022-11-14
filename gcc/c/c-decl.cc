@@ -6457,8 +6457,8 @@ grokdeclarator (const struct c_declarator *declarator,
      seems most appropriate to do so).  */
   element_type = strip_array_types (type);
   int constp = declspecs->const_p + TYPE_READONLY (element_type);
-  int restrictp = declspecs->restrict_p + TYPE_RESTRICT (element_type);
   int volatilep = declspecs->volatile_p + TYPE_VOLATILE (element_type);
+  int restrictp = declspecs->restrict_p + TYPE_RESTRICT (element_type);
   int atomicp = declspecs->atomic_p + TYPE_ATOMIC (element_type);
   int boundp = declspecs->bound_p; //wyc???
   addr_space_t as1 = declspecs->address_space;
@@ -6467,10 +6467,10 @@ grokdeclarator (const struct c_declarator *declarator,
 
   if (constp > 1)
     pedwarn_c90 (loc, OPT_Wpedantic, "duplicate %<const%>");
-  if (restrictp > 1)
-    pedwarn_c90 (loc, OPT_Wpedantic, "duplicate %<restrict%>");
   if (volatilep > 1)
     pedwarn_c90 (loc, OPT_Wpedantic, "duplicate %<volatile%>");
+  if (restrictp > 1)
+    pedwarn_c90 (loc, OPT_Wpedantic, "duplicate %<restrict%>");
   if (atomicp > 1)
     pedwarn_c90 (loc, OPT_Wpedantic, "duplicate %<_Atomic%>");
 
@@ -6486,12 +6486,13 @@ grokdeclarator (const struct c_declarator *declarator,
       type = TYPE_MAIN_VARIANT (type);
     }
   int type_quals = ((constp ? TYPE_QUAL_CONST : 0)
-		| (restrictp ? TYPE_QUAL_RESTRICT : 0)
 		| (volatilep ? TYPE_QUAL_VOLATILE : 0)
+		| (restrictp ? TYPE_QUAL_RESTRICT : 0)
 		| (atomicp ? TYPE_QUAL_ATOMIC : 0)
 		| (boundp ? TYPE_QUAL_BOUND : 0) //wyc
 		| ENCODE_QUAL_ADDR_SPACE (address_space));
-  if (type_quals != TYPE_QUALS (element_type))
+  int element_quals = TYPE_QUALS (element_type);
+  if (type_quals != element_quals)
     orig_qual_type = NULL_TREE;
 
   /* Applying the _Atomic qualifier to an array type (through the use

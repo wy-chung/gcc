@@ -784,7 +784,9 @@ layout_decl (tree decl, unsigned int known_align)
     DECL_SIZE_UNIT (decl) = variable_size (DECL_SIZE_UNIT (decl));
 
   /* If requested, warn about definitions of large data objects.  */
-  if ((code == PARM_DECL || (code == VAR_DECL && !DECL_NONLOCAL_FRAME (decl)))
+  if ((code == PARM_DECL
+       || (code == VAR_DECL
+	   && !DECL_NONLOCAL_FRAME (decl)))
       && !DECL_EXTERNAL (decl))
     {
       tree size = DECL_SIZE_UNIT (decl);

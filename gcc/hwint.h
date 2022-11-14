@@ -213,7 +213,7 @@ static inline int
 ffs_hwi (unsigned HOST_WIDE_INT x)
 {
 # if HOST_BITS_PER_WIDE_INT == HOST_BITS_PER_LONG
-  return __builtin_ffsl (x);
+  return __builtin_ffsl (x); // find first bit set, returns one plus the index of the least significant 1-bit of x,
 # elif HOST_BITS_PER_WIDE_INT == HOST_BITS_PER_LONGLONG
   return __builtin_ffsll (x);
 # else
