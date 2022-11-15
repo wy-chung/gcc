@@ -5118,8 +5118,9 @@ start_decl (struct c_declarator *declarator, struct c_declspecs *declspecs,
     deprecated_state = DEPRECATED_SUPPRESS;
 
   tree expr = NULL_TREE;
+  bool expr_const_operands_dummy;
   tree decl = grokdeclarator (declarator, declspecs,
-			 NORMAL, initialized, NULL, &attributes, &expr, NULL,
+			 NORMAL, initialized, NULL, &attributes, &expr, &expr_const_operands_dummy,
 			 deprecated_state);
   if (!decl || decl == error_mark_node)
     return NULL_TREE;
@@ -5926,8 +5927,9 @@ void
 push_parm_decl (const struct c_parm *parm, tree *expr)
 {
   tree attrs = parm->attrs;
+  bool expr_const_operands_dummy;
   tree decl = grokdeclarator (parm->declarator, parm->specs, PARM, false, NULL,
-			      &attrs, expr, NULL, DEPRECATED_NORMAL);
+			      &attrs, expr, &expr_const_operands_dummy, DEPRECATED_NORMAL);
   if (decl && DECL_P (decl)) //wyc if decl represents a declaration
     DECL_SOURCE_LOCATION (decl) = parm->loc;
 
@@ -6331,8 +6333,8 @@ grokdeclarator (const struct c_declarator *declarator,
 
   /* Look inside a declarator for the name being declared
      and get it as an IDENTIFIER_NODE, for an error message.  */
-  tree name = NULL_TREE;
   bool funcdef_syntax = false;
+  tree name = NULL_TREE;
   {
     const struct c_declarator *decl = declarator;
 
@@ -8440,9 +8442,10 @@ grokfield (location_t loc,
 	pedwarn_c99 (loc, OPT_Wpedantic,
 		     "ISO C90 doesn%'t support unnamed structs/unions");
     }
-
+  tree expr_dummy = NULL;
+  bool expr_const_operands_dummy;
   value = grokdeclarator (declarator, declspecs, FIELD, false,
-			  width ? &width : NULL, decl_attrs, NULL, NULL,
+			  width ? &width : NULL, decl_attrs, &expr_dummy, &expr_const_operands_dummy,
 			  DEPRECATED_NORMAL);
 
   finish_decl (value, loc, NULL_TREE, NULL_TREE, NULL_TREE);
@@ -9527,9 +9530,10 @@ start_function (struct c_declspecs *declspecs, struct c_declarator *declarator,
 
   /* Indicate no valid break/continue context.  */
   In_statement = 0;
-
+  tree expr_dummy = NULL;
+  bool expr_const_operands_dummy;
   tree decl1 = grokdeclarator (declarator, declspecs, FUNCDEF, true, NULL,
-			  &attributes, NULL, NULL, DEPRECATED_NORMAL);
+			  &attributes, &expr_dummy, &expr_const_operands_dummy, DEPRECATED_NORMAL);
   invoke_plugin_callbacks (PLUGIN_START_PARSE_FUNCTION, decl1); //wyc ignore
 
   /* If the declarator is not suitable for a function definition,

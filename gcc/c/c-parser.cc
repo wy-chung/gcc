@@ -8416,8 +8416,10 @@ c_parser_alignof_expression (c_parser *parser)
 		  alignof_spelling);
       c_inhibit_evaluation_warnings--;
       in_alignof--;
+      tree expr_dummy = NULL;
+      bool expr_const_operands_dummy;
       ret.value = c_sizeof_or_alignof_type (loc, groktypename (type_name,
-							       NULL, NULL),
+							       &expr_dummy, &expr_const_operands_dummy),
 					    false, is_c11_alignof, 1);
       ret.original_code = ERROR_MARK;
       ret.original_type = NULL;
