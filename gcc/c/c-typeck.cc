@@ -8313,7 +8313,7 @@ static vec<constructor_elt, va_gc> *constructor_elements;
 static int constructor_incremental;
 
 /* 1 if so far this constructor's elements are all compile-time constants.  */
-static int constructor_constant;
+static bool constructor_constant;
 
 /* 1 if so far this constructor's elements are all valid address constants.  */
 static int constructor_simple;
@@ -8360,7 +8360,7 @@ static tree constructor_decl;
 static bool constructor_top_level;
 
 /* Nonzero if there were any member designators in this initializer.  */
-static int constructor_designated;
+static bool constructor_designated;
 
 /* Nesting depth of designator list.  */
 static int designator_depth;
@@ -8393,14 +8393,14 @@ struct constructor_stack
      constructor at this level.  */
   struct c_expr replacement_value;
   struct constructor_range_stack *range_stack;
-  char constant;
-  char simple;
-  char nonconst;
+  bool constant;
+  bool simple;
+  bool nonconst;
   char implicit;
   char erroneous;
   char outer;
   char incremental;
-  char designated;
+  bool designated;
   int designator_depth;
 };
 
@@ -8469,7 +8469,7 @@ start_init (tree decl, tree asmspec_tree ATTRIBUTE_UNUSED, bool top_level,
   initializer_stack = p;
 
   constructor_decl = decl;
-  constructor_designated = 0;
+  constructor_designated = false;
   constructor_top_level = top_level;
 
   if (decl != NULL_TREE && decl != error_mark_node)
@@ -8580,15 +8580,15 @@ really_start_incremental_init (tree type)
   p->next = 0;
   constructor_stack = p;
 
-  constructor_constant = 1;
-  constructor_simple = 1;
-  constructor_nonconst = 0;
+  constructor_constant = true;
+  constructor_simple = true;
+  constructor_nonconst = false;
   constructor_depth = SPELLING_DEPTH ();
   constructor_elements = NULL;
   constructor_pending_elts = 0;
   constructor_type = type;
   constructor_incremental = 1;
-  constructor_designated = 0;
+  constructor_designated = false;
   constructor_zeroinit = 1;
   designator_depth = 0;
   designator_erroneous = 0;
@@ -8728,9 +8728,9 @@ push_init_level (location_t loc, int implicit,
   p->range_stack = 0;
   constructor_stack = p;
 
-  constructor_constant = 1;
-  constructor_simple = 1;
-  constructor_nonconst = 0;
+  constructor_constant = true;
+  constructor_simple = true;
+  constructor_nonconst = false;
   constructor_depth = SPELLING_DEPTH ();
   constructor_elements = NULL;
   constructor_incremental = 1;
@@ -9106,7 +9106,7 @@ set_designator (location_t loc, bool array,
 			      pop_init_level (loc, 1, braced_init_obstack,
 					      last_init_list_comma),
 			      true, braced_init_obstack);
-      constructor_designated = 1;
+      constructor_designated = true;
       return false;
     }
 
@@ -9137,7 +9137,7 @@ set_designator (location_t loc, bool array,
       return true;
     }
 
-  constructor_designated = 1;
+  constructor_designated = true;
   finish_implicit_inits (loc, braced_init_obstack);
   push_init_level (loc, 2, braced_init_obstack);
   return false;
@@ -9793,7 +9793,7 @@ output_init_element (location_t loc, tree value, tree origtype,
   if (value == error_mark_node)
     constructor_erroneous = 1;
   else if (!TREE_CONSTANT (value))
-    constructor_constant = 0;
+    constructor_constant = false;
   else if (!initializer_constant_valid_p (value,
 					  TREE_TYPE (value),
 					  AGGREGATE_TYPE_P (constructor_type)
@@ -9802,9 +9802,9 @@ output_init_element (location_t loc, tree value, tree origtype,
 	   || (RECORD_OR_UNION_TYPE_P (constructor_type)
 	       && DECL_C_BIT_FIELD (field)
 	       && TREE_CODE (value) != INTEGER_CST))
-    constructor_simple = 0;
+    constructor_simple = false;
   if (!maybe_const)
-    constructor_nonconst = 1;
+    constructor_nonconst = true;
 
   /* Digest the initializer and issue any errors about incompatible
      types before issuing errors about non-constant initializers.  */
