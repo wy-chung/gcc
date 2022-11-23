@@ -5292,13 +5292,13 @@ c_parser_braced_init (c_parser *parser, tree type, bool nested_p,
       ret.original_code = ERROR_MARK;
       ret.original_type = NULL;
       braces.skip_until_found_close (parser);
-      pop_init_level (brace_loc, 0, &braced_init_obstack, last_init_list_comma);
+      pop_init_level (brace_loc, false, &braced_init_obstack, last_init_list_comma);
       obstack_free (&braced_init_obstack, NULL);
       return ret;
     }
   location_t close_loc = next_tok->location;
   c_parser_consume_token (parser);
-  ret = pop_init_level (brace_loc, 0, &braced_init_obstack, close_loc);
+  ret = pop_init_level (brace_loc, false, &braced_init_obstack, close_loc);
   obstack_free (&braced_init_obstack, NULL);
   set_c_expr_source_range (&ret, brace_loc, close_loc);
   return ret;

@@ -8310,7 +8310,7 @@ static vec<constructor_elt, va_gc> *constructor_elements;
 
 /* 1 if constructor should be incrementally stored into a constructor chain,
    0 if all the elements should be kept in AVL tree.  */
-static int constructor_incremental;
+static bool constructor_incremental;
 
 /* 1 if so far this constructor's elements are all compile-time constants.  */
 static bool constructor_constant;
@@ -8323,7 +8323,7 @@ static int constructor_simple;
 static int constructor_nonconst;
 
 /* 1 if this constructor is erroneous so far.  */
-static int constructor_erroneous;
+static bool constructor_erroneous;
 
 /* 1 if this constructor is the universal zero initializer { 0 }.  */
 static int constructor_zeroinit;
@@ -8397,9 +8397,9 @@ struct constructor_stack
   bool simple;
   bool nonconst;
   char implicit;
-  char erroneous;
-  char outer;
-  char incremental;
+  bool erroneous;
+  bool outer;	//wyc always false??
+  bool incremental;
   bool designated;
   int designator_depth;
 };
@@ -8573,7 +8573,7 @@ really_start_incremental_init (tree type)
   p->replacement_value.original_type = NULL;
   p->implicit = 0;
   p->range_stack = 0;
-  p->outer = 0;
+  p->outer = false;
   p->incremental = constructor_incremental;
   p->designated = constructor_designated;
   p->designator_depth = designator_depth;
@@ -8587,7 +8587,7 @@ really_start_incremental_init (tree type)
   constructor_elements = NULL;
   constructor_pending_elts = 0;
   constructor_type = type;
-  constructor_incremental = 1;
+  constructor_incremental = true;
   constructor_designated = false;
   constructor_zeroinit = 1;
   designator_depth = 0;
@@ -8663,7 +8663,7 @@ finish_implicit_inits (location_t loc, struct obstack *braced_init_obstack)
       if (RECORD_OR_UNION_TYPE_P (constructor_type)
 	  && constructor_fields == NULL_TREE)
 	process_init_element (input_location,
-			      pop_init_level (loc, 1, braced_init_obstack,
+			      pop_init_level (loc, true, braced_init_obstack,
 					      last_init_list_comma),
 			      true, braced_init_obstack);
       else if (TREE_CODE (constructor_type) == ARRAY_TYPE
@@ -8671,7 +8671,7 @@ finish_implicit_inits (location_t loc, struct obstack *braced_init_obstack)
 	       && tree_int_cst_lt (constructor_max_index,
 				   constructor_index))
 	process_init_element (input_location,
-			      pop_init_level (loc, 1, braced_init_obstack,
+			      pop_init_level (loc, true, braced_init_obstack,
 					      last_init_list_comma),
 			      true, braced_init_obstack);
       else
@@ -8720,7 +8720,7 @@ push_init_level (location_t loc, int implicit,
   p->replacement_value.original_code = ERROR_MARK;
   p->replacement_value.original_type = NULL;
   p->implicit = implicit;
-  p->outer = 0;
+  p->outer = false;
   p->incremental = constructor_incremental;
   p->designated = constructor_designated;
   p->designator_depth = designator_depth;
@@ -8733,7 +8733,7 @@ push_init_level (location_t loc, int implicit,
   constructor_nonconst = false;
   constructor_depth = SPELLING_DEPTH ();
   constructor_elements = NULL;
-  constructor_incremental = 1;
+  constructor_incremental = true;
   /* If the upper initializer is designated, then mark this as
      designated too to prevent bogus warnings.  */
   constructor_designated = p->designated;
@@ -8872,7 +8872,7 @@ push_init_level (location_t loc, int implicit,
    Otherwise, return a CONSTRUCTOR expression as the value.  */
 
 struct c_expr
-pop_init_level (location_t loc, int implicit,
+pop_init_level (location_t loc, bool implicit,
 		struct obstack *braced_init_obstack,
 		location_t insert_before)
 {
@@ -8882,13 +8882,13 @@ pop_init_level (location_t loc, int implicit,
   ret.original_code = ERROR_MARK;
   ret.original_type = NULL;
 
-  if (implicit == 0)
+  if (!implicit)
     {
       /* When we come to an explicit close brace,
 	 pop any inner levels that didn't have explicit braces.  */
       while (constructor_stack->implicit)
 	process_init_element (input_location,
-			      pop_init_level (loc, 1, braced_init_obstack,
+			      pop_init_level (loc, true, braced_init_obstack,
 					      insert_before),
 			      true, braced_init_obstack);
       gcc_assert (!constructor_range_stack);
@@ -8899,7 +8899,7 @@ pop_init_level (location_t loc, int implicit,
 	(insert_before, "}");
 
   /* Now output all pending elements.  */
-  constructor_incremental = 1;
+  constructor_incremental = true;
   output_pending_init_elements (1, braced_init_obstack);
 
   p = constructor_stack;
@@ -9103,7 +9103,7 @@ set_designator (location_t loc, bool array,
 	 braces.  */
       while (constructor_stack->implicit)
 	process_init_element (input_location,
-			      pop_init_level (loc, 1, braced_init_obstack,
+			      pop_init_level (loc, true, braced_init_obstack,
 					      last_init_list_comma),
 			      true, braced_init_obstack);
       constructor_designated = true;
@@ -9589,7 +9589,7 @@ set_nonincremental_init (struct obstack * braced_init_obstack)
       else
 	constructor_unfilled_index = bitsize_zero_node;
     }
-  constructor_incremental = 0;
+  constructor_incremental = false;
 }
 
 /* Build AVL tree from a string constant.  */
@@ -9668,7 +9668,7 @@ set_nonincremental_init_from_string (tree str,
                         braced_init_obstack);
     }
 
-  constructor_incremental = 0;
+  constructor_incremental = false;
 }
 
 /* Return value of FIELD in pending initializer or NULL_TREE if the field was
@@ -9756,7 +9756,7 @@ output_init_element (location_t loc, tree value, tree origtype,
 
   if (type == error_mark_node || value == error_mark_node)
     {
-      constructor_erroneous = 1;
+      constructor_erroneous = true;
       return;
     }
   if (TREE_CODE (TREE_TYPE (value)) == ARRAY_TYPE
@@ -9791,7 +9791,7 @@ output_init_element (location_t loc, tree value, tree origtype,
   value = c_fully_fold (value, require_constant_value, &maybe_const);
 
   if (value == error_mark_node)
-    constructor_erroneous = 1;
+    constructor_erroneous = true;
   else if (!TREE_CONSTANT (value))
     constructor_constant = false;
   else if (!initializer_constant_valid_p (value,
@@ -9815,7 +9815,7 @@ output_init_element (location_t loc, tree value, tree origtype,
 			   require_constant_value);
   if (new_value == error_mark_node)
     {
-      constructor_erroneous = 1;
+      constructor_erroneous = true;
       return;
     }
   if (require_constant_value || require_constant_elements)
@@ -10272,7 +10272,7 @@ process_init_element (location_t loc, struct c_expr value, bool implicit,
       if (RECORD_OR_UNION_TYPE_P (constructor_type)
 	  && constructor_fields == NULL_TREE)
 	process_init_element (loc,
-			      pop_init_level (loc, 1, braced_init_obstack,
+			      pop_init_level (loc, true, braced_init_obstack,
 					      last_init_list_comma),
 			      true, braced_init_obstack);
       else if ((TREE_CODE (constructor_type) == ARRAY_TYPE
@@ -10281,7 +10281,7 @@ process_init_element (location_t loc, struct c_expr value, bool implicit,
 	       && tree_int_cst_lt (constructor_max_index,
 				   constructor_index))
 	process_init_element (loc,
-			      pop_init_level (loc, 1, braced_init_obstack,
+			      pop_init_level (loc, true, braced_init_obstack,
 					      last_init_list_comma),
 			      true, braced_init_obstack);
       else
@@ -10604,7 +10604,7 @@ process_init_element (location_t loc, struct c_expr value, bool implicit,
 	    {
 	      gcc_assert (constructor_stack->implicit);
 	      process_init_element (loc,
-				    pop_init_level (loc, 1,
+				    pop_init_level (loc, true,
 						    braced_init_obstack,
 						    last_init_list_comma),
 				    true, braced_init_obstack);
@@ -10615,7 +10615,7 @@ process_init_element (location_t loc, struct c_expr value, bool implicit,
 	    {
 	      gcc_assert (constructor_stack->implicit);
 	      process_init_element (loc,
-				    pop_init_level (loc, 1,
+				    pop_init_level (loc, true,
 						    braced_init_obstack,
 						    last_init_list_comma),
 				    true, braced_init_obstack);
