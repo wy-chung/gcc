@@ -8357,7 +8357,7 @@ static int constructor_depth;
 static tree constructor_decl;
 
 /* Nonzero if this is an initializer for a top-level decl.  */
-static int constructor_top_level;
+static bool constructor_top_level;
 
 /* Nonzero if there were any member designators in this initializer.  */
 static int constructor_designated;
@@ -8435,7 +8435,7 @@ struct initializer_stack
   struct spelling *spelling;
   struct spelling *spelling_base;
   int spelling_size;
-  char top_level;
+  bool top_level;
   char require_constant_value;
   char require_constant_elements;
   char designated;
@@ -8447,7 +8447,7 @@ static struct initializer_stack *initializer_stack;
 /* Prepare to parse and output the initializer for variable DECL.  */
 
 void
-start_init (tree decl, tree asmspec_tree ATTRIBUTE_UNUSED, int top_level,
+start_init (tree decl, tree asmspec_tree ATTRIBUTE_UNUSED, bool top_level,
 	    rich_location *richloc)
 {
   const char *locus;

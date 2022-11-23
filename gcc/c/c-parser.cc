@@ -10270,7 +10270,7 @@ c_parser_postfix_expression_after_paren_type (c_parser *parser,
   bool type_expr_const = true;
   check_compound_literal_type (type_loc, type_name);
   rich_location richloc (line_table, type_loc);
-  start_init (NULL_TREE, NULL, 0, &richloc);
+  start_init (NULL_TREE, NULL, false, &richloc);
   type = groktypename (type_name, &type_expr, &type_expr_const);
   start_loc = c_parser_peek_token (parser)->location;
   if (type != error_mark_node && C_TYPE_VARIABLE_SIZE (type))
@@ -22401,7 +22401,7 @@ c_parser_omp_declare_reduction (c_parser *parser, enum pragma_context context)
 		  tree st = push_stmt_list ();
 		  location_t loc = c_parser_peek_token (parser)->location;
 		  rich_location richloc (line_table, loc);
-		  start_init (omp_priv, NULL_TREE, 0, &richloc);
+		  start_init (omp_priv, NULL_TREE, false, &richloc);
 		  struct c_expr init = c_parser_initializer (parser);
 		  finish_init ();
 		  finish_decl (omp_priv, loc, init.value,

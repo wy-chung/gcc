@@ -5221,7 +5221,7 @@ start_decl (struct c_declarator *declarator, struct c_declspecs *declspecs,
      body of code to break, and it allows more efficient variable references
      in the presence of dynamic linking.  */
 
-  if (VAR_P (decl)
+  if (VAR_P (decl) //wyc true. variable declaration?
       && !initialized
       && TREE_PUBLIC (decl)
       && !DECL_THREAD_LOCAL_P (decl)
@@ -6278,7 +6278,7 @@ grokdeclarator (const struct c_declarator *declarator,
 {
   tree type = declspecs->type;
   bool threadp = declspecs->thread_p;
-  enum c_storage_class storage_class = declspecs->storage_class;
+  c_storage_class storage_class = declspecs->storage_class;
   tree decl_attr = declspecs->decl_attr;
   //wyc int constp;
   //wyc int restrictp;
@@ -6296,7 +6296,7 @@ grokdeclarator (const struct c_declarator *declarator,
   tree returned_attrs = NULL_TREE;
   tree decl_id_attrs = NULL_TREE;
   bool bitfield = width != NULL;
-  tree element_type;
+  //wyc tree element_type;
   tree orig_qual_type = NULL;
   size_t orig_qual_indirect = 0;
   struct c_arg_info *arg_info = 0;
@@ -6304,7 +6304,7 @@ grokdeclarator (const struct c_declarator *declarator,
   location_t loc = UNKNOWN_LOCATION;
   tree expr_dummy;
   bool expr_const_operands_dummy;
-  enum c_declarator_kind first_non_attr_kind;
+  //wyc enum c_declarator_kind first_non_attr_kind;
   unsigned int alignas_align = 0;
 
   if (TREE_CODE (type) == ERROR_MARK)
@@ -6335,10 +6335,11 @@ grokdeclarator (const struct c_declarator *declarator,
      and get it as an IDENTIFIER_NODE, for an error message.  */
   bool funcdef_syntax = false;
   tree name = NULL_TREE;
+  c_declarator_kind first_non_attr_kind = cdk_attrs; // enum c_declarator_kind
   {
     const struct c_declarator *decl = declarator;
 
-    first_non_attr_kind = cdk_attrs; // enum c_declarator_kind
+    //wyc first_non_attr_kind = cdk_attrs; // enum c_declarator_kind
     while (decl)
       switch (decl->kind)
 	{
@@ -6457,7 +6458,7 @@ grokdeclarator (const struct c_declarator *declarator,
      qualifiers to work with (C90 is not entirely clear about whether
      duplicate qualifiers should be diagnosed in this case, but it
      seems most appropriate to do so).  */
-  element_type = strip_array_types (type);
+  tree element_type = strip_array_types (type);
   int constp = declspecs->const_p + TYPE_READONLY (element_type);
   int volatilep = declspecs->volatile_p + TYPE_VOLATILE (element_type);
   int restrictp = declspecs->restrict_p + TYPE_RESTRICT (element_type);
@@ -7833,7 +7834,7 @@ grokdeclarator (const struct c_declarator *declarator,
     gcc_assert (!HAS_DECL_ASSEMBLER_NAME_P (decl)
 		|| !DECL_ASSEMBLER_NAME_SET_P (decl));
 
-    if (warn_cxx_compat
+    if (warn_cxx_compat //wyc false
 	&& VAR_P (decl)
 	&& TREE_PUBLIC (decl)
 	&& TREE_STATIC (decl)
