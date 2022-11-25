@@ -6280,29 +6280,11 @@ grokdeclarator (const struct c_declarator *declarator,
   bool threadp = declspecs->thread_p;
   c_storage_class storage_class = declspecs->storage_class;
   tree decl_attr = declspecs->decl_attr;
-  //wyc int constp;
-  //wyc int restrictp;
-  //wyc int volatilep;
-  //wyc int atomicp;
-  //wyc int type_quals = TYPE_UNQUALIFIED;
-  //wyc tree name = NULL_TREE;
-  //wyc bool funcdef_flag = false;
-  //wyc bool funcdef_syntax = false;
-  //wyc bool size_varies = false;
-  int array_ptr_quals = TYPE_UNQUALIFIED;
-  tree array_ptr_attrs = NULL_TREE;
-  bool array_parm_static = false;
-  //wyc bool array_parm_vla_unspec_p = false;
   tree returned_attrs = NULL_TREE;
   tree decl_id_attrs = NULL_TREE;
   bool bitfield = width != NULL;
-  //wyc tree element_type;
-  tree orig_qual_type = NULL;
-  size_t orig_qual_indirect = 0;
   struct c_arg_info *arg_info = 0;
-  //wyc addr_space_t as1, as2, address_space;
   location_t loc = UNKNOWN_LOCATION;
-  //wyc enum c_declarator_kind first_non_attr_kind;
   unsigned int alignas_align = 0;
 
   if (TREE_CODE (type) == ERROR_MARK)
@@ -6481,6 +6463,8 @@ grokdeclarator (const struct c_declarator *declarator,
     error_at (loc, "conflicting named address spaces (%s vs %s)",
 	      c_addr_space_name (as1), c_addr_space_name (as2));
 
+  tree orig_qual_type = NULL;
+  size_t orig_qual_indirect = 0;
   if ((TREE_CODE (type) == ARRAY_TYPE
        || first_non_attr_kind == cdk_array)
       && TYPE_QUALS (element_type))
@@ -6609,8 +6593,12 @@ grokdeclarator (const struct c_declarator *declarator,
      form and then the qualified form is created with
      TYPE_MAIN_VARIANT pointing to the unqualified form.  */
 
+  int array_ptr_quals = TYPE_UNQUALIFIED;
+  tree array_ptr_attrs = NULL_TREE;
+  bool array_parm_static = false;
+  bool array_parm_vla_unspec_p = false;
   while (declarator && declarator->kind != cdk_id)
-    {
+    { //7240
       if (type == error_mark_node)
 	{
 	  declarator = declarator->declarator;
@@ -6680,9 +6668,9 @@ grokdeclarator (const struct c_declarator *declarator,
 					      chainon (returned_attrs, attrs),
 					      attr_flags);
 	    break;
-	  }
+	  } // case cdk_attrs
 	case cdk_array:
-	  {
+	  { //7032
 	    tree itype = NULL_TREE;
 	    tree size = declarator->u.array.dimen;
 	    /* The index is a signed object `sizetype' bits wide.  */
@@ -6691,7 +6679,7 @@ grokdeclarator (const struct c_declarator *declarator,
 	    array_ptr_quals = declarator->u.array.quals;
 	    array_ptr_attrs = declarator->u.array.attrs;
 	    array_parm_static = declarator->u.array.static_p;
-	    bool array_parm_vla_unspec_p = declarator->u.array.vla_unspec_p;
+	    array_parm_vla_unspec_p = declarator->u.array.vla_unspec_p;
 
 	    declarator = declarator->declarator;
 
