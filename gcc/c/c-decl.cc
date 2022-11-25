@@ -648,7 +648,7 @@ add_stmt (tree t)
 static tree
 c_build_pointer_type (tree to_type)
 {
-  addr_space_t as = to_type == error_mark_node? ADDR_SPACE_GENERIC
+  addr_space_t as = (to_type == error_mark_node)? ADDR_SPACE_GENERIC
 					      : TYPE_ADDR_SPACE (to_type);
   machine_mode pointer_mode;
 
@@ -5221,7 +5221,7 @@ start_decl (struct c_declarator *declarator, struct c_declspecs *declspecs,
      body of code to break, and it allows more efficient variable references
      in the presence of dynamic linking.  */
 
-  if (VAR_P (decl) //wyc true. variable declaration?
+  if (VAR_P (decl) //wyc variable declaration? true.
       && !initialized
       && TREE_PUBLIC (decl)
       && !DECL_THREAD_LOCAL_P (decl)
@@ -6302,18 +6302,18 @@ grokdeclarator (const struct c_declarator *declarator,
   struct c_arg_info *arg_info = 0;
   //wyc addr_space_t as1, as2, address_space;
   location_t loc = UNKNOWN_LOCATION;
-  tree expr_dummy;
-  bool expr_const_operands_dummy;
   //wyc enum c_declarator_kind first_non_attr_kind;
   unsigned int alignas_align = 0;
 
   if (TREE_CODE (type) == ERROR_MARK)
     return error_mark_node;
+  tree expr_dummy;
   if (expr == NULL)
     {
       expr = &expr_dummy;
       expr_dummy = NULL_TREE;
     }
+  bool expr_const_operands_dummy;
   if (expr_const_operands == NULL)
     expr_const_operands = &expr_const_operands_dummy;
 
@@ -6366,7 +6366,7 @@ grokdeclarator (const struct c_declarator *declarator,
 	    name = c_decl->u.id.id;
 	  decl_id_attrs = c_decl->u.id.attrs;
 	  if (first_non_attr_kind == cdk_attrs)
-	    first_non_attr_kind = c_decl->kind;
+	    first_non_attr_kind = cdk_id;
 	  //wyc c_decl = 0;
 	  gcc_assert(c_decl->declarator == 0); //wyc
 	  break;

@@ -84,8 +84,8 @@ location_t c_last_sizeof_loc;
    initializer" message within this initializer.  */
 static int found_missing_braces;
 
-static int require_constant_value;
-static int require_constant_elements;
+static bool require_constant_value;	//wyc original int
+static bool require_constant_elements;	//wyc original int
 
 static bool null_pointer_constant_p (const_tree);
 static tree qualify_type (tree, tree);
@@ -8436,9 +8436,9 @@ struct initializer_stack
   struct spelling *spelling_base;
   int spelling_size;
   bool top_level;
-  char require_constant_value;
-  char require_constant_elements;
-  char designated;
+  bool require_constant_value;
+  bool require_constant_elements;
+  bool designated;
   rich_location *missing_brace_richloc;
 };
 
@@ -8484,8 +8484,8 @@ start_init (tree decl, tree asmspec_tree ATTRIBUTE_UNUSED, bool top_level,
     }
   else
     {
-      require_constant_value = 0;
-      require_constant_elements = 0;
+      require_constant_value = false;
+      require_constant_elements = false;
       locus = _("(anonymous)");
     }
 
