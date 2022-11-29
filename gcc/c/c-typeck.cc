@@ -82,7 +82,7 @@ location_t c_last_sizeof_loc;
 
 /* Nonzero if we might need to print a "missing braces around
    initializer" message within this initializer.  */
-static int found_missing_braces;
+static bool found_missing_braces;
 
 static bool require_constant_value;	//wyc original int
 static bool require_constant_elements;	//wyc original int
@@ -7858,7 +7858,25 @@ static int spelling_size;		/* Size of the spelling stack.  */
 /* Push an element on the spelling stack with type KIND and assign VALUE
    to MEMBER.  */
 
-#define PUSH_SPELLING(KIND, VALUE, MEMBER)				\
+template <typename T>
+void PUSH_SPELLING(int KIND, T VALUE)
+{
+  int depth = SPELLING_DEPTH ();
+
+  if (depth >= spelling_size)
+    {
+      spelling_size += 10;
+      spelling_base = XRESIZEVEC (struct spelling, spelling_base,
+				  spelling_size);
+      RESTORE_SPELLING_DEPTH (depth);
+    }
+
+  spelling->kind = KIND;
+  *((T *)&spelling->u) = VALUE;
+  spelling++;
+}
+
+#define PUSH_SPELLING_BAK(KIND, VALUE, MEMBER)				\
 {									\
   int depth = SPELLING_DEPTH ();					\
 									\
@@ -7880,7 +7898,7 @@ static int spelling_size;		/* Size of the spelling stack.  */
 static void
 push_string (const char *string)
 {
-  PUSH_SPELLING (SPELLING_STRING, string, u.s);
+  PUSH_SPELLING (SPELLING_STRING, string/*, u.s*/);
 }
 
 /* Push a member name on the stack.  Printed as '.' STRING.  */
@@ -7892,7 +7910,7 @@ push_member_name (tree decl)
     = (DECL_NAME (decl)
        ? identifier_to_locale (IDENTIFIER_POINTER (DECL_NAME (decl)))
        : _("<anonymous>"));
-  PUSH_SPELLING (SPELLING_MEMBER, string, u.s);
+  PUSH_SPELLING (SPELLING_MEMBER, string/*, u.s*/);
 }
 
 /* Push an array bounds on the stack.  Printed as [BOUNDS].  */
@@ -7900,7 +7918,7 @@ push_member_name (tree decl)
 static void
 push_array_bounds (unsigned HOST_WIDE_INT bounds)
 {
-  PUSH_SPELLING (SPELLING_BOUNDS, bounds, u.i);
+  PUSH_SPELLING (SPELLING_BOUNDS, bounds/*, u.i*/);
 }
 
 /* Compute the maximum size in bytes of the printed spelling.  */
@@ -8489,12 +8507,12 @@ start_init (tree decl, tree asmspec_tree ATTRIBUTE_UNUSED, bool top_level,
       locus = _("(anonymous)");
     }
 
-  constructor_stack = 0;
-  constructor_range_stack = 0;
+  constructor_stack = nullptr;
+  constructor_range_stack = nullptr;
 
-  found_missing_braces = 0;
+  found_missing_braces = false;
 
-  spelling_base = 0;
+  spelling_base = nullptr;
   spelling_size = 0;
   RESTORE_SPELLING_DEPTH (0);
 
@@ -8791,7 +8809,7 @@ push_init_level (location_t loc, int implicit,
 
   if (implicit == 1)
     {
-      found_missing_braces = 1;
+      found_missing_braces = true;
       if (initializer_stack->missing_brace_richloc)
 	initializer_stack->missing_brace_richloc->add_fixit_insert_before
 	  (loc, "{");

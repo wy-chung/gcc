@@ -7747,7 +7747,7 @@ grokdeclarator (const struct c_declarator *declarator,
 
 	if (threadp)
 	  set_decl_tls_model (decl, decl_default_tls_model (decl));
-      } // else
+      } // else /* It's a variable.  */
 
     if ((storage_class == csc_extern
 	 || (storage_class == csc_none
