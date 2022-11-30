@@ -6324,38 +6324,37 @@ grokdeclarator (const struct c_declarator *declarator,
     //wyc first_non_attr_kind = cdk_attrs; // enum c_declarator_kind
     for (const struct c_declarator *c_decl = declarator;
 	 c_decl; c_decl = c_decl->declarator)
+      {
       switch (c_decl->kind)
 	{
-	case cdk_array:
-	  loc = c_decl->id_loc;
-	  [[fallthrough]]; /* FALL THRU.  */
-
 	case cdk_function:
+	  funcdef_syntax = true;
+	  break;
+
 	case cdk_pointer:
-	  funcdef_syntax = (c_decl->kind == cdk_function);
-	  if (first_non_attr_kind == cdk_attrs)
-	    first_non_attr_kind = c_decl->kind;
-	  //wyc c_decl = c_decl->declarator;
+	  funcdef_syntax = false;
 	  break;
 
 	case cdk_attrs:
-	  //wyc c_decl = c_decl->declarator;
 	  break;
 
 	case cdk_id:
-	  loc = c_decl->id_loc;
 	  //wyc if (c_decl->u.id.id)
 	    name = c_decl->u.id.id;
 	  decl_id_attrs = c_decl->u.id.attrs;
-	  if (first_non_attr_kind == cdk_attrs)
-	    first_non_attr_kind = cdk_id;
-	  //wyc c_decl = 0;
-	  gcc_assert(c_decl->declarator == 0); //wyc
+	  gcc_assert(c_decl->declarator == 0); // EXPR should always be true
+	  [[fallthrough]];
+
+	case cdk_array:
+	  loc = c_decl->id_loc;
 	  break;
 
 	default:
-	  gcc_unreachable ();
+	  gcc_unreachable (); // should never reach here
 	} // switch (c_decl->kind), while(c_decl->kind)
+	if (first_non_attr_kind == cdk_attrs)
+	  first_non_attr_kind = c_decl->kind;
+      } // for (; c_decl; c_decl = c_decl->declarator)
     if (name == NULL_TREE)
       {
 	gcc_assert (decl_context == PARM
