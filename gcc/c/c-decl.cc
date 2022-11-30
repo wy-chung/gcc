@@ -6327,6 +6327,12 @@ grokdeclarator (const struct c_declarator *declarator,
       {
       switch (c_decl->kind)
 	{
+	case cdk_array:
+	  loc = c_decl->id_loc;
+	  // cdk_function cannot be followed by cdk_array
+	  gcc_assert(funcdef_syntax == false);
+	  break;
+
 	case cdk_function:
 	  funcdef_syntax = true;
 	  break;
@@ -6339,14 +6345,11 @@ grokdeclarator (const struct c_declarator *declarator,
 	  break;
 
 	case cdk_id:
+	  loc = c_decl->id_loc;
 	  //wyc if (c_decl->u.id.id)
 	    name = c_decl->u.id.id;
 	  decl_id_attrs = c_decl->u.id.attrs;
 	  gcc_assert(c_decl->declarator == 0); // EXPR should always be true
-	  [[fallthrough]];
-
-	case cdk_array:
-	  loc = c_decl->id_loc;
 	  break;
 
 	default:
