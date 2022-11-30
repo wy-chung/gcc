@@ -7859,7 +7859,7 @@ static int spelling_size;		/* Size of the spelling stack.  */
    to MEMBER.  */
 
 template <typename T>
-void PUSH_SPELLING(int KIND, T VALUE)
+void push_spelling(int kind, T value)
 {
   int depth = SPELLING_DEPTH ();
 
@@ -7871,12 +7871,12 @@ void PUSH_SPELLING(int KIND, T VALUE)
       RESTORE_SPELLING_DEPTH (depth);
     }
 
-  spelling->kind = KIND;
-  *((T *)&spelling->u) = VALUE;
+  spelling->kind = kind;
+  *((T *)&spelling->u) = value;
   spelling++;
 }
 
-#define PUSH_SPELLING_BAK(KIND, VALUE, MEMBER)				\
+#define PUSH_SPELLING(KIND, VALUE, MEMBER)				\
 {									\
   int depth = SPELLING_DEPTH ();					\
 									\
@@ -7898,7 +7898,7 @@ void PUSH_SPELLING(int KIND, T VALUE)
 static void
 push_string (const char *string)
 {
-  PUSH_SPELLING (SPELLING_STRING, string/*, u.s*/);
+  push_spelling (SPELLING_STRING, string/*, u.s*/);
 }
 
 /* Push a member name on the stack.  Printed as '.' STRING.  */
@@ -7910,7 +7910,7 @@ push_member_name (tree decl)
     = (DECL_NAME (decl)
        ? identifier_to_locale (IDENTIFIER_POINTER (DECL_NAME (decl)))
        : _("<anonymous>"));
-  PUSH_SPELLING (SPELLING_MEMBER, string/*, u.s*/);
+  push_spelling (SPELLING_MEMBER, string/*, u.s*/);
 }
 
 /* Push an array bounds on the stack.  Printed as [BOUNDS].  */
@@ -7918,7 +7918,7 @@ push_member_name (tree decl)
 static void
 push_array_bounds (unsigned HOST_WIDE_INT bounds)
 {
-  PUSH_SPELLING (SPELLING_BOUNDS, bounds/*, u.i*/);
+  push_spelling (SPELLING_BOUNDS, bounds/*, u.i*/);
 }
 
 /* Compute the maximum size in bytes of the printed spelling.  */
