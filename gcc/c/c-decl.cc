@@ -3258,7 +3258,7 @@ pushdecl (tree x)
 	      b->inner_comp = true;
 	    }
 	  b = b->shadowed;
-	}
+	} // while (b && !B_IN_EXTERNAL_SCOPE (b))
 
       /* If a matching external declaration has been found, set its
 	 type to the composite of all the types of that declaration.
@@ -6338,6 +6338,9 @@ grokdeclarator (const struct c_declarator *declarator,
 	  break;
 
 	case cdk_pointer:
+	  //if (funcdef_syntax == true)
+	  //  gcc_unreachable();
+	  // cdk_function can be followed by cdk_pointer
 	  funcdef_syntax = false;
 	  break;
 
@@ -6443,11 +6446,11 @@ grokdeclarator (const struct c_declarator *declarator,
      duplicate qualifiers should be diagnosed in this case, but it
      seems most appropriate to do so).  */
   tree element_type = strip_array_types (type);
-  int constp = declspecs->const_p + TYPE_READONLY (element_type);
-  int volatilep = declspecs->volatile_p + TYPE_VOLATILE (element_type);
-  int restrictp = declspecs->restrict_p + TYPE_RESTRICT (element_type);
-  int atomicp = declspecs->atomic_p + TYPE_ATOMIC (element_type);
-  int boundp = declspecs->bound_p; //wyc???
+  char constp = declspecs->const_p + TYPE_READONLY (element_type);
+  char volatilep = declspecs->volatile_p + TYPE_VOLATILE (element_type);
+  char restrictp = declspecs->restrict_p + TYPE_RESTRICT (element_type);
+  char atomicp = declspecs->atomic_p + TYPE_ATOMIC (element_type);
+  char boundp = declspecs->bound_p; //wyc???
   addr_space_t as1 = declspecs->address_space;
   addr_space_t as2 = TYPE_ADDR_SPACE (element_type);
   addr_space_t address_space = ADDR_SPACE_GENERIC_P (as1)? as2 : as1;
