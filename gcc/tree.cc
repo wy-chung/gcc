@@ -8196,20 +8196,20 @@ variably_modified_type_p (tree type, tree fn)
    gimplify_one_sizepos would gimplify the expression into a local
    variable.  */
   auto is_var = [type, fn](tree _t)
-  {
-    if (_t != NULL_TREE
-	&& _t != error_mark_node
-	&& !CONSTANT_CLASS_P (_t)
-	&& TREE_CODE (_t) != PLACEHOLDER_EXPR
-	&& (!fn
-	    || (!TYPE_SIZES_GIMPLIFIED (type)
-		&& (TREE_CODE (_t) != VAR_DECL
-		    && !CONTAINS_PLACEHOLDER_P (_t)))
-	    || walk_tree (&_t, find_var_from_fn, fn, NULL)))
-      return true;
-    else
-      return false;
-  };
+    {
+      if (_t != NULL_TREE
+	  && _t != error_mark_node
+	  && !CONSTANT_CLASS_P (_t)
+	  && TREE_CODE (_t) != PLACEHOLDER_EXPR
+	  && (!fn
+	      || (!TYPE_SIZES_GIMPLIFIED (type)
+		  && (TREE_CODE (_t) != VAR_DECL
+		      && !CONTAINS_PLACEHOLDER_P (_t)))
+	      || walk_tree (&_t, find_var_from_fn, fn, NULL)))
+	return true;
+      else
+	return false;
+    };
 
   if (type == error_mark_node)
     return false;
