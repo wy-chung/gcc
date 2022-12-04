@@ -7876,23 +7876,6 @@ void push_spelling(int kind, T value)
   spelling++;
 }
 
-#define PUSH_SPELLING(KIND, VALUE, MEMBER)				\
-{									\
-  int depth = SPELLING_DEPTH ();					\
-									\
-  if (depth >= spelling_size)						\
-    {									\
-      spelling_size += 10;						\
-      spelling_base = XRESIZEVEC (struct spelling, spelling_base,	\
-				  spelling_size);			\
-      RESTORE_SPELLING_DEPTH (depth);					\
-    }									\
-									\
-  spelling->kind = (KIND);						\
-  spelling->MEMBER = (VALUE);						\
-  spelling++;								\
-}
-
 /* Push STRING on the stack.  Printed literally.  */
 
 static void
