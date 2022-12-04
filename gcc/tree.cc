@@ -6889,7 +6889,7 @@ build_pointer_type_for_mode (tree to_type, machine_mode mode,
      ??? This is a kludge, but consistent with the way this function has
      always operated and there doesn't seem to be a good way to avoid this
      at the moment.  */
-  if (TYPE_POINTER_TO (to_type) != 0
+  if (TYPE_POINTER_TO (to_type) != nullptr
       && TREE_CODE (TYPE_POINTER_TO (to_type)) != POINTER_TYPE)
     return TYPE_POINTER_TO (to_type);
 
@@ -8195,25 +8195,28 @@ variably_modified_type_p (tree type, tree fn)
    a variable in FN.  If TYPE isn't gimplified, return true also if
    gimplify_one_sizepos would gimplify the expression into a local
    variable.  */
-#define RETURN_TRUE_IF_VAR(T)						\
-  do { tree _t = (T);							\
-    if (_t != NULL_TREE							\
-	&& _t != error_mark_node					\
-	&& !CONSTANT_CLASS_P (_t)					\
-	&& TREE_CODE (_t) != PLACEHOLDER_EXPR				\
-	&& (!fn								\
-	    || (!TYPE_SIZES_GIMPLIFIED (type)				\
-		&& (TREE_CODE (_t) != VAR_DECL				\
-		    && !CONTAINS_PLACEHOLDER_P (_t)))			\
-	    || walk_tree (&_t, find_var_from_fn, fn, NULL)))		\
-      return true;  } while (0)
+  auto is_var = [type, fn](tree _t)
+  {
+    if (_t != NULL_TREE
+	&& _t != error_mark_node
+	&& !CONSTANT_CLASS_P (_t)
+	&& TREE_CODE (_t) != PLACEHOLDER_EXPR
+	&& (!fn
+	    || (!TYPE_SIZES_GIMPLIFIED (type)
+		&& (TREE_CODE (_t) != VAR_DECL
+		    && !CONTAINS_PLACEHOLDER_P (_t)))
+	    || walk_tree (&_t, find_var_from_fn, fn, NULL)))
+      return true;
+    else
+      return false;
+  };
 
   if (type == error_mark_node)
     return false;
 
   /* If TYPE itself has variable size, it is variably modified.  */
-  RETURN_TRUE_IF_VAR (TYPE_SIZE (type));
-  RETURN_TRUE_IF_VAR (TYPE_SIZE_UNIT (type));
+  if (is_var(TYPE_SIZE (type))) return true;
+  if (is_var(TYPE_SIZE_UNIT (type))) return true;
 
   switch (TREE_CODE (type))
     {
@@ -8247,8 +8250,8 @@ variably_modified_type_p (tree type, tree fn)
     case BOOLEAN_TYPE:
       /* Scalar types are variably modified if their end points
 	 aren't constant.  */
-      RETURN_TRUE_IF_VAR (TYPE_MIN_VALUE (type));
-      RETURN_TRUE_IF_VAR (TYPE_MAX_VALUE (type));
+      if (is_var(TYPE_MIN_VALUE (type))) return true;
+      if (is_var(TYPE_MAX_VALUE (type))) return true;
       break;
 
     case RECORD_TYPE:
@@ -8261,14 +8264,14 @@ variably_modified_type_p (tree type, tree fn)
       for (t = TYPE_FIELDS (type); t; t = DECL_CHAIN (t))
 	if (TREE_CODE (t) == FIELD_DECL)
 	  {
-	    RETURN_TRUE_IF_VAR (DECL_FIELD_OFFSET (t));
-	    RETURN_TRUE_IF_VAR (DECL_SIZE (t));
-	    RETURN_TRUE_IF_VAR (DECL_SIZE_UNIT (t));
+	    if (is_var(DECL_FIELD_OFFSET (t))) return true;
+	    if (is_var(DECL_SIZE (t))) return true;
+	    if (is_var(DECL_SIZE_UNIT (t))) return true;;
 
 	    /* If the type is a qualified union, then the DECL_QUALIFIER
 	       of fields can also be an expression containing a variable.  */
 	    if (TREE_CODE (type) == QUAL_UNION_TYPE)
-	      RETURN_TRUE_IF_VAR (DECL_QUALIFIER (t));
+	      if (is_var(DECL_QUALIFIER (t))) return true;
 
 	    /* If the field is a qualified union, then it's only a container
 	       for what's inside so we look into it.  That's necessary in LTO
@@ -8283,8 +8286,8 @@ variably_modified_type_p (tree type, tree fn)
     case ARRAY_TYPE:
       /* Do not call ourselves to avoid infinite recursion.  This is
 	 variably modified if the element type is.  */
-      RETURN_TRUE_IF_VAR (TYPE_SIZE (TREE_TYPE (type)));
-      RETURN_TRUE_IF_VAR (TYPE_SIZE_UNIT (TREE_TYPE (type)));
+      if (is_var(TYPE_SIZE (TREE_TYPE (type)))) return true;
+      if (is_var(TYPE_SIZE_UNIT (TREE_TYPE (type)))) return true;
       break;
 
     default:
@@ -8295,7 +8298,6 @@ variably_modified_type_p (tree type, tree fn)
      all other types are not variably modified.  */
   return lang_hooks.tree_inlining.var_mod_type_p (type, fn);
 
-#undef RETURN_TRUE_IF_VAR
 }
 
 /* Given a DECL or TYPE, return the scope in which it was declared, or
