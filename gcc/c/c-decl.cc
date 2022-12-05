@@ -6279,9 +6279,6 @@ grokdeclarator (const struct c_declarator *declarator,
   tree type = declspecs->type;
   bool threadp = declspecs->thread_p;
   c_storage_class storage_class = declspecs->storage_class;
-  tree decl_attr = declspecs->decl_attr;
-  tree returned_attrs = NULL_TREE;
-  tree decl_id_attrs = NULL_TREE;
   bool bitfield = width != NULL;
   struct c_arg_info *arg_info = 0;
   location_t loc = UNKNOWN_LOCATION;
@@ -6318,58 +6315,57 @@ grokdeclarator (const struct c_declarator *declarator,
   bool funcdef_syntax = false;
   tree name = NULL_TREE;
   c_declarator_kind first_non_attr_kind = cdk_attrs; // enum c_declarator_kind
+  tree decl_id_attrs = NULL_TREE;
+
+  for (const struct c_declarator *c_decl = declarator;
+       c_decl; c_decl = c_decl->declarator)
   {
-    //const struct c_declarator *c_decl = declarator;
+    switch (c_decl->kind)
+    {
+    case cdk_array:
+      loc = c_decl->id_loc;
+      // cdk_function cannot be followed by cdk_array
+      gcc_assert(funcdef_syntax == false);
+      break;
 
-    //wyc first_non_attr_kind = cdk_attrs; // enum c_declarator_kind
-    for (const struct c_declarator *c_decl = declarator;
-	 c_decl; c_decl = c_decl->declarator)
-      {
-      switch (c_decl->kind)
-	{
-	case cdk_array:
-	  loc = c_decl->id_loc;
-	  // cdk_function cannot be followed by cdk_array
-	  gcc_assert(funcdef_syntax == false);
-	  break;
+    case cdk_function:
+      funcdef_syntax = true;
+      break;
 
-	case cdk_function:
-	  funcdef_syntax = true;
-	  break;
+    case cdk_pointer:
+      //if (funcdef_syntax == true)
+      //  gcc_unreachable();
+      // cdk_function can be followed by cdk_pointer
+      funcdef_syntax = false;
+      break;
 
-	case cdk_pointer:
-	  //if (funcdef_syntax == true)
-	  //  gcc_unreachable();
-	  // cdk_function can be followed by cdk_pointer
-	  funcdef_syntax = false;
-	  break;
+    case cdk_attrs:
+      break;
 
-	case cdk_attrs:
-	  break;
+    case cdk_id:
+      loc = c_decl->id_loc;
+      //wyc if (c_decl->u.id.id)
+	name = c_decl->u.id.id;
+      decl_id_attrs = c_decl->u.id.attrs;
+      gcc_assert(c_decl->declarator == 0); // EXPR should always be true
+      break;
 
-	case cdk_id:
-	  loc = c_decl->id_loc;
-	  //wyc if (c_decl->u.id.id)
-	    name = c_decl->u.id.id;
-	  decl_id_attrs = c_decl->u.id.attrs;
-	  gcc_assert(c_decl->declarator == 0); // EXPR should always be true
-	  break;
+    default:
+      gcc_unreachable (); // should never reach here
+    } // switch (c_decl->kind), while(c_decl->kind)
 
-	default:
-	  gcc_unreachable (); // should never reach here
-	} // switch (c_decl->kind), while(c_decl->kind)
-	if (first_non_attr_kind == cdk_attrs)
-	  first_non_attr_kind = c_decl->kind;
-      } // for (; c_decl; c_decl = c_decl->declarator)
-    if (name == NULL_TREE)
-      {
-	gcc_assert (decl_context == PARM
-		    || decl_context == TYPENAME
-		    || (decl_context == FIELD
-			&& declarator->kind == cdk_id));
-	gcc_assert (!initialized);
-      }
-  } // compound statement
+    if (first_non_attr_kind == cdk_attrs)
+      first_non_attr_kind = c_decl->kind;
+  } // for (; c_decl; c_decl = c_decl->declarator)
+
+  if (name == NULL_TREE)
+  {
+    gcc_assert (decl_context == PARM
+		|| decl_context == TYPENAME
+		|| (decl_context == FIELD
+		&& declarator->kind == cdk_id));
+    gcc_assert (!initialized);
+  }
 
   /* A function definition's declarator must have the form of
      a function declarator.  */
@@ -6602,6 +6598,7 @@ grokdeclarator (const struct c_declarator *declarator,
   tree array_ptr_attrs = NULL_TREE;
   bool array_parm_static = false;
   bool array_parm_vla_unspec_p = false;
+  tree returned_attrs = NULL_TREE;
   while (declarator && declarator->kind != cdk_id)
     { //7240
       if (type == error_mark_node)
@@ -7623,7 +7620,7 @@ grokdeclarator (const struct c_declarator *declarator,
 
 	decl = build_decl (declarator->id_loc,
 			   FUNCTION_DECL, declarator->u.id.id, type);
-	decl = build_decl_attribute_variant (decl, decl_attr);
+	decl = build_decl_attribute_variant (decl, declspecs->decl_attr);
 
 	if (type_quals & TYPE_QUAL_ATOMIC)
 	  {
