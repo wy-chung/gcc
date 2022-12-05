@@ -7231,7 +7231,7 @@ grokdeclarator (const struct c_declarator *declarator,
 
 	    /* Process type qualifiers (such as const or volatile)
 	       that were given inside the `*'.  */
-	    type_quals = declarator->u.pointer_quals;
+	    type_quals = declarator->u.pointer_quals; // 0x02 == volatile
 
 	    declarator = declarator->declarator;
 	    break;
@@ -7460,7 +7460,6 @@ grokdeclarator (const struct c_declarator *declarator,
   /* Now create the decl, which may be a VAR_DECL, a PARM_DECL
      or a FUNCTION_DECL, depending on DECL_CONTEXT and TYPE.  */
 
-  {
     tree decl;
 
     if (decl_context == PARM)
@@ -7837,7 +7836,6 @@ grokdeclarator (const struct c_declarator *declarator,
 		  decl);
 
     return decl;
-  } // compound statement
 }
 
 /* Decode the parameter-list info for a function type or function definition.
