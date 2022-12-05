@@ -3602,7 +3602,7 @@ c_parser_struct_declaration (c_parser *parser)
 
 	  ret = grokfield (c_parser_peek_token (parser)->location,
 			   c_declarator::new_id (NULL_TREE), specs,
-			   NULL_TREE, &attrs);
+			   NULL_TREE, attrs);
 	  if (ret)
 	    decl_attributes (&ret, attrs, 0);
 	}
@@ -3659,7 +3659,7 @@ c_parser_struct_declaration (c_parser *parser)
 	  if (c_parser_next_token_is_keyword (parser, RID_ATTRIBUTE))
 	    postfix_attrs = c_parser_gnu_attributes (parser);
 	  d = grokfield (c_parser_peek_token (parser)->location,
-			 declarator, specs, width, &all_prefix_attrs);
+			 declarator, specs, width, all_prefix_attrs);
 	  decl_attributes (&d, chainon (postfix_attrs,
 					all_prefix_attrs), 0);
 	  DECL_CHAIN (d) = decls;

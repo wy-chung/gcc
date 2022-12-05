@@ -608,7 +608,7 @@ static tree lookup_name_in_scope (tree, struct c_scope *);
 static tree c_make_fname_decl (location_t, tree, int);
 static tree grokdeclarator (const struct c_declarator *,
 			    struct c_declspecs *,
-			    enum decl_context, bool, tree *, tree *, tree *,
+			    enum decl_context, bool, tree *, tree &, tree *,
 			    bool *, enum deprecated_states);
 static tree grokparms (struct c_arg_info *, bool);
 static void layout_array_type (tree);
@@ -5027,7 +5027,7 @@ groktypename (struct c_type_name *type_name, tree *expr,
   type_name->specs->attrs = NULL_TREE;
 
   type = grokdeclarator (type_name->declarator, type_name->specs, TYPENAME,
-			 false, NULL, &attrs, expr, expr_const_operands,
+			 false, NULL, attrs, expr, expr_const_operands,
 			 DEPRECATED_NORMAL);
 
   /* Apply attributes.  */
@@ -5120,7 +5120,7 @@ start_decl (struct c_declarator *declarator, struct c_declspecs *declspecs,
   tree expr = NULL_TREE;
   bool expr_const_operands_dummy;
   tree decl = grokdeclarator (declarator, declspecs,
-			 NORMAL, initialized, NULL, &attributes, &expr, &expr_const_operands_dummy,
+			 NORMAL, initialized, NULL, attributes, &expr, &expr_const_operands_dummy,
 			 deprecated_state);
   if (!decl || decl == error_mark_node)
     return NULL_TREE;
@@ -5731,8 +5731,9 @@ tree
 grokparm (const struct c_parm *parm, tree *expr)
 {
   tree attrs = parm->attrs;
+  bool expr_const_operands_dummy;
   tree decl = grokdeclarator (parm->declarator, parm->specs, PARM, false,
-			      NULL, &attrs, expr, NULL, DEPRECATED_NORMAL);
+			      NULL, attrs, expr, &expr_const_operands_dummy, DEPRECATED_NORMAL);
 
   decl_attributes (&decl, attrs, 0);
 
@@ -5929,7 +5930,7 @@ push_parm_decl (const struct c_parm *parm, tree *expr)
   tree attrs = parm->attrs;
   bool expr_const_operands_dummy;
   tree decl = grokdeclarator (parm->declarator, parm->specs, PARM, false, NULL,
-			      &attrs, expr, &expr_const_operands_dummy, DEPRECATED_NORMAL);
+			      attrs, expr, &expr_const_operands_dummy, DEPRECATED_NORMAL);
   if (decl && DECL_P (decl)) //wyc if decl represents a declaration
     DECL_SOURCE_LOCATION (decl) = parm->loc;
 
@@ -6070,7 +6071,7 @@ check_compound_literal_type (location_t loc, struct c_type_name *type_name)
    replacing with appropriate values if they are invalid.  */
 
 static void
-check_bitfield_type_and_width (location_t loc, tree *type, tree *width,
+check_bitfield_type_and_width (location_t loc, tree &type, tree &width,
 			       tree orig_name)
 {
   tree type_mv;
@@ -6082,56 +6083,56 @@ check_bitfield_type_and_width (location_t loc, tree *type, tree *width,
 
   /* Detect and ignore out of range field width and process valid
      field widths.  */
-  if (!INTEGRAL_TYPE_P (TREE_TYPE (*width)))
+  if (!INTEGRAL_TYPE_P (TREE_TYPE (width)))
     {
       error_at (loc, "bit-field %qs width not an integer constant", name);
-      *width = integer_one_node;
+      width = integer_one_node;
     }
   else
     {
-      if (TREE_CODE (*width) != INTEGER_CST)
+      if (TREE_CODE (width) != INTEGER_CST)
 	{
-	  *width = c_fully_fold (*width, false, NULL);
-	  if (TREE_CODE (*width) == INTEGER_CST)
+	  width = c_fully_fold (width, false, NULL);
+	  if (TREE_CODE (width) == INTEGER_CST)
 	    pedwarn (loc, OPT_Wpedantic,
 		     "bit-field %qs width not an integer constant expression",
 		     name);
 	}
-      if (TREE_CODE (*width) != INTEGER_CST)
+      if (TREE_CODE (width) != INTEGER_CST)
 	{
 	  error_at (loc, "bit-field %qs width not an integer constant", name);
-	  *width = integer_one_node;
+	  width = integer_one_node;
 	}
-      constant_expression_warning (*width);
-      if (tree_int_cst_sgn (*width) < 0)
+      constant_expression_warning (width);
+      if (tree_int_cst_sgn (width) < 0)
 	{
 	  error_at (loc, "negative width in bit-field %qs", name);
-	  *width = integer_one_node;
+	  width = integer_one_node;
 	}
-      else if (integer_zerop (*width) && orig_name)
+      else if (integer_zerop (width) && orig_name)
 	{
 	  error_at (loc, "zero width for bit-field %qs", name);
-	  *width = integer_one_node;
+	  width = integer_one_node;
 	}
     }
 
   /* Detect invalid bit-field type.  */
-  if (TREE_CODE (*type) != INTEGER_TYPE
-      && TREE_CODE (*type) != BOOLEAN_TYPE
-      && TREE_CODE (*type) != ENUMERAL_TYPE)
+  if (TREE_CODE (type) != INTEGER_TYPE
+      && TREE_CODE (type) != BOOLEAN_TYPE
+      && TREE_CODE (type) != ENUMERAL_TYPE)
     {
       error_at (loc, "bit-field %qs has invalid type", name);
-      *type = unsigned_type_node;
+      type = unsigned_type_node;
     }
 
-  if (TYPE_WARN_IF_NOT_ALIGN (*type))
+  if (TYPE_WARN_IF_NOT_ALIGN (type))
     {
       error_at (loc, "cannot declare bit-field %qs with %<warn_if_not_aligned%> type",
 		name);
-      *type = unsigned_type_node;
+      type = unsigned_type_node;
     }
 
-  type_mv = TYPE_MAIN_VARIANT (*type);
+  type_mv = TYPE_MAIN_VARIANT (type);
   if (!in_system_header_at (input_location)
       && type_mv != integer_type_node
       && type_mv != unsigned_type_node
@@ -6139,23 +6140,23 @@ check_bitfield_type_and_width (location_t loc, tree *type, tree *width,
     pedwarn_c90 (loc, OPT_Wpedantic,
 		 "type of bit-field %qs is a GCC extension", name);
 
-  max_width = TYPE_PRECISION (*type);
+  max_width = TYPE_PRECISION (type);
 
-  if (compare_tree_int (*width, max_width) > 0)
+  if (compare_tree_int (width, max_width) > 0)
     {
       error_at (loc, "width of %qs exceeds its type", name);
       w = max_width;
-      *width = build_int_cst (integer_type_node, w);
+      width = build_int_cst (integer_type_node, w);
     }
   else
-    w = tree_to_uhwi (*width);
+    w = tree_to_uhwi (width);
 
-  if (TREE_CODE (*type) == ENUMERAL_TYPE)
+  if (TREE_CODE (type) == ENUMERAL_TYPE)
     {
-      struct lang_type *lt = TYPE_LANG_SPECIFIC (*type);
+      struct lang_type *lt = TYPE_LANG_SPECIFIC (type);
       if (!lt
-	  || w < tree_int_cst_min_precision (lt->enum_min, TYPE_SIGN (*type))
-	  || w < tree_int_cst_min_precision (lt->enum_max, TYPE_SIGN (*type)))
+	  || w < tree_int_cst_min_precision (lt->enum_min, TYPE_SIGN (type))
+	  || w < tree_int_cst_min_precision (lt->enum_max, TYPE_SIGN (type)))
 	warning_at (loc, 0, "%qs is narrower than values of its type", name);
     }
 }
@@ -6271,7 +6272,7 @@ grokdeclarator (const struct c_declarator *declarator,
 		enum decl_context decl_context,
 		bool initialized, // has an initializer?
 		tree *width,      // for bit-fields
-		tree *decl_attrs, // points to the list of attributes
+		tree &decl_attrs, // points to the list of attributes
 		tree *expr,       // any expressions that need to be evaluated
 		bool *expr_const_operands, // can be used in constant expressions?
 		enum deprecated_states deprecated_state)
@@ -7240,8 +7241,8 @@ grokdeclarator (const struct c_declarator *declarator,
 	  gcc_unreachable ();
 	} // switch (declarator->kind)
     } // while (declarator->kind != cdk_id)
-  *decl_attrs = chainon (returned_attrs, *decl_attrs);
-  *decl_attrs = chainon (decl_id_attrs, *decl_attrs);
+  decl_attrs = chainon (returned_attrs, decl_attrs);
+  decl_attrs = chainon (decl_id_attrs, decl_attrs);
 
   /* Now TYPE has the actual type, apart from any qualifiers in
      TYPE_QUALS.  */
@@ -7302,7 +7303,7 @@ grokdeclarator (const struct c_declarator *declarator,
   /* Check the type and width of a bit-field.  */
   if (bitfield)
     {
-      check_bitfield_type_and_width (loc, &type, width, name);
+      check_bitfield_type_and_width (loc, type, *width, name);
       /* C11 makes it implementation-defined (6.7.2.1#5) whether
 	 atomic types are permitted for bit-fields; we have no code to
 	 make bit-field accesses atomic, so disallow them.  */
@@ -8376,7 +8377,7 @@ start_struct (location_t loc, enum tree_code code, tree name,
 tree
 grokfield (location_t loc,
 	   struct c_declarator *declarator, struct c_declspecs *declspecs,
-	   tree width, tree *decl_attrs)
+	   tree width, tree &decl_attrs)
 {
   tree value;
 
@@ -9522,7 +9523,7 @@ start_function (struct c_declspecs *declspecs, struct c_declarator *declarator,
   tree expr_dummy = NULL;
   bool expr_const_operands_dummy;
   tree decl1 = grokdeclarator (declarator, declspecs, FUNCDEF, true, NULL,
-			  &attributes, &expr_dummy, &expr_const_operands_dummy, DEPRECATED_NORMAL);
+			  attributes, &expr_dummy, &expr_const_operands_dummy, DEPRECATED_NORMAL);
   invoke_plugin_callbacks (PLUGIN_START_PARSE_FUNCTION, decl1); //wyc ignore
 
   /* If the declarator is not suitable for a function definition,
