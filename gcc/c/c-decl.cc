@@ -608,7 +608,7 @@ static tree lookup_name_in_scope (tree, struct c_scope *);
 static tree c_make_fname_decl (location_t, tree, int);
 static tree grokdeclarator (const struct c_declarator *,
 			    struct c_declspecs *,
-			    enum decl_context, bool, tree *, tree &, tree *,
+			    enum decl_context, bool, tree &, tree &, tree *,
 			    bool *, enum deprecated_states);
 static tree grokparms (struct c_arg_info *, bool);
 static void layout_array_type (tree);
@@ -5025,9 +5025,9 @@ groktypename (struct c_type_name *type_name, tree *expr,
   tree attrs = type_name->specs->attrs;
 
   type_name->specs->attrs = NULL_TREE;
-
+  tree width_dummy = nullptr;
   type = grokdeclarator (type_name->declarator, type_name->specs, TYPENAME,
-			 false, NULL, attrs, expr, expr_const_operands,
+			 false, width_dummy, attrs, expr, expr_const_operands,
 			 DEPRECATED_NORMAL);
 
   /* Apply attributes.  */
@@ -5117,10 +5117,11 @@ start_decl (struct c_declarator *declarator, struct c_declspecs *declspecs,
   else if (lookup_attribute ("deprecated", attributes))
     deprecated_state = DEPRECATED_SUPPRESS;
 
+  tree width_dummy = nullptr;
   tree expr = NULL_TREE;
   bool expr_const_operands_dummy;
   tree decl = grokdeclarator (declarator, declspecs,
-			 NORMAL, initialized, NULL, attributes, &expr, &expr_const_operands_dummy,
+			 NORMAL, initialized, width_dummy, attributes, &expr, &expr_const_operands_dummy,
 			 deprecated_state);
   if (!decl || decl == error_mark_node)
     return NULL_TREE;
@@ -5730,10 +5731,11 @@ finish_decl (tree decl, location_t init_loc, tree init,
 tree
 grokparm (const struct c_parm *parm, tree *expr)
 {
+  tree width_dummy = nullptr;
   tree attrs = parm->attrs;
   bool expr_const_operands_dummy;
   tree decl = grokdeclarator (parm->declarator, parm->specs, PARM, false,
-			      NULL, attrs, expr, &expr_const_operands_dummy, DEPRECATED_NORMAL);
+			      width_dummy, attrs, expr, &expr_const_operands_dummy, DEPRECATED_NORMAL);
 
   decl_attributes (&decl, attrs, 0);
 
@@ -5927,9 +5929,10 @@ get_parm_array_spec (const struct c_parm *parm, tree attrs)
 void
 push_parm_decl (const struct c_parm *parm, tree *expr)
 {
+  tree width_dummy = nullptr;
   tree attrs = parm->attrs;
   bool expr_const_operands_dummy;
-  tree decl = grokdeclarator (parm->declarator, parm->specs, PARM, false, NULL,
+  tree decl = grokdeclarator (parm->declarator, parm->specs, PARM, false, width_dummy,
 			      attrs, expr, &expr_const_operands_dummy, DEPRECATED_NORMAL);
   if (decl && DECL_P (decl)) //wyc if decl represents a declaration
     DECL_SOURCE_LOCATION (decl) = parm->loc;
@@ -6271,7 +6274,7 @@ grokdeclarator (const struct c_declarator *declarator,
 		struct c_declspecs *declspecs, // the declaration specifiers
 		enum decl_context decl_context,
 		bool initialized, // has an initializer?
-		tree *width,      // for bit-fields
+		tree &width,      // for bit-fields
 		tree &decl_attrs, // points to the list of attributes
 		tree *expr,       // any expressions that need to be evaluated
 		bool *expr_const_operands, // can be used in constant expressions?
@@ -7303,7 +7306,7 @@ grokdeclarator (const struct c_declarator *declarator,
   /* Check the type and width of a bit-field.  */
   if (bitfield)
     {
-      check_bitfield_type_and_width (loc, type, *width, name);
+      check_bitfield_type_and_width (loc, type, width, name);
       /* C11 makes it implementation-defined (6.7.2.1#5) whether
 	 atomic types are permitted for bit-fields; we have no code to
 	 make bit-field accesses atomic, so disallow them.  */
@@ -8435,7 +8438,7 @@ grokfield (location_t loc,
   tree expr_dummy = NULL;
   bool expr_const_operands_dummy;
   value = grokdeclarator (declarator, declspecs, FIELD, false,
-			  width ? &width : NULL, decl_attrs, &expr_dummy, &expr_const_operands_dummy,
+			  width/* ? &width : NULL*/, decl_attrs, &expr_dummy, &expr_const_operands_dummy,
 			  DEPRECATED_NORMAL);
 
   finish_decl (value, loc, NULL_TREE, NULL_TREE, NULL_TREE);
@@ -9520,9 +9523,10 @@ start_function (struct c_declspecs *declspecs, struct c_declarator *declarator,
 
   /* Indicate no valid break/continue context.  */
   In_statement = 0;
+  tree width_dummy = nullptr;
   tree expr_dummy = NULL;
   bool expr_const_operands_dummy;
-  tree decl1 = grokdeclarator (declarator, declspecs, FUNCDEF, true, NULL,
+  tree decl1 = grokdeclarator (declarator, declspecs, FUNCDEF, true, width_dummy,
 			  attributes, &expr_dummy, &expr_const_operands_dummy, DEPRECATED_NORMAL);
   invoke_plugin_callbacks (PLUGIN_START_PARSE_FUNCTION, decl1); //wyc ignore
 
