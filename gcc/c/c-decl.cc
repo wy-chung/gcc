@@ -3114,7 +3114,6 @@ pushdecl (tree x)
 {
   tree name = DECL_NAME (x);
   struct c_scope *scope = current_scope;
-  //wyc struct c_binding *b;
   bool nested = false;
   location_t locus = DECL_SOURCE_LOCATION (x);
 
@@ -6286,19 +6285,12 @@ grokdeclarator (const struct c_declarator *declarator,
   bool bitfield = width != NULL;
   struct c_arg_info *arg_info = 0;
   location_t loc = UNKNOWN_LOCATION;
-  unsigned int alignas_align = 0;
 
   if (TREE_CODE (type) == ERROR_MARK)
     return error_mark_node;
-  tree expr_dummy;
-  if (expr == NULL)
-    {
-      expr = &expr_dummy;
-      expr_dummy = NULL_TREE;
-    }
-  bool expr_const_operands_dummy;
-  if (expr_const_operands == NULL)
-    expr_const_operands = &expr_const_operands_dummy;
+
+  gcc_assert(expr != NULL);
+  gcc_assert(expr_const_operands != NULL);
 
   if (declspecs->expr)
     {
@@ -6318,8 +6310,8 @@ grokdeclarator (const struct c_declarator *declarator,
      and get it as an IDENTIFIER_NODE, for an error message.  */
   bool funcdef_syntax = false;
   tree name = NULL_TREE;
-  c_declarator_kind first_non_attr_kind = cdk_attrs; // enum c_declarator_kind
   tree decl_id_attrs = NULL_TREE;
+  c_declarator_kind first_non_attr_kind = cdk_attrs; // enum c_declarator_kind
 
   for (const struct c_declarator *c_decl = declarator;
        c_decl; c_decl = c_decl->declarator)
@@ -6470,9 +6462,10 @@ grokdeclarator (const struct c_declarator *declarator,
 
   tree orig_qual_type = NULL;
   size_t orig_qual_indirect = 0;
+  int element_quals = TYPE_QUALS (element_type);
   if ((TREE_CODE (type) == ARRAY_TYPE
        || first_non_attr_kind == cdk_array)
-      && TYPE_QUALS (element_type))
+      && element_quals)
     {
       orig_qual_type = type;
       type = TYPE_MAIN_VARIANT (type);
@@ -6483,7 +6476,6 @@ grokdeclarator (const struct c_declarator *declarator,
 		| (atomicp ? TYPE_QUAL_ATOMIC : 0)
 		| (boundp ? TYPE_QUAL_BOUND : 0) //wyc
 		| ENCODE_QUAL_ADDR_SPACE (address_space));
-  int element_quals = TYPE_QUALS (element_type);
   if (type_quals != element_quals)
     orig_qual_type = NULL_TREE;
 
@@ -7321,6 +7313,7 @@ grokdeclarator (const struct c_declarator *declarator,
     }
 
   /* Reject invalid uses of _Alignas.  */
+  unsigned int alignas_align = 0;
   if (declspecs->alignas_p)
     {
       if (storage_class == csc_typedef)

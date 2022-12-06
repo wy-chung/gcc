@@ -8172,7 +8172,7 @@ find_var_from_fn (tree *tp, int *walk_subtrees, void *data)
   return NULL_TREE;
 }
 
-/* Returns true if T is, contains, or refers to a type with variable
+/* Returns true if TYPE is, contains, or refers to a type with variable
    size.  For METHOD_TYPEs and FUNCTION_TYPEs we exclude the
    arguments, but not the return type.  If FN is nonzero, only return
    true if a modifier of the type or position of FN is a variable or
@@ -8195,6 +8195,7 @@ variably_modified_type_p (tree type, tree fn)
    a variable in FN.  If TYPE isn't gimplified, return true also if
    gimplify_one_sizepos would gimplify the expression into a local
    variable.  */
+//#define RETURN_TRUE_IF_VAR(T)
   auto is_var = [type, fn](tree _t)
     {
       if (_t != NULL_TREE
