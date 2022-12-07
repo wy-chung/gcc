@@ -7818,99 +7818,101 @@ c_parser_binary_expression (c_parser *parser, struct c_expr *after,
   int sp;
   /* Location of the binary operator.  */
   location_t binary_loc = UNKNOWN_LOCATION;  /* Quiet warning.  */
-#define POP								      \
-  do {									      \
-    switch (stack[sp].op)						      \
-      {									      \
-      case TRUTH_ANDIF_EXPR:						      \
-	c_inhibit_evaluation_warnings -= (stack[sp - 1].expr.value	      \
-					  == truthvalue_false_node);	      \
-	break;								      \
-      case TRUTH_ORIF_EXPR:						      \
-	c_inhibit_evaluation_warnings -= (stack[sp - 1].expr.value	      \
-					  == truthvalue_true_node);	      \
-	break;								      \
-      case TRUNC_DIV_EXPR:						      \
-	if ((stack[sp - 1].expr.original_code == SIZEOF_EXPR		      \
-	     || stack[sp - 1].expr.original_code == PAREN_SIZEOF_EXPR)	      \
-	    && (stack[sp].expr.original_code == SIZEOF_EXPR		      \
-		|| stack[sp].expr.original_code == PAREN_SIZEOF_EXPR))	      \
-	  {								      \
-	    tree type0 = stack[sp - 1].sizeof_arg;			      \
-	    tree type1 = stack[sp].sizeof_arg;				      \
-	    tree first_arg = type0;					      \
-	    if (!TYPE_P (type0))					      \
-	      type0 = TREE_TYPE (type0);				      \
-	    if (!TYPE_P (type1))					      \
-	      type1 = TREE_TYPE (type1);				      \
-	    if (POINTER_TYPE_P (type0)					      \
-		&& comptypes (TREE_TYPE (type0), type1)			      \
-		&& !(TREE_CODE (first_arg) == PARM_DECL			      \
-		     && C_ARRAY_PARAMETER (first_arg)			      \
-		     && warn_sizeof_array_argument))			      \
-	      {								      \
-		auto_diagnostic_group d;				      \
-		if (warning_at (stack[sp].loc, OPT_Wsizeof_pointer_div,	      \
-				  "division %<sizeof (%T) / sizeof (%T)%> "   \
-				  "does not compute the number of array "     \
-				  "elements",				      \
-				  type0, type1))			      \
-		  if (DECL_P (first_arg))				      \
-		    inform (DECL_SOURCE_LOCATION (first_arg),		      \
-			      "first %<sizeof%> operand was declared here");  \
-	      }								      \
-	    else if (TREE_CODE (type0) == ARRAY_TYPE			      \
-		     && !char_type_p (TYPE_MAIN_VARIANT (TREE_TYPE (type0)))  \
-		     && stack[sp].expr.original_code != PAREN_SIZEOF_EXPR)    \
-	      maybe_warn_sizeof_array_div (stack[sp].loc, first_arg, type0,   \
-					   stack[sp].sizeof_arg, type1);      \
-	  }								      \
-	break;								      \
-      default:								      \
-	break;								      \
-      }									      \
-    stack[sp - 1].expr							      \
-      = convert_lvalue_to_rvalue (stack[sp - 1].loc,			      \
-				  stack[sp - 1].expr, true, true);	      \
-    stack[sp].expr							      \
-      = convert_lvalue_to_rvalue (stack[sp].loc,			      \
-				  stack[sp].expr, true, true);		      \
-    if (__builtin_expect (omp_atomic_lhs != NULL_TREE, 0) && sp == 1	      \
-	&& ((c_parser_next_token_is (parser, CPP_SEMICOLON)		      \
-	     && ((1 << stack[sp].prec)					      \
-		 & ((1 << PREC_BITOR) | (1 << PREC_BITXOR)		      \
-		     | (1 << PREC_BITAND) | (1 << PREC_SHIFT)		      \
-		     | (1 << PREC_ADD) | (1 << PREC_MULT)		      \
-		     | (1 << PREC_EQ))))				      \
-	    || ((c_parser_next_token_is (parser, CPP_QUERY)		      \
-		 || (omp_atomic_lhs == void_list_node			      \
-		     && c_parser_next_token_is (parser, CPP_CLOSE_PAREN)))    \
-		&& (stack[sp].prec == PREC_REL || stack[sp].prec == PREC_EQ)))\
-	&& stack[sp].op != TRUNC_MOD_EXPR				      \
-	&& stack[sp].op != GE_EXPR					      \
-	&& stack[sp].op != LE_EXPR					      \
-	&& stack[sp].op != NE_EXPR					      \
-	&& stack[0].expr.value != error_mark_node			      \
-	&& stack[1].expr.value != error_mark_node			      \
-	&& (omp_atomic_lhs == void_list_node				      \
-	    || c_tree_equal (stack[0].expr.value, omp_atomic_lhs)	      \
-	    || c_tree_equal (stack[1].expr.value, omp_atomic_lhs)	      \
-	    || (stack[sp].op == EQ_EXPR					      \
-		&& c_parser_peek_2nd_token (parser)->keyword == RID_IF)))     \
-      {									      \
-	tree t = make_node (stack[1].op);				      \
-	TREE_TYPE (t) = TREE_TYPE (stack[0].expr.value);		      \
-	TREE_OPERAND (t, 0) = stack[0].expr.value;			      \
-	TREE_OPERAND (t, 1) = stack[1].expr.value;			      \
-	stack[0].expr.value = t;					      \
-      }									      \
-    else								      \
-      stack[sp - 1].expr = parser_build_binary_op (stack[sp].loc,	      \
-						   stack[sp].op,	      \
-						   stack[sp - 1].expr,	      \
-						   stack[sp].expr);	      \
-    sp--;								      \
-  } while (0)
+//#define POP
+  auto pop = [parser, omp_atomic_lhs, &stack, &sp]()
+  {
+    switch (stack[sp].op)
+      {
+      case TRUTH_ANDIF_EXPR:
+	c_inhibit_evaluation_warnings -= (stack[sp - 1].expr.value
+					  == truthvalue_false_node);
+	break;
+      case TRUTH_ORIF_EXPR:
+	c_inhibit_evaluation_warnings -= (stack[sp - 1].expr.value
+					  == truthvalue_true_node);
+	break;
+      case TRUNC_DIV_EXPR:
+	if ((stack[sp - 1].expr.original_code == SIZEOF_EXPR
+	     || stack[sp - 1].expr.original_code == PAREN_SIZEOF_EXPR)
+	    && (stack[sp].expr.original_code == SIZEOF_EXPR
+		|| stack[sp].expr.original_code == PAREN_SIZEOF_EXPR))
+	  {
+	    tree type0 = stack[sp - 1].sizeof_arg;
+	    tree type1 = stack[sp].sizeof_arg;
+	    tree first_arg = type0;
+	    if (!TYPE_P (type0))
+	      type0 = TREE_TYPE (type0);
+	    if (!TYPE_P (type1))
+	      type1 = TREE_TYPE (type1);
+	    if (POINTER_TYPE_P (type0)
+		&& comptypes (TREE_TYPE (type0), type1)
+		&& !(TREE_CODE (first_arg) == PARM_DECL
+		     && C_ARRAY_PARAMETER (first_arg)
+		     && warn_sizeof_array_argument))
+	      {
+		auto_diagnostic_group d;
+		if (warning_at (stack[sp].loc, OPT_Wsizeof_pointer_div,
+				  "division %<sizeof (%T) / sizeof (%T)%> "
+				  "does not compute the number of array "
+				  "elements",
+				  type0, type1))
+		  if (DECL_P (first_arg))
+		    inform (DECL_SOURCE_LOCATION (first_arg),
+			      "first %<sizeof%> operand was declared here");
+	      }
+	    else if (TREE_CODE (type0) == ARRAY_TYPE
+		     && !char_type_p (TYPE_MAIN_VARIANT (TREE_TYPE (type0)))
+		     && stack[sp].expr.original_code != PAREN_SIZEOF_EXPR)
+	      maybe_warn_sizeof_array_div (stack[sp].loc, first_arg, type0,
+					   stack[sp].sizeof_arg, type1);
+	  }
+	break;
+      default:
+	break;
+      }
+    stack[sp - 1].expr
+      = convert_lvalue_to_rvalue (stack[sp - 1].loc,
+				  stack[sp - 1].expr, true, true);
+    stack[sp].expr
+      = convert_lvalue_to_rvalue (stack[sp].loc,
+				  stack[sp].expr, true, true);
+    if (__builtin_expect (omp_atomic_lhs != NULL_TREE, 0) && sp == 1
+	&& ((c_parser_next_token_is (parser, CPP_SEMICOLON)
+	     && ((1 << stack[sp].prec)
+		 & ((1 << PREC_BITOR) | (1 << PREC_BITXOR)
+		     | (1 << PREC_BITAND) | (1 << PREC_SHIFT)
+		     | (1 << PREC_ADD) | (1 << PREC_MULT)
+		     | (1 << PREC_EQ))))
+	    || ((c_parser_next_token_is (parser, CPP_QUERY)
+		 || (omp_atomic_lhs == void_list_node
+		     && c_parser_next_token_is (parser, CPP_CLOSE_PAREN)))
+		&& (stack[sp].prec == PREC_REL || stack[sp].prec == PREC_EQ)))
+	&& stack[sp].op != TRUNC_MOD_EXPR
+	&& stack[sp].op != GE_EXPR
+	&& stack[sp].op != LE_EXPR
+	&& stack[sp].op != NE_EXPR
+	&& stack[0].expr.value != error_mark_node
+	&& stack[1].expr.value != error_mark_node
+	&& (omp_atomic_lhs == void_list_node
+	    || c_tree_equal (stack[0].expr.value, omp_atomic_lhs)
+	    || c_tree_equal (stack[1].expr.value, omp_atomic_lhs)
+	    || (stack[sp].op == EQ_EXPR
+		&& c_parser_peek_2nd_token (parser)->keyword == RID_IF)))
+      {
+	tree t = make_node (stack[1].op);
+	TREE_TYPE (t) = TREE_TYPE (stack[0].expr.value);
+	TREE_OPERAND (t, 0) = stack[0].expr.value;
+	TREE_OPERAND (t, 1) = stack[1].expr.value;
+	stack[0].expr.value = t;
+      }
+    else
+      stack[sp - 1].expr = parser_build_binary_op (stack[sp].loc,
+						   stack[sp].op,
+						   stack[sp - 1].expr,
+						   stack[sp].expr);
+    sp--;
+  };
+
   gcc_assert (!after || c_dialect_objc ());
   stack[0].loc = c_parser_peek_token (parser)->location;
   stack[0].expr = c_parser_cast_expression (parser, after);
@@ -8005,7 +8007,7 @@ c_parser_binary_expression (c_parser *parser, struct c_expr *after,
 	}
       binary_loc = c_parser_peek_token (parser)->location;
       while (oprec <= stack[sp].prec)
-	POP;
+	pop();
       c_parser_consume_token (parser);
       switch (ocode)
 	{
@@ -8043,9 +8045,8 @@ c_parser_binary_expression (c_parser *parser, struct c_expr *after,
     }
  out:
   while (sp > 0)
-    POP;
+    pop();
   return stack[0].expr;
-#undef POP
 }
 
 /* Parse a cast expression (C90 6.3.4, C99 6.5.4, C11 6.5.4).  If AFTER
