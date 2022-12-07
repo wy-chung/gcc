@@ -8464,9 +8464,9 @@ start_init (tree decl, tree asmspec_tree ATTRIBUTE_UNUSED, bool top_level,
   p->spelling_base = spelling_base;
   p->spelling_size = spelling_size;
   p->top_level = constructor_top_level;
-  p->next = initializer_stack;
   p->missing_brace_richloc = richloc;
   p->designated = constructor_designated;
+  p->next = initializer_stack;
   initializer_stack = p;
 
   constructor_decl = decl;

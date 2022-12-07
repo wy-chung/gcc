@@ -653,7 +653,7 @@ c_build_pointer_type (tree to_type)
   machine_mode pointer_mode;
 
   if (as != ADDR_SPACE_GENERIC || c_default_pointer_mode == VOIDmode)
-    pointer_mode = targetm.addr_space.pointer_mode (as);
+    pointer_mode = targetm.addr_space.pointer_mode (as); // E_DImode
   else
     pointer_mode = c_default_pointer_mode;
   return build_pointer_type_for_mode (to_type, pointer_mode, false);
@@ -6438,6 +6438,7 @@ grokdeclarator (const struct c_declarator *declarator,
      duplicate qualifiers should be diagnosed in this case, but it
      seems most appropriate to do so).  */
   tree element_type = strip_array_types (type);
+  int element_quals = TYPE_QUALS (element_type);
   char constp = declspecs->const_p + TYPE_READONLY (element_type);
   char volatilep = declspecs->volatile_p + TYPE_VOLATILE (element_type);
   char restrictp = declspecs->restrict_p + TYPE_RESTRICT (element_type);
@@ -6462,7 +6463,6 @@ grokdeclarator (const struct c_declarator *declarator,
 
   tree orig_qual_type = NULL;
   size_t orig_qual_indirect = 0;
-  int element_quals = TYPE_QUALS (element_type);
   if ((TREE_CODE (type) == ARRAY_TYPE
        || first_non_attr_kind == cdk_array)
       && element_quals)
@@ -6632,7 +6632,7 @@ grokdeclarator (const struct c_declarator *declarator,
 	}
 
       switch (declarator->kind)
-	{
+	{ //7237
 	case cdk_attrs:
 	  {
 	    /* A declarator with embedded attributes.  */
@@ -7158,7 +7158,7 @@ grokdeclarator (const struct c_declarator *declarator,
 		     && type_quals)
 	      pedwarn (loc, OPT_Wpedantic,
 		       "ISO C forbids qualified function types");
-	    if (type_quals)
+	    if (type_quals) // 1: TYPE_QUAL_CONST
 	      type = c_build_qualified_type (type, type_quals, orig_qual_type,
 					     orig_qual_indirect);
 	    orig_qual_type = NULL_TREE;
@@ -7227,14 +7227,14 @@ grokdeclarator (const struct c_declarator *declarator,
 
 	    /* Process type qualifiers (such as const or volatile)
 	       that were given inside the `*'.  */
-	    type_quals = declarator->u.pointer_quals; // 0x02 == volatile
+	    type_quals = declarator->u.pointer_quals; // 2: volatile
 
 	    declarator = declarator->declarator;
 	    break;
 	  } // case cdk_pointer
 	default:
 	  gcc_unreachable ();
-	} // switch (declarator->kind)
+	} //6635 switch (declarator->kind)
     } // while (declarator->kind != cdk_id)
   decl_attrs = chainon (returned_attrs, decl_attrs);
   decl_attrs = chainon (decl_id_attrs, decl_attrs);

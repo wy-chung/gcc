@@ -7520,7 +7520,7 @@ c_parser_string_literal (c_parser *parser, bool translate, bool wide_ok)
 
 static struct c_expr
 c_parser_expr_no_commas (c_parser *parser, struct c_expr *after,
-			 tree omp_atomic_lhs)
+			 tree omp_atomic_lhs /* default: NULL_TREE */)
 {
   struct c_expr lhs, rhs, ret;
   enum tree_code code;
@@ -7777,31 +7777,31 @@ c_parser_conditional_expression (c_parser *parser, struct c_expr *after,
      logical-OR-expression || logical-AND-expression
 */
 
+/* A binary expression is parsed using operator-precedence parsing,
+   with the operands being cast expressions.  All the binary
+   operators are left-associative.  Thus a binary expression is of
+   form:
+
+   E0 op1 E1 op2 E2 ...
+
+   which we represent on a stack.  On the stack, the precedence
+   levels are strictly increasing.  When a new operator is
+   encountered of higher precedence than that at the top of the
+   stack, it is pushed; its LHS is the top expression, and its RHS
+   is everything parsed until it is popped.  When a new operator is
+   encountered with precedence less than or equal to that at the top
+   of the stack, triples E[i-1] op[i] E[i] are popped and replaced
+   by the result of the operation until the operator at the top of
+   the stack has lower precedence than the new operator or there is
+   only one element on the stack; then the top expression is the LHS
+   of the new operator.  In the case of logical AND and OR
+   expressions, we also need to adjust c_inhibit_evaluation_warnings
+   as appropriate when the operators are pushed and popped.  */
+
 static struct c_expr
 c_parser_binary_expression (c_parser *parser, struct c_expr *after,
 			    tree omp_atomic_lhs)
 {
-  /* A binary expression is parsed using operator-precedence parsing,
-     with the operands being cast expressions.  All the binary
-     operators are left-associative.  Thus a binary expression is of
-     form:
-
-     E0 op1 E1 op2 E2 ...
-
-     which we represent on a stack.  On the stack, the precedence
-     levels are strictly increasing.  When a new operator is
-     encountered of higher precedence than that at the top of the
-     stack, it is pushed; its LHS is the top expression, and its RHS
-     is everything parsed until it is popped.  When a new operator is
-     encountered with precedence less than or equal to that at the top
-     of the stack, triples E[i-1] op[i] E[i] are popped and replaced
-     by the result of the operation until the operator at the top of
-     the stack has lower precedence than the new operator or there is
-     only one element on the stack; then the top expression is the LHS
-     of the new operator.  In the case of logical AND and OR
-     expressions, we also need to adjust c_inhibit_evaluation_warnings
-     as appropriate when the operators are pushed and popped.  */
-
   struct {
     /* The expression at this stack level.  */
     struct c_expr expr;
