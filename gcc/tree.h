@@ -127,7 +127,7 @@ as_internal_fn (combined_fn code)
 
 #define TREE_CODE_CLASS_STRING(CLASS)\
         tree_code_class_strings[(int) (CLASS)]
-
+//wyc tree code to code class
 #define TREE_CODE_CLASS(CODE)	tree_code_type[(int) (CODE)]
 
 /* Nonzero if NODE represents an exceptional code.  */
@@ -2209,23 +2209,23 @@ extern tree vector_element_bits_tree (const_tree);
   (TYPE_CHECK (NODE)->type_common.no_force_blk_flag)
 
 /* Nonzero in a type considered volatile as a whole.  */
-#define TYPE_VOLATILE(NODE) (TYPE_CHECK (NODE)->base.volatile_flag)
-
-/* Nonzero in a type considered atomic as a whole.  */
-#define TYPE_ATOMIC(NODE) (TYPE_CHECK (NODE)->base.u.bits.atomic_flag)
+#define TYPE_VOLATILE(NODE)   (TYPE_CHECK (NODE)->base.volatile_flag)
 
 /* Means this type is const-qualified.  */
-#define TYPE_READONLY(NODE) (TYPE_CHECK (NODE)->base.readonly_flag)
+#define TYPE_READONLY(NODE)   (TYPE_CHECK (NODE)->base.readonly_flag)
 
-/* If nonzero, this type is `restrict'-qualified, in the C sense of
-   the term.  */
-#define TYPE_RESTRICT(NODE) (TYPE_CHECK (NODE)->type_common.restrict_flag)
+/* Nonzero in a type considered atomic as a whole.  */
+#define TYPE_ATOMIC(NODE)     (TYPE_CHECK (NODE)->base.u.bits.atomic_flag)
 
 /* If nonzero, type's name shouldn't be emitted into debug info.  */
-#define TYPE_NAMELESS(NODE) (TYPE_CHECK (NODE)->base.u.bits.nameless_flag)
+#define TYPE_NAMELESS(NODE)   (TYPE_CHECK (NODE)->base.u.bits.nameless_flag)
 
 /* The address space the type is in.  */
 #define TYPE_ADDR_SPACE(NODE) (TYPE_CHECK (NODE)->base.u.bits.address_space)
+
+/* If nonzero, this type is `restrict'-qualified, in the C sense of
+   the term.  */
+#define TYPE_RESTRICT(NODE)   (TYPE_CHECK (NODE)->type_common.restrict_flag)
 
 /* Encode/decode the named memory support as part of the qualifier.  If more
    than 8 qualifiers are added, these macros need to be adjusted.  */
@@ -2243,8 +2243,8 @@ extern tree vector_element_bits_tree (const_tree);
 #define TYPE_QUALS(NODE)					\
   ((int) ((TYPE_READONLY (NODE) * TYPE_QUAL_CONST)		\
 	  | (TYPE_VOLATILE (NODE) * TYPE_QUAL_VOLATILE)		\
-	  | (TYPE_ATOMIC (NODE) * TYPE_QUAL_ATOMIC)		\
 	  | (TYPE_RESTRICT (NODE) * TYPE_QUAL_RESTRICT)		\
+	  | (TYPE_ATOMIC (NODE) * TYPE_QUAL_ATOMIC)		\
 	  | (ENCODE_QUAL_ADDR_SPACE (TYPE_ADDR_SPACE (NODE)))))
 
 /* The same as TYPE_QUALS without the address space qualifications.  */

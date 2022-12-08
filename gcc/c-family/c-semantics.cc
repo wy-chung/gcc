@@ -31,7 +31,7 @@ push_stmt_list (void)
 {
   tree t;
   t = alloc_stmt_list ();
-  vec_safe_push (stmt_list_stack, t);
+  vec_safe_push (stmt_list_stack, t); //wyc stmt_list_stack == c_stmt_tree.x_cur_stmt_list
   return t;
 }
 

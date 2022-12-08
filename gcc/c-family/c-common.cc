@@ -341,9 +341,9 @@ static bool nonnull_check_p (tree, unsigned HOST_WIDE_INT);
    reserved word too, but only if it follows an '@' sign.
 */
 const struct c_common_resword c_common_reswords[] =
-{
-  { "_Alignas",		RID_ALIGNAS,   D_CONLY },
-  { "_Alignof",		RID_ALIGNOF,   D_CONLY },
+{ //wyc word,		rid,		disable
+  { "_Alignas",		RID_ALIGNAS,   D_CONLY }, //wyc D means disable
+  { "_Alignof",		RID_ALIGNOF,   D_CONLY }, //wyc D_CONLY means not used in C
   { "_Atomic",		RID_ATOMIC,    D_CONLY },
   { "_Bool",		RID_BOOL,      D_CONLY },
   { "_Complex",		RID_COMPLEX,	0 },
@@ -391,6 +391,7 @@ const struct c_common_resword c_common_reswords[] =
   { "__builtin_offsetof", RID_OFFSETOF, 0 },
   { "__builtin_types_compatible_p", RID_TYPES_COMPATIBLE_P, D_CONLY },
   { "__builtin_va_arg",	RID_VA_ARG,	0 },
+  { "__bound__",	RID_BOUND,	0 }, //wyc bound
   { "__complex",	RID_COMPLEX,	0 },
   { "__complex__",	RID_COMPLEX,	0 },
   { "__const",		RID_CONST,	0 },
@@ -620,10 +621,10 @@ c_addr_space_name (addr_space_t as)
 void
 start_fname_decls (void)
 {
-  unsigned ix;
+  //unsigned ix;
   tree saved = NULL_TREE;
 
-  for (ix = 0; fname_vars[ix].decl; ix++)
+  for (unsigned ix = 0; fname_vars[ix].decl; ix++)
     {
       tree decl = *fname_vars[ix].decl;
 

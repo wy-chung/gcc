@@ -1817,8 +1817,8 @@ linemap_expand_location (line_maps *set,
 
       const line_map_ordinary *ord_map = linemap_check_ordinary (map);
 
-      xloc.file = LINEMAP_FILE (ord_map);
-      xloc.line = SOURCE_LINE (ord_map, loc);
+      xloc.file = LINEMAP_FILE (ord_map);	//wyc to_file
+      xloc.line = SOURCE_LINE (ord_map, loc);	//wyc ? + ord_map->to_line
       xloc.column = SOURCE_COLUMN (ord_map, loc);
       xloc.sysp = LINEMAP_SYSP (ord_map) != 0;
     }

@@ -2040,9 +2040,9 @@ static void
 c_parser_gimple_declaration (gimple_parser &parser)
 {
   struct c_declarator *declarator;
-  struct c_declspecs *specs = build_null_declspecs ();
+  struct c_declspecs *specs = c_declspecs::new_null (); //build_null_declspecs ();
   c_parser_declspecs (parser, specs, true, true, true,
-		      true, true, true, true, cla_nonabstract_decl);
+		      true, true, true, true, false, cla_nonabstract_decl);
   finish_declspecs (specs);
 
   /* Provide better error recovery.  Note that a type name here is usually
@@ -2456,10 +2456,10 @@ c_finish_gimple_return (location_t loc, tree retval)
 		"function declared %<noreturn%> has a %<return%> statement");
 
   if (! retval)
-    current_function_returns_null = 1;
+    Current_function_returns_null = 1;
   else if (valtype == 0 || TREE_CODE (valtype) == VOID_TYPE)
     {
-      current_function_returns_null = 1;
+      Current_function_returns_null = 1;
       if (TREE_CODE (TREE_TYPE (retval)) != VOID_TYPE)
 	{
 	  error_at

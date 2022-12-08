@@ -774,7 +774,7 @@ layout_decl (tree decl, unsigned int known_align)
       /* Should this be controlled by DECL_USER_ALIGN, too?  */
       if (mfa != 0)
 	SET_DECL_ALIGN (decl, MIN (DECL_ALIGN (decl), mfa));
-    }
+    } // else code == FIELD_DECL
 
   /* Evaluate nonconstant size only once, either now or as soon as safe.  */
   if (DECL_SIZE (decl) != 0 && TREE_CODE (DECL_SIZE (decl)) != INTEGER_CST)
@@ -784,12 +784,14 @@ layout_decl (tree decl, unsigned int known_align)
     DECL_SIZE_UNIT (decl) = variable_size (DECL_SIZE_UNIT (decl));
 
   /* If requested, warn about definitions of large data objects.  */
-  if ((code == PARM_DECL || (code == VAR_DECL && !DECL_NONLOCAL_FRAME (decl)))
+  if ((code == PARM_DECL
+       || (code == VAR_DECL
+	   && !DECL_NONLOCAL_FRAME (decl)))
       && !DECL_EXTERNAL (decl))
     {
       tree size = DECL_SIZE_UNIT (decl);
 
-      if (size != 0 && TREE_CODE (size) == INTEGER_CST)
+      if (size != nullptr && TREE_CODE (size) == INTEGER_CST)
 	{
 	  /* -Wlarger-than= argument of HOST_WIDE_INT_MAX is treated
 	     as if PTRDIFF_MAX had been specified, with the value

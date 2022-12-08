@@ -1588,7 +1588,7 @@ default_ref_may_alias_errno (ao_ref *ref)
 scalar_int_mode
 default_addr_space_pointer_mode (addr_space_t addrspace ATTRIBUTE_UNUSED)
 {
-  return ptr_mode;
+  return ptr_mode; // E_DImode
 }
 
 /* Return the mode for an address in a given ADDRSPACE,

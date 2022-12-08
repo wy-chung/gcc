@@ -82,10 +82,10 @@ location_t c_last_sizeof_loc;
 
 /* Nonzero if we might need to print a "missing braces around
    initializer" message within this initializer.  */
-static int found_missing_braces;
+static bool found_missing_braces;
 
-static int require_constant_value;
-static int require_constant_elements;
+static bool require_constant_value;	//wyc original int
+static bool require_constant_elements;	//wyc original int
 
 static bool null_pointer_constant_p (const_tree);
 static tree qualify_type (tree, tree);
@@ -3160,7 +3160,7 @@ build_function_call_vec (location_t loc, vec<location_t> arg_loc,
     }
 
   if (fundecl && TREE_THIS_VOLATILE (fundecl))
-    current_function_returns_abnormally = 1;
+    Current_function_returns_abnormally = 1;
 
   /* fntype now gets the type of function pointed to.  */
   fntype = TREE_TYPE (fntype);
@@ -7843,7 +7843,7 @@ struct spelling
 
 #define SPELLING_STRING 1
 #define SPELLING_MEMBER 2
-#define SPELLING_BOUNDS 3
+#define SPELLING_BOUNDS 3 //wyc array bounds
 
 static struct spelling *spelling;	/* Next stack element (unused).  */
 static struct spelling *spelling_base;	/* Spelling stack base.  */
@@ -7858,21 +7858,22 @@ static int spelling_size;		/* Size of the spelling stack.  */
 /* Push an element on the spelling stack with type KIND and assign VALUE
    to MEMBER.  */
 
-#define PUSH_SPELLING(KIND, VALUE, MEMBER)				\
-{									\
-  int depth = SPELLING_DEPTH ();					\
-									\
-  if (depth >= spelling_size)						\
-    {									\
-      spelling_size += 10;						\
-      spelling_base = XRESIZEVEC (struct spelling, spelling_base,	\
-				  spelling_size);			\
-      RESTORE_SPELLING_DEPTH (depth);					\
-    }									\
-									\
-  spelling->kind = (KIND);						\
-  spelling->MEMBER = (VALUE);						\
-  spelling++;								\
+template <typename T>
+void push_spelling(int kind, T value)
+{
+  int depth = SPELLING_DEPTH ();
+
+  if (depth >= spelling_size)
+    {
+      spelling_size += 10;
+      spelling_base = XRESIZEVEC (struct spelling, spelling_base,
+				  spelling_size);
+      RESTORE_SPELLING_DEPTH (depth);
+    }
+
+  spelling->kind = kind;
+  *((T *)&spelling->u) = value;
+  spelling++;
 }
 
 /* Push STRING on the stack.  Printed literally.  */
@@ -7880,7 +7881,7 @@ static int spelling_size;		/* Size of the spelling stack.  */
 static void
 push_string (const char *string)
 {
-  PUSH_SPELLING (SPELLING_STRING, string, u.s);
+  push_spelling (SPELLING_STRING, string/*, u.s*/);
 }
 
 /* Push a member name on the stack.  Printed as '.' STRING.  */
@@ -7892,7 +7893,7 @@ push_member_name (tree decl)
     = (DECL_NAME (decl)
        ? identifier_to_locale (IDENTIFIER_POINTER (DECL_NAME (decl)))
        : _("<anonymous>"));
-  PUSH_SPELLING (SPELLING_MEMBER, string, u.s);
+  push_spelling (SPELLING_MEMBER, string/*, u.s*/);
 }
 
 /* Push an array bounds on the stack.  Printed as [BOUNDS].  */
@@ -7900,7 +7901,7 @@ push_member_name (tree decl)
 static void
 push_array_bounds (unsigned HOST_WIDE_INT bounds)
 {
-  PUSH_SPELLING (SPELLING_BOUNDS, bounds, u.i);
+  push_spelling (SPELLING_BOUNDS, bounds/*, u.i*/);
 }
 
 /* Compute the maximum size in bytes of the printed spelling.  */
@@ -8310,10 +8311,10 @@ static vec<constructor_elt, va_gc> *constructor_elements;
 
 /* 1 if constructor should be incrementally stored into a constructor chain,
    0 if all the elements should be kept in AVL tree.  */
-static int constructor_incremental;
+static bool constructor_incremental;
 
 /* 1 if so far this constructor's elements are all compile-time constants.  */
-static int constructor_constant;
+static bool constructor_constant;
 
 /* 1 if so far this constructor's elements are all valid address constants.  */
 static int constructor_simple;
@@ -8323,7 +8324,7 @@ static int constructor_simple;
 static int constructor_nonconst;
 
 /* 1 if this constructor is erroneous so far.  */
-static int constructor_erroneous;
+static bool constructor_erroneous;
 
 /* 1 if this constructor is the universal zero initializer { 0 }.  */
 static int constructor_zeroinit;
@@ -8357,10 +8358,10 @@ static int constructor_depth;
 static tree constructor_decl;
 
 /* Nonzero if this is an initializer for a top-level decl.  */
-static int constructor_top_level;
+static bool constructor_top_level;
 
 /* Nonzero if there were any member designators in this initializer.  */
-static int constructor_designated;
+static bool constructor_designated;
 
 /* Nesting depth of designator list.  */
 static int designator_depth;
@@ -8393,14 +8394,14 @@ struct constructor_stack
      constructor at this level.  */
   struct c_expr replacement_value;
   struct constructor_range_stack *range_stack;
-  char constant;
-  char simple;
-  char nonconst;
+  bool constant;
+  bool simple;
+  bool nonconst;
   char implicit;
-  char erroneous;
-  char outer;
-  char incremental;
-  char designated;
+  bool erroneous;
+  bool outer;	//wyc always false??
+  bool incremental;
+  bool designated;
   int designator_depth;
 };
 
@@ -8435,10 +8436,10 @@ struct initializer_stack
   struct spelling *spelling;
   struct spelling *spelling_base;
   int spelling_size;
-  char top_level;
-  char require_constant_value;
-  char require_constant_elements;
-  char designated;
+  bool top_level;
+  bool require_constant_value;
+  bool require_constant_elements;
+  bool designated;
   rich_location *missing_brace_richloc;
 };
 
@@ -8447,7 +8448,7 @@ static struct initializer_stack *initializer_stack;
 /* Prepare to parse and output the initializer for variable DECL.  */
 
 void
-start_init (tree decl, tree asmspec_tree ATTRIBUTE_UNUSED, int top_level,
+start_init (tree decl, tree asmspec_tree ATTRIBUTE_UNUSED, bool top_level,
 	    rich_location *richloc)
 {
   const char *locus;
@@ -8463,13 +8464,13 @@ start_init (tree decl, tree asmspec_tree ATTRIBUTE_UNUSED, int top_level,
   p->spelling_base = spelling_base;
   p->spelling_size = spelling_size;
   p->top_level = constructor_top_level;
-  p->next = initializer_stack;
   p->missing_brace_richloc = richloc;
   p->designated = constructor_designated;
+  p->next = initializer_stack;
   initializer_stack = p;
 
   constructor_decl = decl;
-  constructor_designated = 0;
+  constructor_designated = false;
   constructor_top_level = top_level;
 
   if (decl != NULL_TREE && decl != error_mark_node)
@@ -8484,17 +8485,17 @@ start_init (tree decl, tree asmspec_tree ATTRIBUTE_UNUSED, int top_level,
     }
   else
     {
-      require_constant_value = 0;
-      require_constant_elements = 0;
+      require_constant_value = false;
+      require_constant_elements = false;
       locus = _("(anonymous)");
     }
 
-  constructor_stack = 0;
-  constructor_range_stack = 0;
+  constructor_stack = nullptr;
+  constructor_range_stack = nullptr;
 
-  found_missing_braces = 0;
+  found_missing_braces = false;
 
-  spelling_base = 0;
+  spelling_base = nullptr;
   spelling_size = 0;
   RESTORE_SPELLING_DEPTH (0);
 
@@ -8573,22 +8574,22 @@ really_start_incremental_init (tree type)
   p->replacement_value.original_type = NULL;
   p->implicit = 0;
   p->range_stack = 0;
-  p->outer = 0;
+  p->outer = false;
   p->incremental = constructor_incremental;
   p->designated = constructor_designated;
   p->designator_depth = designator_depth;
   p->next = 0;
   constructor_stack = p;
 
-  constructor_constant = 1;
-  constructor_simple = 1;
-  constructor_nonconst = 0;
+  constructor_constant = true;
+  constructor_simple = true;
+  constructor_nonconst = false;
   constructor_depth = SPELLING_DEPTH ();
   constructor_elements = NULL;
   constructor_pending_elts = 0;
   constructor_type = type;
-  constructor_incremental = 1;
-  constructor_designated = 0;
+  constructor_incremental = true;
+  constructor_designated = false;
   constructor_zeroinit = 1;
   designator_depth = 0;
   designator_erroneous = 0;
@@ -8663,7 +8664,7 @@ finish_implicit_inits (location_t loc, struct obstack *braced_init_obstack)
       if (RECORD_OR_UNION_TYPE_P (constructor_type)
 	  && constructor_fields == NULL_TREE)
 	process_init_element (input_location,
-			      pop_init_level (loc, 1, braced_init_obstack,
+			      pop_init_level (loc, true, braced_init_obstack,
 					      last_init_list_comma),
 			      true, braced_init_obstack);
       else if (TREE_CODE (constructor_type) == ARRAY_TYPE
@@ -8671,7 +8672,7 @@ finish_implicit_inits (location_t loc, struct obstack *braced_init_obstack)
 	       && tree_int_cst_lt (constructor_max_index,
 				   constructor_index))
 	process_init_element (input_location,
-			      pop_init_level (loc, 1, braced_init_obstack,
+			      pop_init_level (loc, true, braced_init_obstack,
 					      last_init_list_comma),
 			      true, braced_init_obstack);
       else
@@ -8720,7 +8721,7 @@ push_init_level (location_t loc, int implicit,
   p->replacement_value.original_code = ERROR_MARK;
   p->replacement_value.original_type = NULL;
   p->implicit = implicit;
-  p->outer = 0;
+  p->outer = false;
   p->incremental = constructor_incremental;
   p->designated = constructor_designated;
   p->designator_depth = designator_depth;
@@ -8728,12 +8729,12 @@ push_init_level (location_t loc, int implicit,
   p->range_stack = 0;
   constructor_stack = p;
 
-  constructor_constant = 1;
-  constructor_simple = 1;
-  constructor_nonconst = 0;
+  constructor_constant = true;
+  constructor_simple = true;
+  constructor_nonconst = false;
   constructor_depth = SPELLING_DEPTH ();
   constructor_elements = NULL;
-  constructor_incremental = 1;
+  constructor_incremental = true;
   /* If the upper initializer is designated, then mark this as
      designated too to prevent bogus warnings.  */
   constructor_designated = p->designated;
@@ -8791,7 +8792,7 @@ push_init_level (location_t loc, int implicit,
 
   if (implicit == 1)
     {
-      found_missing_braces = 1;
+      found_missing_braces = true;
       if (initializer_stack->missing_brace_richloc)
 	initializer_stack->missing_brace_richloc->add_fixit_insert_before
 	  (loc, "{");
@@ -8872,7 +8873,7 @@ push_init_level (location_t loc, int implicit,
    Otherwise, return a CONSTRUCTOR expression as the value.  */
 
 struct c_expr
-pop_init_level (location_t loc, int implicit,
+pop_init_level (location_t loc, bool implicit,
 		struct obstack *braced_init_obstack,
 		location_t insert_before)
 {
@@ -8882,13 +8883,13 @@ pop_init_level (location_t loc, int implicit,
   ret.original_code = ERROR_MARK;
   ret.original_type = NULL;
 
-  if (implicit == 0)
+  if (!implicit)
     {
       /* When we come to an explicit close brace,
 	 pop any inner levels that didn't have explicit braces.  */
       while (constructor_stack->implicit)
 	process_init_element (input_location,
-			      pop_init_level (loc, 1, braced_init_obstack,
+			      pop_init_level (loc, true, braced_init_obstack,
 					      insert_before),
 			      true, braced_init_obstack);
       gcc_assert (!constructor_range_stack);
@@ -8899,7 +8900,7 @@ pop_init_level (location_t loc, int implicit,
 	(insert_before, "}");
 
   /* Now output all pending elements.  */
-  constructor_incremental = 1;
+  constructor_incremental = true;
   output_pending_init_elements (1, braced_init_obstack);
 
   p = constructor_stack;
@@ -9103,10 +9104,10 @@ set_designator (location_t loc, bool array,
 	 braces.  */
       while (constructor_stack->implicit)
 	process_init_element (input_location,
-			      pop_init_level (loc, 1, braced_init_obstack,
+			      pop_init_level (loc, true, braced_init_obstack,
 					      last_init_list_comma),
 			      true, braced_init_obstack);
-      constructor_designated = 1;
+      constructor_designated = true;
       return false;
     }
 
@@ -9137,7 +9138,7 @@ set_designator (location_t loc, bool array,
       return true;
     }
 
-  constructor_designated = 1;
+  constructor_designated = true;
   finish_implicit_inits (loc, braced_init_obstack);
   push_init_level (loc, 2, braced_init_obstack);
   return false;
@@ -9589,7 +9590,7 @@ set_nonincremental_init (struct obstack * braced_init_obstack)
       else
 	constructor_unfilled_index = bitsize_zero_node;
     }
-  constructor_incremental = 0;
+  constructor_incremental = false;
 }
 
 /* Build AVL tree from a string constant.  */
@@ -9668,7 +9669,7 @@ set_nonincremental_init_from_string (tree str,
                         braced_init_obstack);
     }
 
-  constructor_incremental = 0;
+  constructor_incremental = false;
 }
 
 /* Return value of FIELD in pending initializer or NULL_TREE if the field was
@@ -9756,7 +9757,7 @@ output_init_element (location_t loc, tree value, tree origtype,
 
   if (type == error_mark_node || value == error_mark_node)
     {
-      constructor_erroneous = 1;
+      constructor_erroneous = true;
       return;
     }
   if (TREE_CODE (TREE_TYPE (value)) == ARRAY_TYPE
@@ -9791,9 +9792,9 @@ output_init_element (location_t loc, tree value, tree origtype,
   value = c_fully_fold (value, require_constant_value, &maybe_const);
 
   if (value == error_mark_node)
-    constructor_erroneous = 1;
+    constructor_erroneous = true;
   else if (!TREE_CONSTANT (value))
-    constructor_constant = 0;
+    constructor_constant = false;
   else if (!initializer_constant_valid_p (value,
 					  TREE_TYPE (value),
 					  AGGREGATE_TYPE_P (constructor_type)
@@ -9802,9 +9803,9 @@ output_init_element (location_t loc, tree value, tree origtype,
 	   || (RECORD_OR_UNION_TYPE_P (constructor_type)
 	       && DECL_C_BIT_FIELD (field)
 	       && TREE_CODE (value) != INTEGER_CST))
-    constructor_simple = 0;
+    constructor_simple = false;
   if (!maybe_const)
-    constructor_nonconst = 1;
+    constructor_nonconst = true;
 
   /* Digest the initializer and issue any errors about incompatible
      types before issuing errors about non-constant initializers.  */
@@ -9815,7 +9816,7 @@ output_init_element (location_t loc, tree value, tree origtype,
 			   require_constant_value);
   if (new_value == error_mark_node)
     {
-      constructor_erroneous = 1;
+      constructor_erroneous = true;
       return;
     }
   if (require_constant_value || require_constant_elements)
@@ -10272,7 +10273,7 @@ process_init_element (location_t loc, struct c_expr value, bool implicit,
       if (RECORD_OR_UNION_TYPE_P (constructor_type)
 	  && constructor_fields == NULL_TREE)
 	process_init_element (loc,
-			      pop_init_level (loc, 1, braced_init_obstack,
+			      pop_init_level (loc, true, braced_init_obstack,
 					      last_init_list_comma),
 			      true, braced_init_obstack);
       else if ((TREE_CODE (constructor_type) == ARRAY_TYPE
@@ -10281,7 +10282,7 @@ process_init_element (location_t loc, struct c_expr value, bool implicit,
 	       && tree_int_cst_lt (constructor_max_index,
 				   constructor_index))
 	process_init_element (loc,
-			      pop_init_level (loc, 1, braced_init_obstack,
+			      pop_init_level (loc, true, braced_init_obstack,
 					      last_init_list_comma),
 			      true, braced_init_obstack);
       else
@@ -10604,7 +10605,7 @@ process_init_element (location_t loc, struct c_expr value, bool implicit,
 	    {
 	      gcc_assert (constructor_stack->implicit);
 	      process_init_element (loc,
-				    pop_init_level (loc, 1,
+				    pop_init_level (loc, true,
 						    braced_init_obstack,
 						    last_init_list_comma),
 				    true, braced_init_obstack);
@@ -10615,7 +10616,7 @@ process_init_element (location_t loc, struct c_expr value, bool implicit,
 	    {
 	      gcc_assert (constructor_stack->implicit);
 	      process_init_element (loc,
-				    pop_init_level (loc, 1,
+				    pop_init_level (loc, true,
 						    braced_init_obstack,
 						    last_init_list_comma),
 				    true, braced_init_obstack);
@@ -10876,7 +10877,7 @@ c_finish_return (location_t loc, tree retval, tree origtype)
 
   if (!retval)
     {
-      current_function_returns_null = 1;
+      Current_function_returns_null = 1;
       if ((warn_return_type >= 0 || flag_isoc99)
 	  && valtype != NULL_TREE && TREE_CODE (valtype) != VOID_TYPE)
 	{
@@ -10897,7 +10898,7 @@ c_finish_return (location_t loc, tree retval, tree origtype)
     }
   else if (valtype == NULL_TREE || TREE_CODE (valtype) == VOID_TYPE)
     {
-      current_function_returns_null = 1;
+      Current_function_returns_null = 1;
       bool warned_here;
       if (TREE_CODE (TREE_TYPE (retval)) != VOID_TYPE)
 	warned_here = pedwarn
@@ -10920,7 +10921,7 @@ c_finish_return (location_t loc, tree retval, tree origtype)
       tree inner;
       bool save;
 
-      current_function_returns_value = 1;
+      Current_function_returns_value = 1;
       if (t == error_mark_node)
 	return NULL_TREE;
 
@@ -11049,7 +11050,7 @@ struct c_switch {
    during the processing of the body of a function, and we never
    collect at that point.  */
 
-struct c_switch *c_switch_stack;
+struct c_switch *C_switch_stack;
 
 /* Start a C switch statement, testing expression EXP.  Return the new
    SWITCH_STMT.  SWITCH_LOC is the location of the `switch'.
@@ -11118,8 +11119,8 @@ c_start_switch (location_t switch_loc,
   cs->bindings = c_get_switch_bindings ();
   cs->break_stmt_seen_p = false;
   cs->bool_cond_p = bool_cond_p;
-  cs->next = c_switch_stack;
-  c_switch_stack = cs;
+  cs->next = C_switch_stack;
+  C_switch_stack = cs;
 
   return add_stmt (cs->switch_stmt);
 }
@@ -11147,7 +11148,7 @@ do_case (location_t loc, tree low_value, tree high_value)
 		 "case label is not an integer constant expression");
     }
 
-  if (c_switch_stack == NULL)
+  if (C_switch_stack == NULL)
     {
       if (low_value)
 	error_at (loc, "case label not within a switch statement");
@@ -11156,13 +11157,13 @@ do_case (location_t loc, tree low_value, tree high_value)
       return NULL_TREE;
     }
 
-  if (c_check_switch_jump_warnings (c_switch_stack->bindings,
-				    EXPR_LOCATION (c_switch_stack->switch_stmt),
+  if (c_check_switch_jump_warnings (C_switch_stack->bindings,
+				    EXPR_LOCATION (C_switch_stack->switch_stmt),
 				    loc))
     return NULL_TREE;
 
-  label = c_add_case_label (loc, c_switch_stack->cases,
-			    SWITCH_STMT_COND (c_switch_stack->switch_stmt),
+  label = c_add_case_label (loc, C_switch_stack->cases,
+			    SWITCH_STMT_COND (C_switch_stack->switch_stmt),
 			    low_value, high_value);
   if (label == error_mark_node)
     label = NULL_TREE;
@@ -11175,7 +11176,7 @@ do_case (location_t loc, tree low_value, tree high_value)
 void
 c_finish_switch (tree body, tree type)
 {
-  struct c_switch *cs = c_switch_stack;
+  struct c_switch *cs = C_switch_stack;
   location_t switch_location;
 
   SWITCH_STMT_BODY (cs->switch_stmt) = body;
@@ -11191,7 +11192,7 @@ c_finish_switch (tree body, tree type)
   SWITCH_STMT_NO_BREAK_P (cs->switch_stmt) = !cs->break_stmt_seen_p;
 
   /* Pop the stack.  */
-  c_switch_stack = cs->next;
+  C_switch_stack = cs->next;
   splay_tree_delete (cs->cases);
   c_release_switch_bindings (cs->bindings);
   XDELETE (cs);
@@ -11225,7 +11226,7 @@ c_finish_bc_stmt (location_t loc, tree label, bool is_break)
   bool skip = !block_may_fallthru (cur_stmt_list);
 
   if (is_break)
-    switch (in_statement)
+    switch (In_statement)
       {
       case 0:
 	error_at (loc, "break statement not within loop or switch");
@@ -11240,12 +11241,12 @@ c_finish_bc_stmt (location_t loc, tree label, bool is_break)
       case IN_OBJC_FOREACH:
 	break;
       default:
-	gcc_assert (in_statement & IN_SWITCH_STMT);
-	c_switch_stack->break_stmt_seen_p = true;
+	gcc_assert (In_statement & IN_SWITCH_STMT);
+	C_switch_stack->break_stmt_seen_p = true;
 	break;
       }
   else
-    switch (in_statement & ~IN_SWITCH_STMT)
+    switch (In_statement & ~IN_SWITCH_STMT)
       {
       case 0:
 	error_at (loc, "continue statement not within a loop");
@@ -11263,8 +11264,8 @@ c_finish_bc_stmt (location_t loc, tree label, bool is_break)
 
   if (skip)
     return NULL_TREE;
-  else if ((in_statement & IN_OBJC_FOREACH)
-	   && !(is_break && (in_statement & IN_SWITCH_STMT)))
+  else if ((In_statement & IN_OBJC_FOREACH)
+	   && !(is_break && (In_statement & IN_SWITCH_STMT)))
     {
       /* The foreach expander produces low-level code using gotos instead
 	 of a structured loop construct.  */
@@ -11388,9 +11389,9 @@ c_begin_stmt_expr (void)
   keep_next_level ();
   ret = c_begin_compound_stmt (true);
 
-  c_bindings_start_stmt_expr (c_switch_stack == NULL
+  c_bindings_start_stmt_expr (C_switch_stack == NULL
 			      ? NULL
-			      : c_switch_stack->bindings);
+			      : C_switch_stack->bindings);
 
   /* Mark the current statement list as belonging to a statement list.  */
   STATEMENT_LIST_STMT_EXPR (ret) = 1;
@@ -11409,9 +11410,9 @@ c_finish_stmt_expr (location_t loc, tree body)
 
   body = c_end_compound_stmt (loc, body, true);
 
-  c_bindings_end_stmt_expr (c_switch_stack == NULL
+  c_bindings_end_stmt_expr (C_switch_stack == NULL
 			    ? NULL
-			    : c_switch_stack->bindings);
+			    : C_switch_stack->bindings);
 
   /* Locate the last statement in BODY.  See c_end_compound_stmt
      about always returning a BIND_EXPR.  */
@@ -11513,7 +11514,7 @@ c_finish_stmt_expr (location_t loc, tree body)
 tree
 c_begin_compound_stmt (bool do_scope)
 {
-  tree stmt = push_stmt_list ();
+  tree stmt = push_stmt_list (); // Create an empty statement tree
   if (do_scope)
     push_scope ();
   return stmt;
@@ -15851,7 +15852,7 @@ c_build_qualified_type (tree type, int type_quals, tree orig_qual_type,
             TYPE_CANONICAL (t) = t;
 	}
       return t;
-    }
+    } // if (TREE_CODE (type) == ARRAY_TYPE)
 
   /* A restrict-qualified pointer type must be a pointer to object or
      incomplete type.  Note that the use of POINTER_TYPE_P also allows

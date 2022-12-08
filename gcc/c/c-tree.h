@@ -47,12 +47,12 @@ along with GCC; see the file COPYING3.  If not see
 
 /* In an IDENTIFIER_NODE, nonzero if this identifier is actually a
    keyword.  C_RID_CODE (node) is then the RID_* value of the keyword.  */
-#define C_IS_RESERVED_WORD(ID) TREE_LANG_FLAG_0 (ID)
+#define C_IS_RESERVED_WORD(ID) TREE_LANG_FLAG_0 (ID) //wyc (ID)->base.u.bits.lang_flag_0
 
 /* Record whether a type or decl was written with nonconstant size.
    Note that TYPE_SIZE may have simplified to a constant.  */
-#define C_TYPE_VARIABLE_SIZE(TYPE) TYPE_LANG_FLAG_1 (TYPE)
-#define C_DECL_VARIABLE_SIZE(TYPE) DECL_LANG_FLAG_0 (TYPE)
+#define C_TYPE_VARIABLE_SIZE(TYPE) TYPE_LANG_FLAG_1 (TYPE) //wyc (TYPE)->type_common.lang_flag_1
+#define C_DECL_VARIABLE_SIZE(TYPE) DECL_LANG_FLAG_0 (TYPE) //WYC (NODE)->decl_common.lang_flag_0
 
 /* Record whether a type is defined inside a struct or union type.
    This is used for -Wc++-compat. */
@@ -284,6 +284,7 @@ enum c_declspec_word {
   cdw_volatile,
   cdw_restrict,
   cdw_atomic,
+  cdw_bound, //wyc bound
   cdw_saturating,
   cdw_alignas,
   cdw_address_space,
@@ -305,6 +306,8 @@ enum c_declspec_il {
    specifier is added, please update the enum c_declspec_word above
    accordingly.  */
 struct c_declspecs {
+  static c_declspecs *new_null (); //wyc
+
   location_t locations[cdw_number_of_elements];
   /* The type specified, if a single type specifier such as a struct,
      union or enum specifier, typedef name or typeof specifies the
@@ -403,6 +406,8 @@ struct c_declspecs {
   BOOL_BITFIELD restrict_p : 1;
   /* Whether "_Atomic" was specified.  */
   BOOL_BITFIELD atomic_p : 1;
+  /* Whether "__bound__" was specified.  */
+  BOOL_BITFIELD bound_p : 1; //wyc bound
   /* Whether "_Sat" was specified.  */
   BOOL_BITFIELD saturating_p : 1;
   /* Whether any alignment specifier (even with zero alignment) was
@@ -436,6 +441,8 @@ struct c_arg_tag {
 
 /* Information about the parameters in a function declarator.  */
 struct c_arg_info {
+  static c_arg_info *new_null(); //wyc
+
   /* A list of parameter decls.  */
   tree parms;
   /* A list of structure, union and enum tags defined.  */
@@ -457,6 +464,13 @@ struct c_arg_info {
 
 /* A declarator.  */
 struct c_declarator {
+  //wyc
+  static c_declarator *new_attrs (tree attrs, c_declarator *target);
+  static c_declarator *new_function (c_arg_info *args, c_declarator *target);
+  static c_declarator *new_id (tree ident);
+  static c_declarator *new_pointer (c_declspecs *type_quals_attrs,
+				    c_declarator *target);
+
   /* The kind of declarator.  */
   enum c_declarator_kind kind;
   location_t id_loc; /* Currently only set for cdk_id, cdk_array. */
@@ -504,6 +518,9 @@ struct c_type_name {
 
 /* A parameter.  */
 struct c_parm {
+  static c_parm *new_init(c_declspecs *specs, tree attrs,
+		  c_declarator *declarator, location_t loc);
+
   /* The declaration specifiers, minus any prefix attributes.  */
   struct c_declspecs *specs;
   /* The attributes.  */
@@ -543,7 +560,7 @@ extern void c_parse_init (void);
 extern bool c_keyword_starts_typename (enum rid keyword);
 
 /* in c-aux-info.cc */
-extern void gen_aux_info_record (tree, int, int, int);
+extern void gen_aux_info_record (tree, bool, bool, bool); //wyc
 
 /* in c-decl.cc */
 struct c_spot_bindings;
@@ -559,7 +576,7 @@ extern struct obstack parser_obstack;
 #define IN_OMP_BLOCK		4
 #define IN_OMP_FOR		8
 #define IN_OBJC_FOREACH		16
-extern unsigned char in_statement;
+extern unsigned char In_statement;
 
 extern bool switch_statement_break_seen_p;
 
@@ -600,10 +617,10 @@ extern tree c_simulate_enum_decl (location_t, const char *,
 				  vec<string_int_pair> *);
 extern tree c_simulate_record_decl (location_t, const char *,
 				    array_slice<const tree>);
-extern struct c_arg_info *build_arg_info (void);
+//extern struct c_arg_info *build_arg_info (void);
 extern struct c_arg_info *get_parm_info (bool, tree);
 extern tree grokfield (location_t, struct c_declarator *,
-		       struct c_declspecs *, tree, tree *);
+		       struct c_declspecs *, tree, tree &);
 extern tree groktypename (struct c_type_name *, tree *, bool *);
 extern tree grokparm (const struct c_parm *, tree *);
 extern tree implicitly_declare (location_t, tree);
@@ -634,6 +651,7 @@ extern void temp_pop_parm_decls (void);
 extern tree xref_tag (enum tree_code, tree);
 extern struct c_typespec parser_xref_tag (location_t, enum tree_code, tree,
 					  bool, tree);
+#if 0
 extern struct c_parm *build_c_parm (struct c_declspecs *, tree,
 				    struct c_declarator *, location_t);
 extern struct c_declarator *build_attrs_declarator (tree,
@@ -644,6 +662,7 @@ extern struct c_declarator *build_id_declarator (tree);
 extern struct c_declarator *make_pointer_declarator (struct c_declspecs *,
 						     struct c_declarator *);
 extern struct c_declspecs *build_null_declspecs (void);
+#endif
 extern struct c_declspecs *declspecs_add_qual (location_t,
 					       struct c_declspecs *, tree);
 extern struct c_declspecs *declspecs_add_type (location_t,
@@ -677,7 +696,7 @@ extern bool c_in_omp_for;
 extern tree c_last_sizeof_arg;
 extern location_t c_last_sizeof_loc;
 
-extern struct c_switch *c_switch_stack;
+extern struct c_switch *C_switch_stack;
 
 extern bool char_type_p (tree);
 extern tree c_objc_common_truthvalue_conversion (location_t, tree);
@@ -716,12 +735,12 @@ extern tree c_cast_expr (location_t, struct c_type_name *, tree);
 extern tree build_c_cast (location_t, tree, tree);
 extern void store_init_value (location_t, tree, tree, tree);
 extern void maybe_warn_string_init (location_t, tree, struct c_expr);
-extern void start_init (tree, tree, int, rich_location *);
+extern void start_init (tree, tree, bool, rich_location *);
 extern void finish_init (void);
 extern void really_start_incremental_init (tree);
 extern void finish_implicit_inits (location_t, struct obstack *);
 extern void push_init_level (location_t, int, struct obstack *);
-extern struct c_expr pop_init_level (location_t, int, struct obstack *,
+extern struct c_expr pop_init_level (location_t, bool, struct obstack *,
 				     location_t);
 extern void set_init_index (location_t, tree, tree, struct obstack *);
 extern void set_init_label (location_t, tree, location_t, struct obstack *);
@@ -771,17 +790,17 @@ extern tree c_omp_clause_copy_ctor (tree, tree, tree);
 /* Set to 0 at beginning of a function definition, set to 1 if
    a return statement that specifies a return value is seen.  */
 
-extern int current_function_returns_value;
+extern int Current_function_returns_value;
 
 /* Set to 0 at beginning of a function definition, set to 1 if
    a return statement with no argument is seen.  */
 
-extern int current_function_returns_null;
+extern int Current_function_returns_null;
 
 /* Set to 0 at beginning of a function definition, set to 1 if
    a call to a noreturn function is seen.  */
 
-extern int current_function_returns_abnormally;
+extern int Current_function_returns_abnormally;
 
 /* In c-decl.cc */
 

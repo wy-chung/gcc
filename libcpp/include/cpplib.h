@@ -150,13 +150,13 @@ struct _cpp_file;
 
 #define OP(e, s) CPP_ ## e,
 #define TK(e, s) CPP_ ## e,
-enum cpp_ttype
+enum cpp_ttype //wyc token type
 {
   TTYPE_TABLE
   N_TTYPES,
 
   /* A token type for keywords, as opposed to ordinary identifiers.  */
-  CPP_KEYWORD,
+  CPP_KEYWORD, //wyc RID(reserved ID) such as int, check c_common_reswords
 
   /* Positions in the table.  */
   CPP_LAST_EQ        = CPP_LSHIFT,

@@ -603,11 +603,12 @@ enum omp_memory_order {
    combined by bitwise-or to form the complete set of qualifiers for a
    type.  */
 enum cv_qualifier {
-  TYPE_UNQUALIFIED   = 0x0,
-  TYPE_QUAL_CONST    = 0x1,
-  TYPE_QUAL_VOLATILE = 0x2,
-  TYPE_QUAL_RESTRICT = 0x4,
-  TYPE_QUAL_ATOMIC   = 0x8
+  TYPE_UNQUALIFIED   = 0x00,
+  TYPE_QUAL_CONST    = 0x01,
+  TYPE_QUAL_VOLATILE = 0x02,
+  TYPE_QUAL_RESTRICT = 0x04,
+  TYPE_QUAL_ATOMIC   = 0x08,
+  TYPE_QUAL_BOUND    = 0x10, //wyc bound
 };
 
 /* Standard named or nameless data types of the C compiler.  */

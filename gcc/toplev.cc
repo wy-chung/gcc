@@ -2072,7 +2072,7 @@ do_compile (bool no_backend)
 
       timevar_start (TV_PHASE_SETUP);
 
-      if (flag_save_optimization_record)
+      if (flag_save_optimization_record) //wyc false
 	{
 	  dump_context::get ().set_json_writer (new optrecord_json_writer ());
 	}
@@ -2080,7 +2080,7 @@ do_compile (bool no_backend)
       /* This must be run always, because it is needed to compute the FP
 	 predefined macros, such as __LDBL_MAX__, for targets using non
 	 default FP formats.  */
-      init_adjust_machine_modes ();
+      init_adjust_machine_modes (); //wyc gcc.build/gcc/insn-modes.cc
       init_derived_machine_modes ();
 
       /* This must happen after the backend has a chance to process
