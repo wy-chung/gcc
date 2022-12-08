@@ -1776,7 +1776,12 @@ c_parser_external_declaration (c_parser *parser)
 	 an @interface or @protocol with prefix attributes).  We can
 	 only tell which after parsing the declaration specifiers, if
 	 any, and the first declarator.  */
-      c_parser_declaration_or_fndef (parser, true, true, true, false, true);
+      c_parser_declaration_or_fndef (parser,
+	true,	// fndef_ok
+	true,	// static_assert_ok
+	true,	// empty_ok
+	false,	// nested
+	true);	// start_attr_ok
       break;
     } // switch (token type)
 }
