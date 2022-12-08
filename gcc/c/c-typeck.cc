@@ -3021,7 +3021,7 @@ c_expr_sizeof_type (location_t loc, struct c_type_name *t)
   struct c_expr ret;
   tree type_expr = NULL_TREE;
   bool type_expr_const = true;
-  type = groktypename (t, &type_expr, &type_expr_const);
+  type = groktypename (t, type_expr, type_expr_const);
   ret.value = c_sizeof (loc, type);
   c_last_sizeof_arg = type;
   c_last_sizeof_loc = loc;
@@ -6178,7 +6178,7 @@ c_cast_expr (location_t loc, struct c_type_name *type_name, tree expr)
      integers.  E.g. "#define SIG_DFL (void(*)())0".  */
   if (TREE_CODE (expr) == INTEGER_CST)
     warn_strict_prototypes = 0;
-  type = groktypename (type_name, &type_expr, &type_expr_const);
+  type = groktypename (type_name, type_expr, type_expr_const);
   warn_strict_prototypes = saved_wsp;
 
   if (TREE_CODE (expr) == ADDR_EXPR && !VOID_TYPE_P (type)

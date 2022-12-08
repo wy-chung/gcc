@@ -1360,8 +1360,9 @@ c_parser_gimple_typespec (gimple_parser &parser)
     }
   if (!type_name)
     return NULL_TREE;
-  tree tem;
-  tree type = groktypename (type_name, &tem, NULL);
+  tree tem = nullptr; //wyctodo
+  bool expr_const_operands_dummy;
+  tree type = groktypename (type_name, tem, expr_const_operands_dummy);
   if (alignment)
     type = build_aligned_type (type, tree_to_uhwi (alignment));
   return type;
@@ -1451,9 +1452,10 @@ c_parser_gimple_postfix_expression (gimple_parser &parser)
 						 "expected %<)%>");
 		      if (alias_type_name)
 			{
-			  tree tem;
+			  tree tem = nullptr; //wyctodo
+			  bool expr_const_operands_dummy;
 			  alias_type = groktypename (alias_type_name,
-						     &tem, NULL);
+						     tem, expr_const_operands_dummy);
 			}
 		    }
 		  ptr = c_parser_gimple_unary_expression (parser);
@@ -1554,9 +1556,10 @@ c_parser_gimple_postfix_expression (gimple_parser &parser)
 	      if (c_parser_require (parser, CPP_OPEN_PAREN, "expected %<(%>"))
 		{
 		  struct c_type_name *type_name = c_parser_type_name (parser);
-		  tree tem;
+		  tree tem = nullptr; //wyctodo
+		  bool expr_const_operands_dummy;
 		  if (type_name)
-		    type = groktypename (type_name, &tem, NULL);
+		    type = groktypename (type_name, tem, expr_const_operands_dummy);
 		  c_parser_skip_until_found (parser, CPP_CLOSE_PAREN,
 					     "expected %<)%>");
 		}

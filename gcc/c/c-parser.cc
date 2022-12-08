@@ -3049,8 +3049,8 @@ c_parser_declspecs (c_parser *parser, struct c_declspecs *specs,
 	      t.expr = NULL_TREE;
 	      t.expr_const_operands = true;
 	      if (type != NULL)
-		t.spec = groktypename (type, &t.expr,
-				       &t.expr_const_operands);
+		t.spec = groktypename (type, t.expr,
+				       t.expr_const_operands);
 	      c_parser_skip_until_found (parser, CPP_CLOSE_PAREN,
 					 "expected %<)%>");
 	      if (t.spec != error_mark_node)
@@ -3732,7 +3732,7 @@ c_parser_typeof_specifier (c_parser *parser)
       in_typeof--;
       if (type != NULL)
 	{
-	  ret.spec = groktypename (type, &ret.expr, &ret.expr_const_operands);
+	  ret.spec = groktypename (type, ret.expr, ret.expr_const_operands);
 	  pop_maybe_used (variably_modified_type_p (ret.spec, NULL_TREE));
 	}
     }
@@ -3787,9 +3787,13 @@ c_parser_alignas_specifier (c_parser * parser)
   if (c_parser_next_tokens_start_typename (parser, cla_prefer_id))
     {
       struct c_type_name *type = c_parser_type_name (parser);
-      if (type != NULL)
-	ret = c_sizeof_or_alignof_type (loc, groktypename (type, NULL, NULL),
-					false, true, 1);
+      if (type != NULL) {
+	tree expr_dummy = NULL;
+	bool expr_const_operands_dummy;
+	ret = c_sizeof_or_alignof_type (loc,
+		groktypename (type, expr_dummy, expr_const_operands_dummy),
+		false, true, 1);
+      }
     }
   else
     ret = c_parser_expr_no_commas (parser, NULL).value;
@@ -8425,7 +8429,7 @@ c_parser_alignof_expression (c_parser *parser)
       tree expr_dummy = NULL;
       bool expr_const_operands_dummy;
       ret.value = c_sizeof_or_alignof_type (loc, groktypename (type_name,
-							       &expr_dummy, &expr_const_operands_dummy),
+							       expr_dummy, expr_const_operands_dummy),
 					    false, is_c11_alignof, 1);
       ret.original_code = ERROR_MARK;
       ret.original_type = NULL;
@@ -8492,7 +8496,9 @@ c_parser_has_attribute_expression (c_parser *parser)
       in_typeof--;
       if (tname)
 	{
-	  oper = groktypename (tname, NULL, NULL);
+	  tree expr_dummy = NULL;
+	  bool expr_const_operands_dummy;
+	  oper = groktypename (tname, expr_dummy, expr_const_operands_dummy);
 	  pop_maybe_used (variably_modified_type_p (oper, NULL_TREE));
 	}
     }
@@ -8740,7 +8746,9 @@ c_parser_generic_selection (c_parser *parser)
 	      c_parser_skip_until_found (parser, CPP_CLOSE_PAREN, NULL);
 	      return error_expr;
 	    }
-	  assoc.type = groktypename (type_name, NULL, NULL);
+	  tree expr_dummy = NULL;
+	  bool expr_const_operands_dummy;
+	  assoc.type = groktypename (type_name, expr_dummy, expr_const_operands_dummy);
 	  if (assoc.type == error_mark_node)
 	    {
 	      c_parser_skip_until_found (parser, CPP_CLOSE_PAREN, NULL);
@@ -9197,8 +9205,9 @@ c_parser_postfix_expression (c_parser *parser)
 	    else
 	      {
 		tree type_expr = NULL_TREE;
+		bool expr_const_operands_dummy;
 		expr.value = c_build_va_arg (start_loc, e1.value, loc,
-					     groktypename (t1, &type_expr, NULL));
+				groktypename (t1, type_expr, expr_const_operands_dummy));
 		if (type_expr)
 		  {
 		    expr.value = build2 (C_MAYBE_CONST_EXPR,
@@ -9230,7 +9239,9 @@ c_parser_postfix_expression (c_parser *parser)
 		expr.set_error ();
 		break;
 	      }
-	    tree type = groktypename (t1, NULL, NULL);
+	    tree expr_dummy = NULL;
+	    bool expr_const_operands_dummy;
+	    tree type = groktypename (t1, expr_dummy, expr_const_operands_dummy);
 	    tree offsetof_ref;
 	    if (type == error_mark_node)
 	      offsetof_ref = error_mark_node;
@@ -9375,8 +9386,10 @@ c_parser_postfix_expression (c_parser *parser)
 	    location_t close_paren_loc = c_parser_peek_token (parser)->location;
 	    parens.skip_until_found_close (parser);
 	    tree e1, e2;
-	    e1 = groktypename (t1, NULL, NULL);
-	    e2 = groktypename (t2, NULL, NULL);
+	    tree expr_dummy = NULL;
+	    bool expr_const_operands_dummy;
+	    e1 = groktypename (t1, expr_dummy, expr_const_operands_dummy);
+	    e2 = groktypename (t2, expr_dummy, expr_const_operands_dummy);
 	    if (e1 == error_mark_node || e2 == error_mark_node)
 	      {
 		expr.set_error ();
@@ -10125,9 +10138,10 @@ c_parser_postfix_expression (c_parser *parser)
 	    else
 	      {
 		tree type_expr = NULL_TREE;
+		bool expr_const_operands_dummy;
 		expr.value = c_build_vec_convert (start_loc, e1.value, loc,
-						  groktypename (t1, &type_expr,
-								NULL));
+						  groktypename (t1, type_expr,
+						  expr_const_operands_dummy));
 		set_c_expr_source_range (&expr, start_loc, end_loc);
 	      }
 	  }
@@ -10212,7 +10226,9 @@ c_parser_postfix_expression (c_parser *parser)
 	      }
 	    location_t close_loc = c_parser_peek_token (parser)->location;
 	    parens.skip_until_found_close (parser);
-	    tree type = groktypename (t1, NULL, NULL);
+	    tree expr_dummy = NULL;
+	    bool expr_const_operands_dummy;
+	    tree type = groktypename (t1, expr_dummy, expr_const_operands_dummy);
 	    expr.value = objc_build_encode_expr (type);
 	    set_c_expr_source_range (&expr, loc, close_loc);
 	  }
@@ -10277,7 +10293,7 @@ c_parser_postfix_expression_after_paren_type (c_parser *parser,
   check_compound_literal_type (type_loc, type_name);
   rich_location richloc (line_table, type_loc);
   start_init (NULL_TREE, NULL, false, &richloc);
-  type = groktypename (type_name, &type_expr, &type_expr_const);
+  type = groktypename (type_name, type_expr, type_expr_const);
   start_loc = c_parser_peek_token (parser)->location;
   if (type != error_mark_node && C_TYPE_VARIABLE_SIZE (type))
     {
@@ -11593,8 +11609,10 @@ c_parser_objc_type_name (c_parser *parser)
     }
   if (c_parser_next_tokens_start_typename (parser, cla_prefer_type))
     type_name = c_parser_type_name (parser);
+  tree expr_dummy = NULL;
+  bool expr_const_operands_dummy;
   if (type_name)
-    type = groktypename (type_name, NULL, NULL);
+    type = groktypename (type_name, expr_dummy, expr_const_operands_dummy);
 
   /* If the type is unknown, and error has already been produced and
      we need to recover from the error.  In that case, use NULL_TREE
@@ -15916,8 +15934,9 @@ c_parser_omp_iterators (c_parser *parser)
       if (c_parser_next_tokens_start_typename (parser, cla_prefer_id))
 	{
 	  struct c_type_name *type = c_parser_type_name (parser);
+	  bool expr_const_operands_dummy;
 	  if (type != NULL)
-	    iter_type = groktypename (type, &type_expr, NULL);
+	    iter_type = groktypename (type, type_expr, expr_const_operands_dummy);
 	}
       if (iter_type == NULL_TREE)
 	iter_type = integer_type_node;
@@ -22212,7 +22231,9 @@ c_parser_omp_declare_reduction (c_parser *parser, enum pragma_context context)
       struct c_type_name *ctype = c_parser_type_name (parser);
       if (ctype != NULL)
 	{
-	  type = groktypename (ctype, NULL, NULL);
+	  tree expr_dummy = NULL;
+	  bool expr_const_operands_dummy;
+	  type = groktypename (ctype, expr_dummy, expr_const_operands_dummy);
 	  if (type == error_mark_node)
 	    ;
 	  else if ((INTEGRAL_TYPE_P (type)
