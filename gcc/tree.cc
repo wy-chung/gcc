@@ -8195,7 +8195,7 @@ variably_modified_type_p (tree type, tree fn)
    a variable in FN.  If TYPE isn't gimplified, return true also if
    gimplify_one_sizepos would gimplify the expression into a local
    variable.  */
-//#define RETURN_TRUE_IF_VAR(T)
+//wyctodo #define RETURN_TRUE_IF_VAR(T)
   auto is_var = [type, fn](tree _t)
     {
       if (_t != NULL_TREE

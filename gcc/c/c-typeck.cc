@@ -7857,7 +7857,7 @@ static int spelling_size;		/* Size of the spelling stack.  */
 
 /* Push an element on the spelling stack with type KIND and assign VALUE
    to MEMBER.  */
-
+//wyctodo #define PUSH_SPELLING(KIND, VALUE, MEMBER)
 template <typename T>
 void push_spelling(int kind, T value)
 {

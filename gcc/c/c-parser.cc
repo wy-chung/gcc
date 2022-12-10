@@ -7827,7 +7827,7 @@ c_parser_binary_expression (c_parser *parser, struct c_expr *after,
   int sp;
   /* Location of the binary operator.  */
   location_t binary_loc = UNKNOWN_LOCATION;  /* Quiet warning.  */
-//#define POP
+//wyctodo #define POP
   auto pop = [parser, omp_atomic_lhs, &stack, &sp]()
   {
     switch (stack[sp].op)
